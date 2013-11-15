@@ -2,6 +2,19 @@ import os, time
 
 verbose = False
 
+def resolve_value(keyValMap, given_val):
+    result = given_val
+    for key, val in keyValMap.iteritems():
+        match_string = "<{0}>".format(key)
+        result = result.replace(match_string, val)
+    if_verbose("  value resolved to : {0}".format(result))
+    return result
+    
+def if_verbose(message):
+    global verbose
+    if (verbose):
+        print message
+            
 class ClusterSpec(object):
     '''
     Wraps the cluster specification file *.cspec
@@ -23,7 +36,7 @@ class ClusterSpec(object):
                 exit()
             f.close()
             
-            self.permutations = self.load_permutations(self.path)
+            self.permuters = self.load_permutations(self.path)
             self.concise_print_map = self.load_concise_print_map(self.path)
             self.key_val_map = self.load_key_val_map(self.path)
             self.qsub_commands = self.load_qsub_commands(self.path,self.key_val_map)
@@ -33,18 +46,8 @@ class ClusterSpec(object):
             exit()
 
       
-    def if_verbose(self, message):
-        global verbose
-        if (verbose):
-            print message
+    
 
-    def resolve_value(self, keyValMap, given_val):
-        result = given_val
-        for key, val in keyValMap.iteritems():
-            match_string = "<{0}>".format(key)
-            result = result.replace(match_string, val)
-        self.if_verbose("  value resolved to : {0}".format(result))
-        return result
     
     def load_permutations(self, path):
         f = open(path, 'r')
@@ -53,9 +56,7 @@ class ClusterSpec(object):
         for line in lines:
             line = line.rstrip()
             if (line.startswith("permute:")):
-                #foo = "  processing permute line - {0}".format(line)
-                #self.if_verbose(foo)
-                self.if_verbose("  processing permute line - {0}".format(line))
+                if_verbose("  processing permute line - {0}".format(line))
                 foo, permuteKey, permute_list_string = line.split(':')
                 if (permute_list_string.find(" ") != -1):
                     permute_start, permute_end = permute_list_string.split(" ")
@@ -80,9 +81,9 @@ class ClusterSpec(object):
             if (line.startswith("#")):
                 pass
             elif (line.find("=") != -1):
-                self.if_verbose("  processing keyVal line - {0}".format(line))
+                if_verbose("  processing keyVal line - {0}".format(line))
                 key, val = line.split("=")
-                val = self.resolve_value(key_val_map, val)
+                val = resolve_value(key_val_map, val)
                 key_val_map[key] = val
             else:
                 pass
@@ -97,10 +98,9 @@ class ClusterSpec(object):
         for line in lines:
             line = line.rstrip()
             if (line.startswith("qsub_command:")):
-                self.if_verbose("  processing qsub_command line - {0}".format(line))
+                if_verbose("  processing qsub_command line - {0}".format(line))
                 x, this_command = line.split(":")
                 qsub_commands.append(this_command)
-                #resolve_command(this_command, key_val_map, qsub_commands)
             else:
                 pass
         f.close()
@@ -113,10 +113,9 @@ class ClusterSpec(object):
         for line in lines:
             line = line.rstrip()
             if (line.startswith("command:")):
-                self.if_verbose("  processing command line - {0}".format(line))
+                if_verbose("  processing command line - {0}".format(line))
                 x, this_command = line.split(":")
                 commands.append(this_command)
-                #resolve_command(this_command, key_val_map, commands)
             else:
                 pass
         f.close()
@@ -130,7 +129,7 @@ class ClusterSpec(object):
         for line in lines:
             line = line.rstrip()
             if (line.startswith("concise_print:")):
-                self.if_verbose("  processing concise_print line - {0}".format(line))
+                if_verbose("  processing concise_print line - {0}".format(line))
                 command, conciseKeyVal = line.split(":")
                 key, val = conciseKeyVal.split(",")
                 concisePrintMap[key] = val

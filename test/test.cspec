@@ -2,6 +2,7 @@
 tag=_myTag
 permute:number:1,2,3
 permute:letter:AAA,BBB
+permute:unused_vals:x,y
 concise_print:letter,l
 concise_print:month,m
 #

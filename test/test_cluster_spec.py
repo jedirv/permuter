@@ -8,12 +8,17 @@ class TestClusterSpec(unittest.TestCase):
         self.cspec = cluster_spec.ClusterSpec(path)
         
     def test_load_permutes(self):
-        permutations_as_string = "{0}".format(self.cspec.permutations)
-        self.assertTrue(permutations_as_string == "{'number': ['1', '2', '3'], 'letter': ['AAA', 'BBB']}")
+        self.assertTrue(self.cspec.permuters['number'][0] == '1')
+        self.assertTrue(self.cspec.permuters['number'][1] == '2')
+        self.assertTrue(self.cspec.permuters['number'][2] == '3')
+        self.assertTrue(self.cspec.permuters['letter'][0] == 'AAA')
+        self.assertTrue(self.cspec.permuters['letter'][1] == 'BBB')
+        self.assertTrue(self.cspec.permuters['unused_vals'][0] == 'x')
+        self.assertTrue(self.cspec.permuters['unused_vals'][1] == 'y')
         
     def test_concise_print_map(self):
-        concise_print_map_as_string = "{0}".format(self.cspec.concise_print_map)
-        self.assertTrue(concise_print_map_as_string == "{'letter': 'l', 'month': 'm'}")
+        self.assertTrue(self.cspec.concise_print_map['letter'] == 'l')
+        self.assertTrue(self.cspec.concise_print_map['month'] == 'm')
            
     def test_key_val_map(self):
         kvm = self.cspec.key_val_map
@@ -40,9 +45,12 @@ class TestClusterSpec(unittest.TestCase):
     def test__qsub_commands(self):
         qsub_commands_as_string = "{0}".format(self.cspec.qsub_commands)
         self.assertTrue(qsub_commands_as_string == "['-q eecs,eecs1,eecs,share', '-M someone@gmail.com', '-m beas']")
-           
-
-           
+  
+    def test_resolve_value(self):
+        kv = {}
+        kv['x'] = 'foo'
+        self.assertTrue('somethingfoo' == cluster_spec.resolve_value(kv, 'something<x>'))
+        
 if __name__ == '__main__':
     unittest.main()
     
