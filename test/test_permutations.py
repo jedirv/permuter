@@ -1,6 +1,6 @@
 import unittest
 from permute import cluster_spec
-from permute import permuter
+from permute import permutations
 
 class TestPermuter(unittest.TestCase):
 
@@ -8,9 +8,9 @@ class TestPermuter(unittest.TestCase):
         path = "./test.cspec"
         self.cspec = cluster_spec.ClusterSpec(path)
         
-    def test_expand_permutes(self):
+    def test_expand_permutations(self):
         permuters = self.cspec.permuters
-        dict_list = permuter.expand_permutations(permuters)
+        dict_list = permutations.expand_permutations(permuters)
         self.assertTrue(len(dict_list) == 12)
         dict1 =  {'unused_vals': 'x', 'number': '1', 'letter': 'AAA'}
         dict2 =  {'unused_vals': 'x', 'number': '1', 'letter': 'BBB'}
@@ -44,7 +44,7 @@ class TestPermuter(unittest.TestCase):
         kv = {}
         kv['pretty[AAA]'] = 'aaa'
         kv['pretty[BBB]'] = 'bbb'
-        resolved_commands = permuter.resolve_permutation(permute_dict, commands, kv)
+        resolved_commands = permutations.resolve_permutation(permute_dict, commands, kv)
         self.assertTrue(len(resolved_commands) == 1)
         self.assertTrue(resolved_commands[0] == 'ls -la /nfs/1/AAA/aaa')
 
@@ -52,8 +52,7 @@ class TestPermuter(unittest.TestCase):
     def test_generate_permutation_code(self):
         permute_dict = {'unused_vals': 'x', 'number': '1', 'letter': 'AAA'}
         concisePrintMap = { 'number': 'n', 'unused_vals':'u'}
-        code = permuter.generate_permutation_code(permute_dict, concisePrintMap)
-        print code
+        code = permutations.generate_permutation_code(permute_dict, concisePrintMap)
         self.assertTrue(code == 'letter_AAA_n_1_u_x')        
         
 if __name__ == '__main__':

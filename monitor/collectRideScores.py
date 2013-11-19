@@ -13,7 +13,7 @@ def main():
     configs_for_month['2013-04'] = "003_a54a12478c5efcf9"
 	
     #perm_sets = ["ride_s_1_k_1-10_a", "ride_s_0.9_k_4", "ride_s_0.9_k_3", "ride_s_0.1_k_3","ride_s_0.1_k_10"]
-    perm_sets = ["ride_s_1_k_1-10_c"]
+    perm_sets = ["ride_s_1_k_5_t_0.1_f_0.1"]
     #arg_sets = ["", "_ride_opt", "_ride_opt_k3_s0.1", "_ride_opt_k4_s0.9", "_ride_opt_k1_s1.0"]
     #arg_sets_pretty = {}
     #arg_sets_pretty[""] = "k=10_s=0.01"

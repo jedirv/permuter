@@ -1,5 +1,3 @@
-import os, time
-
 verbose = False
 
 def resolve_value(keyValMap, given_val):
@@ -46,7 +44,8 @@ class ClusterSpec(object):
             exit()
 
       
-    
+    def validate(self):
+        pass
 
     
     def load_permutations(self, path):
