@@ -11,19 +11,20 @@ class TestPermuter(unittest.TestCase):
     def test_expand_permutations(self):
         permuters = self.cspec.permuters
         dict_list = permutations.expand_permutations(permuters)
+        #print dict_list
         self.assertTrue(len(dict_list) == 12)
-        dict1 =  {'unused_vals': 'x', 'number': '1', 'letter': 'AAA'}
-        dict2 =  {'unused_vals': 'x', 'number': '1', 'letter': 'BBB'}
-        dict3 =  {'unused_vals': 'x', 'number': '2', 'letter': 'AAA'}
-        dict4 =  {'unused_vals': 'x', 'number': '2', 'letter': 'BBB'}
-        dict5 =  {'unused_vals': 'x', 'number': '3', 'letter': 'AAA'}
-        dict6 =  {'unused_vals': 'x', 'number': '3', 'letter': 'BBB'}
-        dict7 =  {'unused_vals': 'y', 'number': '1', 'letter': 'AAA'}
-        dict8 =  {'unused_vals': 'y', 'number': '1', 'letter': 'BBB'}
-        dict9 =  {'unused_vals': 'y', 'number': '2', 'letter': 'AAA'}
-        dict10 = {'unused_vals': 'y', 'number': '2', 'letter': 'BBB'}
-        dict11 = {'unused_vals': 'y', 'number': '3', 'letter': 'AAA'}
-        dict12 = {'unused_vals': 'y', 'number': '3', 'letter': 'BBB'}
+        dict1 =  {'unused_vals': 'x', 'number': '1', 'letter': 'AAA', 'singleton_val': '300'}
+        dict2 =  {'unused_vals': 'x', 'number': '1', 'letter': 'BBB', 'singleton_val': '300'}
+        dict3 =  {'unused_vals': 'x', 'number': '2', 'letter': 'AAA', 'singleton_val': '300'}
+        dict4 =  {'unused_vals': 'x', 'number': '2', 'letter': 'BBB', 'singleton_val': '300'}
+        dict5 =  {'unused_vals': 'x', 'number': '3', 'letter': 'AAA', 'singleton_val': '300'}
+        dict6 =  {'unused_vals': 'x', 'number': '3', 'letter': 'BBB', 'singleton_val': '300'}
+        dict7 =  {'unused_vals': 'y', 'number': '1', 'letter': 'AAA', 'singleton_val': '300'}
+        dict8 =  {'unused_vals': 'y', 'number': '1', 'letter': 'BBB', 'singleton_val': '300'}
+        dict9 =  {'unused_vals': 'y', 'number': '2', 'letter': 'AAA', 'singleton_val': '300'}
+        dict10 = {'unused_vals': 'y', 'number': '2', 'letter': 'BBB', 'singleton_val': '300'}
+        dict11 = {'unused_vals': 'y', 'number': '3', 'letter': 'AAA', 'singleton_val': '300'}
+        dict12 = {'unused_vals': 'y', 'number': '3', 'letter': 'BBB', 'singleton_val': '300'}
         self.assertTrue(dict1 in dict_list)
         self.assertTrue(dict2 in dict_list)
         self.assertTrue(dict3 in dict_list)
@@ -51,9 +52,9 @@ class TestPermuter(unittest.TestCase):
 
     def test_generate_permutation_code(self):
         permute_dict = {'unused_vals': 'x', 'number': '1', 'letter': 'AAA'}
-        concisePrintMap = { 'number': 'n', 'unused_vals':'u'}
+        concisePrintMap = { 'number': 'n', 'unused_vals':'u', 'AAA':'A'}
         code = permutations.generate_permutation_code(permute_dict, concisePrintMap)
-        self.assertTrue(code == 'letter_AAA_n_1_u_x')        
+        self.assertTrue(code == 'letter_A_n_1_u_x')        
         
 if __name__ == '__main__':
     unittest.main()

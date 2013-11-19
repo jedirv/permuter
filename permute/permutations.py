@@ -18,6 +18,8 @@ def generate_permutation_code(permute_dict, concisePrintMap):
         val = permute_dict[key]
         if (concisePrintMap.has_key(key)):
             key = concisePrintMap[key]
+        if (concisePrintMap.has_key(val)):
+            val = concisePrintMap[val]
         code = "{0}_{1}_{2}".format(code, key, val)
     code = code.lstrip('_')
     if_verbose("code determined as : {0}".format(code))

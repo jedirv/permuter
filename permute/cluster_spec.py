@@ -56,13 +56,16 @@ class ClusterSpec(object):
             line = line.rstrip()
             if (line.startswith("permute:")):
                 if_verbose("  processing permute line - {0}".format(line))
-                foo, permuteKey, permute_list_string = line.split(':')
+                permutecommand, permuteKey, permute_list_string = line.split(':')
                 if (permute_list_string.find(" ") != -1):
                     permute_start, permute_end = permute_list_string.split(" ")
                     permute_list = range(int(permute_start), int(permute_end)+1)
                     permute_list = map(str, permute_list)
-                else:
+                elif (permute_list_string.find(",") != -1):
                     permute_list = permute_list_string.split(",")
+                else:
+                    # must be a singleton cvalue
+                    permute_list = [ permute_list_string ]
                 permuters[permuteKey] = permute_list
             else:
                 pass

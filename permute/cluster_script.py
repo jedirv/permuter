@@ -59,7 +59,7 @@ class ClusterScript(object):
             f.write("{0}\n".format(cur_command))
         f.close()  
     
-    def launch(self, user_job_number, keyValMap, permute_code):
+    def launch(self):
         try: 
             print "calling qsub {0}".format(self.pathname)
             subprocess.check_call(["qsub", self.pathname])

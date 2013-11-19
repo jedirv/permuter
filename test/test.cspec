@@ -3,8 +3,10 @@ tag=_myTag
 permute:number:1,2,3
 permute:letter:AAA,BBB
 permute:unused_vals:x,y
+permute:singleton_val:300
 concise_print:letter,l
 concise_print:month,m
+concise_print:singleton_val,s
 #
 # permutation-dependent mappings can be expressed like this.  These will be matched by 
 # using permutations like this:  <config[(month)]>
