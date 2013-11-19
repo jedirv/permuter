@@ -59,6 +59,16 @@ class ClusterScript(object):
             f.write("{0}\n".format(cur_command))
         f.close()  
     
+    def preview(self):
+        self.pathname = "junk.sh"
+        self.generate()
+        f = open(self.pathname, 'r')
+        lines = f.readlines()
+        for line in lines:
+            print(line)
+        f.close()
+        os.remove(self.pathname)
+        
     def launch(self):
         try: 
             print "calling qsub {0}".format(self.pathname)
