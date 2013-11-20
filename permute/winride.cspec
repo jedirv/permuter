@@ -1,0 +1,67 @@
+#cspec
+#tag=
+permute:month=2013-01,2013-02,2013-03,2013-04
+#permute:month=2013-01,2013-02
+permute:fv_type=AlUdRawCounts,AlUdCoUq
+permute:f_val=0.5
+permute:t_val=0.1
+permute:s_val=1.0
+permute:k_val=5
+
+concise_print:step,s
+concise_print:fv_type,fv
+concise_print:month,m
+concise_print:f_val,f
+concise_print:s_val,s
+concise_print:t_val,t
+concise_print:k_val,k
+concise_print:AlUdRawCounts,Raw
+concise_print:AlUdCoUq,CoUq
+#
+# permutation-dependent mappings can be expressed like this.  These will be matched by 
+# using permutations like this:  <config[(month)]>
+#
+<replace>:config[2013-01]=003_a54a12478c5efcf9
+<replace>:config[2013-02]=003_a54a12478c5efcf9
+<replace>:config[2013-03]=003_a54a12478c5efcf9
+<replace>:config[2013-04]=003_a54a12478c5efcf9
+<replace>:pretty[AlUdRawCounts]=DTAllUdRawCounts
+<replace>:pretty[AlUdCoUq]=DTAllUdCoUvq
+#
+<replace>:permutation_set_name=ride_s_1_k_5_t_0.1_f_0.05
+<replace>:fv_root=C:\fvdir
+<replace>:fv_dir=<fv_root>\(month)\<config[(month)]>\(fv_type)
+<replace>:algs_dir=C:\algsdir
+<replace>:tools_dir=<algs_dir>\tools
+<replace>:results_root=C:\results\<permutation_set_name>
+<replace>:answer_key_dir=C:\answerKeys
+<replace>:results_dir=<results_root>/<permutation_set_name>/(month)/(fv_type)RIDE
+<replace>:outfile_root=<pretty[(fv_type)]>__RIDE
+#
+#  dir_script is where the generated scripts will be
+#
+script_dir:C:\adams\scripts
+#
+qsub_command:-q eecs,eecs1,eecs,share
+qsub_command:-M jedirv@gmail.com
+qsub_command:-m beas
+qsub_command:-cwd
+one_up_basis=700
+#
+#command:head -6000 <fv_dir>/DT<pretty[(fv_type)]>__fv.csv > <fv_dir>/DT<pretty[(fv_type)]>__fv<tag>.csv
+#
+command:<algs_dir>/ride/ride_cluster -i <fv_dir>/<pretty[(fv_type)]>__fv<tag>.csv -O <results_dir> -N <pretty[(fv_type)]>__RIDE_resultRaw<tag>.csv -I 1  -f (f_val) -t (t_val) -s (s_val) -e 0.0001 -k (k_val) -v
+#
+command:<tools_dir>/userday_to_user_cluster -i <results_dir>/<outfile_root>_resultRaw<tag>.csv    -o <results_dir>/<outfile_root>_userCentered<tag>.csv --topn 1
+#
+command:<tools_dir>/statScore_cluster -i  <results_dir>/<outfile_root>_userCentered<tag>.csv -o <results_dir>/<outfile_root>_publishable_UserMonth<tag>.csv
+#
+command:<tools_dir>/statScore_cluster -i  <results_dir>/<outfile_root>_resultRaw<tag>.csv    -o <results_dir>/<outfile_root>_publishable_UserDay<tag>.csv
+#
+command:touch <results_dir>/<config[(month)]>.txt
+#
+command:<tools_dir>/scoreRanking_cluster -i    <results_dir>/<outfile_root>_publishable_UserMonth.csv -a <answer_key_dir>/userIds/userIds_(month).txt -o <results_dir>/score_out_userMonth.csv
+command:<tools_dir>/scoreRanking_cluster -i    <results_dir>/<outfile_root>_publishable_UserDay.csv -a <answer_key_dir>/userDayIds/userDayIds_(month).txt -o <results_dir>/score_out_userDay.csv
+
+#command:rm -f <fv_dir>/DT<pretty[(fv_type)]>__fv<tag>.csv
+#

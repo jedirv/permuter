@@ -8,12 +8,12 @@ class TestClusterSpec(unittest.TestCase):
         self.cspec = cluster_spec.ClusterSpec(path)
         
     def test_script_dir(self):
-        print self.cspec.script_dir
+        #print self.cspec.script_dir
         self.assertTrue(self.cspec.script_dir=='./scripts_unittest')
         
     def test_one_up_basis(self):
-        print ""
-        print "one up is {0}".format(self.cspec.one_up_basis)
+        #print ""
+        #print "one up is _{0}_".format(self.cspec.one_up_basis)
         self.assertTrue(self.cspec.one_up_basis == '100')
         
     def test_validate_permutes(self):
@@ -27,11 +27,11 @@ class TestClusterSpec(unittest.TestCase):
         self.assertTrue(cluster_spec.validate_permute_entries("well_formed_cspecs/permute_comma_list_range.cspec"))
         
     def test_validate_replaces(self):
-        self.assertFalse(cluster_spec.validate_permute_entries("malformed_cspecs/replace_colon_count.cspec"))
-        self.assertFalse(cluster_spec.validate_permute_entries("malformed_cspecs/replace_empty_key.cspec"))
-        self.assertFalse(cluster_spec.validate_permute_entries("malformed_cspecs/replace_empty_val.cspec"))
+        self.assertFalse(cluster_spec.validate_replace_entries("malformed_cspecs/replace_empty_key.cspec"))
+        self.assertFalse(cluster_spec.validate_replace_entries("malformed_cspecs/replace_empty_val.cspec"))
+        self.assertFalse(cluster_spec.validate_replace_entries("malformed_cspecs/replace_colon_count.cspec"))
         
-        self.assertTrue(cluster_spec.validate_permute_entries("well_formed_cspecs/replace_basic.cspec"))
+        self.assertTrue(cluster_spec.validate_replace_entries("well_formed_cspecs/replace_basic.cspec"))
         
         
     def test_load_permutes(self):

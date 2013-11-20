@@ -42,7 +42,7 @@ class ClusterSpec(object):
             self.commands = self.load_commands(self.path,self.key_val_map)
             self.script_dir = self.load_script_dir(self.path)
             self.one_up_basis = self.load_one_up_basis(self.path)
-            print "done loading cspec"
+            #print "done loading cspec"
         except IOError:
             print "An error occured trying to open cspec file {0}".format(path)
             exit()
@@ -51,6 +51,7 @@ class ClusterSpec(object):
         f = open(path, 'r')
         lines = f.readlines()
         for line in lines:
+            line = line.rstrip()
             if (line.startswith("one_up_basis:")):
                 command, basis = line.split(":")
                 return basis
@@ -61,6 +62,7 @@ class ClusterSpec(object):
         f = open(path, 'r')
         lines = f.readlines()
         for line in lines:
+            line = line.rstrip()
             if (line.startswith("script_dir:")):
                 command, dir = line.split(":")
                 dir = resolve_value(self.key_val_map, dir)
@@ -76,7 +78,8 @@ class ClusterSpec(object):
             line = line.rstrip()
             if (line.startswith("permute:")):
                 if_verbose("  processing permute line - {0}".format(line))
-                permutecommand, permuteKey, permute_list_string = line.split(':')
+                permute_command, permute_info = line.split(':')
+                permuteKey, permute_list_string = permute_info.split('=')
                 if (permute_list_string.find(" ") != -1):
                     permute_start, permute_end = permute_list_string.split(" ")
                     permute_list = range(int(permute_start), int(permute_end)+1)
@@ -183,6 +186,7 @@ def validate_script_dir(path):
     return result
 
 def validate_replace_entries(path):
+    result = True
     f = open(path, 'r')
     lines = f.readlines()
     f.close()
@@ -193,7 +197,7 @@ def validate_replace_entries(path):
             if (colon_count != 1):
                 # should be one :
                 print "<replace>:key=value - line malformed - {0}".format(line)
-                return False
+                result = False
             else:
                 replace_command, keyVal = line.split(":")
                 equal_count = keyVal.count('=')
@@ -212,8 +216,7 @@ def validate_replace_entries(path):
                         result = False
                     else:
                         pass
-    f.close()
-    return True
+    return result
     
 def validate_permute_entries(path):
     result = True
@@ -224,14 +227,15 @@ def validate_permute_entries(path):
         if (line.startswith("permute:")):
             # should be 3 colons
             colon_count = line.count(':')
-            if (colon_count != 2):
-                print "permute line malformed - {0} - should be permute:var:vals where vals can be:".format(line)
+            if (colon_count != 1):
+                print "permute line malformed - {0} - should be permute:var=vals where vals can be:".format(line)
                 print "   range of integers with a space    1 5 (expanded to 1,2,3,4,5)"
                 print "   single value                    x   (this exposes the value in the permutation code)"
                 print "   comma separated list of values  aa,bb,cc"
                 result = False
             else:
-                permutecommand, permuteKey, permute_list_string = line.split(':')
+                permutecommand, permute_info = line.split(':')
+                permuteKey, permute_list_string = permute_info.split('=')
                 if (permute_list_string.find(" ") != -1):
                     permute_start, permute_end = permute_list_string.split(" ")
                     # start of range is an int?
