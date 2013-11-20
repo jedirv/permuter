@@ -23,7 +23,6 @@ def main():
     if (not(cluster_spec.validate(cspec_path))):
         exit()
     cspec = cluster_spec.ClusterSpec(cspec_path)
-    cspec.validate()
     if (flags == "-v"):
         global verbose
         verbose = True
@@ -83,6 +82,7 @@ def generate_scripts(cspec, permute_dictionary_list):
        
 
 def preview_scripts(cspec, permute_dictionary_list):
+    if_verbose("preview mode")
     kvm = cspec.key_val_map
     user_job_number = 1
     if kvm.has_key('one_up_basis'):
@@ -90,7 +90,7 @@ def preview_scripts(cspec, permute_dictionary_list):
     permute_dict = permute_dictionary_list[0]
     permute_code = permutations.generate_permutation_code(permute_dict, cspec.concise_print_map)
     commands_for_this_permutation = permutations.resolve_permutation(permute_dict, cspec.commands, kvm)
-    cscript = cluster_script.ClusterScript(user_job_number, kvm, permute_code, commands_for_this_permutation, cspec.qsub_commands)
+    cscript = cluster_script.ClusterScript(user_job_number, kvm, permute_code, commands_for_this_permutation, cspec)
     cscript.preview()
        
                   

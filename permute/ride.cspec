@@ -1,12 +1,12 @@
 #cspec
 #tag=
-permute:month:2013-01,2013-02,2013-03,2013-04
-#permute:month:2013-01,2013-02
-permute:fv_type:AlUdRawCounts,AlUdCoUq
-permute:f_val:0.5
-permute:t_val:0.1
-permute:s_val:1.0
-permute:k_val:5
+permute:month=2013-01,2013-02,2013-03,2013-04
+#permute:month=2013-01,2013-02
+permute:fv_type=AlUdRawCounts,AlUdCoUq
+permute:f_val=0.5
+permute:t_val=0.1
+permute:s_val=1.0
+permute:k_val=5
 
 concise_print:step,s
 concise_print:fv_type,fv
@@ -40,13 +40,13 @@ concise_print:AlUdCoUq,CoUq
 #
 #  dir_script is where the generated scripts will be
 #
-dir_script=/nfs/stak/students/i/irvine/cluster/scripts_<permutation_set_name><tag>
+script_dir:/nfs/stak/students/i/irvine/cluster/scripts_<permutation_set_name><tag>
 #
 qsub_command:-q eecs,eecs1,eecs,share
 qsub_command:-M jedirv@gmail.com
 qsub_command:-m beas
 qsub_command:-cwd
-one_up_basis=700
+one_up_basis:700
 #
 #command:head -6000 <fv_dir>/DT<pretty[(fv_type)]>__fv.csv > <fv_dir>/DT<pretty[(fv_type)]>__fv<tag>.csv
 #

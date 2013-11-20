@@ -165,9 +165,16 @@ class ClusterSpec(object):
         return concisePrintMap
     
 def validate(path):
-    validate_permute_entries(path)
-    validate_replace_entries(path)
-    validate_script_dir(path)
+    result_permute = validate_permute_entries(path)
+    result_replace = validate_replace_entries(path)
+    result_script_dir = validate_script_dir(path)
+    if not(result_permute):
+        print "problem found in permute statements"
+    if not(result_replace):
+        print "problem found in replace statements"
+    if not(result_script_dir):
+        print "problem found in script_dir statement"
+    return result_permute and result_replace and result_script_dir
     
 def validate_script_dir(path):
     result = True
