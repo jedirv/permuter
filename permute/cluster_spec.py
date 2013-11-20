@@ -34,19 +34,39 @@ class ClusterSpec(object):
                 exit()
             f.close()
             
+            
             self.permuters = self.load_permutations(self.path)
             self.concise_print_map = self.load_concise_print_map(self.path)
-            self.key_val_map = self.load_key_val_map(self.path)
+            self.key_val_map = self.load_replaces(self.path)
             self.qsub_commands = self.load_qsub_commands(self.path,self.key_val_map)
             self.commands = self.load_commands(self.path,self.key_val_map)
+            self.script_dir = self.load_script_dir(self.path)
+            self.one_up_basis = self.load_one_up_basis(self.path)
+            print "done loading cspec"
         except IOError:
             print "An error occured trying to open cspec file {0}".format(path)
             exit()
 
+    def load_one_up_basis(self, path):
+        f = open(path, 'r')
+        lines = f.readlines()
+        for line in lines:
+            if (line.startswith("one_up_basis:")):
+                command, basis = line.split(":")
+                return basis
+        return ""
+    
       
-    def validate(self):
-        pass
-
+    def load_script_dir(self, path):
+        f = open(path, 'r')
+        lines = f.readlines()
+        for line in lines:
+            if (line.startswith("script_dir:")):
+                command, dir = line.split(":")
+                dir = resolve_value(self.key_val_map, dir)
+                return dir
+        # validation pass should prevent the following from ever happening
+        return "script_dir_not_specified"
     
     def load_permutations(self, path):
         f = open(path, 'r')
@@ -72,7 +92,7 @@ class ClusterSpec(object):
         f.close()
         return permuters
     
-    def load_key_val_map(self, path):
+    def load_replaces(self, path):
         f = open(path, 'r')
         key_val_map = {}
         # set default tag as empty string
@@ -82,9 +102,10 @@ class ClusterSpec(object):
             line = line.rstrip()
             if (line.startswith("#")):
                 pass
-            elif (line.find("=") != -1):
+            elif (line.startswith("<replace>")):
                 if_verbose("  processing keyVal line - {0}".format(line))
-                key, val = line.split("=")
+                replace_command, keyVal = line.split(":")
+                key, val = keyVal.split("=")
                 val = resolve_value(key_val_map, val)
                 key_val_map[key] = val
             else:
@@ -139,4 +160,105 @@ class ClusterSpec(object):
                 pass
         f.close()
         return concisePrintMap
+    
+def validate(path):
+    validate_permute_entries(path)
+    validate_replace_entries(path)
+    validate_script_dir(path)
+    
+def validate_script_dir(path):
+    result = True
+    script_dir = "unknown"
+    f = open(path, 'r')
+    lines = f.readlines()
+    f.close()
+    for line in lines:
+        line = line.rstrip()
+        if (line.startswith("script_dir:")):
+            # should be one =
+            script_dir_command, script_dir = line.split(":")
+    if (script_dir == "unknown"):
+        result = False
+        print "cluster_spec missing script_dir declaration (script_dir:some_dir) {0}".format(path)      
+    return result
+
+def validate_replace_entries(path):
+    f = open(path, 'r')
+    lines = f.readlines()
+    f.close()
+    for line in lines:
+        line = line.rstrip()
+        if (line.startswith("<replace>:")):
+            colon_count = line.count(':')
+            if (colon_count != 1):
+                # should be one :
+                print "<replace>:key=value - line malformed - {0}".format(line)
+                return False
+            else:
+                replace_command, keyVal = line.split(":")
+                equal_count = keyVal.count('=')
+                if (equal_count != 1):
+                    # should be one =
+                    print "<replace>:key=value - line malformed - {0}".format(line)
+                    result = False
+                else:
+                    key, val = keyVal.split('=')
+                    # key has to be nonempty string
+                    if (key == ""):
+                        print "<replace>:key=value - key must be non-empty string {0}".format(line)
+                        result = False
+                    elif (val == ""):
+                        print "<replace>:key=value - val must be non-empty string {0}".format(line)
+                        result = False
+                    else:
+                        pass
+    f.close()
+    return True
+    
+def validate_permute_entries(path):
+    result = True
+    f = open(path, 'r')
+    lines = f.readlines()
+    for line in lines:
+        line = line.rstrip()
+        if (line.startswith("permute:")):
+            # should be 3 colons
+            colon_count = line.count(':')
+            if (colon_count != 2):
+                print "permute line malformed - {0} - should be permute:var:vals where vals can be:".format(line)
+                print "   range of integers with a space    1 5 (expanded to 1,2,3,4,5)"
+                print "   single value                    x   (this exposes the value in the permutation code)"
+                print "   comma separated list of values  aa,bb,cc"
+                result = False
+            else:
+                permutecommand, permuteKey, permute_list_string = line.split(':')
+                if (permute_list_string.find(" ") != -1):
+                    permute_start, permute_end = permute_list_string.split(" ")
+                    # start of range is an int?
+                    try:
+                        foo = int(permute_start)
+                    except:
+                        print "{0} is not an integer in {1}".format(permute_start, line)
+                        result = False
+                    # end of range is an int?    
+                    try:
+                        foo = int(permute_end)
+                    except:
+                        print "{0} is not an integer in {1}".format(permute_end, line)
+                        result = False
+                    if (result):
+                        start = int(permute_start)
+                        end = int(permute_end)
+                        if (start > end):
+                            print "start or range is greater than end {0}".format(line)
+                            result = False
+                elif (permute_list_string.find(",") != -1):
+                    # no way I can think of to mess this up
+                    pass
+                else:
+                    # must be a singleton cvalue
+                    # no way I can think of to mess this up
+                    pass
+    f.close()
+    return result
     

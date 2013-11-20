@@ -7,29 +7,29 @@ class ClusterScript(object):
     Wraps the cluster script file
     '''
     
-    def __init__(self, user_job_number, key_val_map, permute_code, commands_for_this_permutation, qsub_commands):
+    def __init__(self, user_job_number, key_val_map, permute_code, commands_for_this_permutation, cspec):
         '''
         Constructor
         '''
         self.key_val_map = key_val_map
         self.permute_code = permute_code
         self.commands_for_this_permutation = commands_for_this_permutation
-        self.qsub_commands = qsub_commands
+        self.qsub_commands = cspec.qsub_commands
         self.user_job_number = user_job_number
+        self.script_dir = cspec.script_dir
         self.script_path_root = self.get_script_path_root()
         self.pathname = "{0}.sh".format(self.script_path_root)
 
     def get_script_path_root(self):
-        dir_script = self.key_val_map['dir_script']
-        if (not(os.path.isdir(dir_script))):
-            os.makedirs(dir_script)
+        if (not(os.path.isdir(self.script_dir))):
+            os.makedirs(self.script_dir)
         tag = ""
         pathname_root = ""
         if (self.key_val_map.has_key('tag')):
             tag = self.key_val_map['tag']
-            pathname_root = "{0}{1}j{2}_{3}{4}".format(dir_script, os.sep, self.user_job_number, self.permute_code, tag)
+            pathname_root = "{0}{1}j{2}_{3}{4}".format(self.script_dir, os.sep, self.user_job_number, self.permute_code, tag)
         else:
-            pathname_root = "{0}{1}j{2}_{3}".format(dir_script, os.sep, self.user_job_number, self.permute_code)
+            pathname_root = "{0}{1}j{2}_{3}".format(self.script_dir, os.sep, self.user_job_number, self.permute_code)
         return pathname_root
     
     def generate(self):

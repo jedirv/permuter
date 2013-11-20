@@ -7,6 +7,33 @@ class TestClusterSpec(unittest.TestCase):
         path = "./test.cspec"
         self.cspec = cluster_spec.ClusterSpec(path)
         
+    def test_script_dir(self):
+        print self.cspec.script_dir
+        self.assertTrue(self.cspec.script_dir=='./scripts_unittest')
+        
+    def test_one_up_basis(self):
+        print ""
+        print "one up is {0}".format(self.cspec.one_up_basis)
+        self.assertTrue(self.cspec.one_up_basis == '100')
+        
+    def test_validate_permutes(self):
+        self.assertFalse(cluster_spec.validate_permute_entries("malformed_cspecs/permute_colon_count.cspec"))
+        self.assertFalse(cluster_spec.validate_permute_entries("malformed_cspecs/permute_start_integer.cspec"))
+        self.assertFalse(cluster_spec.validate_permute_entries("malformed_cspecs/permute_end_integer.cspec"))
+        self.assertFalse(cluster_spec.validate_permute_entries("malformed_cspecs/permute_integer_order.cspec"))
+        
+        self.assertTrue(cluster_spec.validate_permute_entries("well_formed_cspecs/permute_integer_range.cspec"))
+        self.assertTrue(cluster_spec.validate_permute_entries("well_formed_cspecs/permute_singleton_range.cspec"))
+        self.assertTrue(cluster_spec.validate_permute_entries("well_formed_cspecs/permute_comma_list_range.cspec"))
+        
+    def test_validate_replaces(self):
+        self.assertFalse(cluster_spec.validate_permute_entries("malformed_cspecs/replace_colon_count.cspec"))
+        self.assertFalse(cluster_spec.validate_permute_entries("malformed_cspecs/replace_empty_key.cspec"))
+        self.assertFalse(cluster_spec.validate_permute_entries("malformed_cspecs/replace_empty_val.cspec"))
+        
+        self.assertTrue(cluster_spec.validate_permute_entries("well_formed_cspecs/replace_basic.cspec"))
+        
+        
     def test_load_permutes(self):
         self.assertTrue(self.cspec.permuters['number'][0] == '1')
         self.assertTrue(self.cspec.permuters['number'][1] == '2')
@@ -35,8 +62,6 @@ class TestClusterSpec(unittest.TestCase):
         self.assertTrue(kvm['results_root']=='/nfs/foo/results/unittest')
         self.assertTrue(kvm['results_dir']=='/nfs/foo/results/unittest/(number)/(letter)')
         self.assertTrue(kvm['outfile_root']=='<pretty[(number)]>__TEST')
-        self.assertTrue(kvm['dir_script']=='./scripts_unittest')
-        self.assertTrue(kvm['one_up_basis']=='100')
             
     def test_commands(self):
         commands_as_string = "{0}".format(self.cspec.commands)

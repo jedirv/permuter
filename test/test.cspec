@@ -1,9 +1,9 @@
 #cspec
 tag=_myTag
-permute:number:1,2,3
-permute:letter:AAA,BBB
-permute:unused_vals:x,y
-permute:singleton_val:300
+permute:number=1 3
+permute:letter=AAA,BBB
+permute:unused_vals=x,y
+permute:singleton_val=300
 concise_print:letter,l
 concise_print:month,m
 concise_print:singleton_val,s
@@ -11,30 +11,30 @@ concise_print:singleton_val,s
 # permutation-dependent mappings can be expressed like this.  These will be matched by 
 # using permutations like this:  <config[(month)]>
 #
-config[AAA]=aaa
-config[BBB]=bbb
+<replace>:config[AAA]=aaa
+<replace>:config[BBB]=bbb
 
-pretty[1]=one
-pretty[2]=two
-pretty[3]=three
+<replace>:pretty[1]=one
+<replace>:pretty[2]=two
+<replace>:pretty[3]=three
 #
-permutation_set_name=unittest
-root=/nfs/foo/bar
-x_dir=<root>/(letter)/<config[(letter)]>/(number)
-algs_dir=/nfs/algs
-tools_dir=<algs_dir>/tools
-results_root=/nfs/foo/results/<permutation_set_name>
-results_dir=<results_root>/(number)/(letter)
-outfile_root=<pretty[(number)]>__TEST
+<replace>:permutation_set_name=unittest
+<replace>:root=/nfs/foo/bar
+<replace>:x_dir=<root>/(letter)/<config[(letter)]>/(number)
+<replace>:algs_dir=/nfs/algs
+<replace>:tools_dir=<algs_dir>/tools
+<replace>:results_root=/nfs/foo/results/<permutation_set_name>
+<replace>:results_dir=<results_root>/(number)/(letter)
+<replace>:outfile_root=<pretty[(number)]>__TEST
 #
 #  dir_script is where the generated scripts will be
 #
-dir_script=./scripts_<permutation_set_name>
+script_dir:./scripts_<permutation_set_name>
 #
 qsub_command:-q eecs,eecs1,eecs,share
 qsub_command:-M someone@gmail.com
 qsub_command:-m beas
-one_up_basis=100
+one_up_basis:100
 
 command:ls -la /nfs/missing > <x_dir>/<pretty[(number)]>.txt
 #
