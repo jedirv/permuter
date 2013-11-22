@@ -16,6 +16,14 @@ class TestClusterSpec(unittest.TestCase):
         #print "one up is _{0}_".format(self.cspec.one_up_basis)
         self.assertTrue(self.cspec.one_up_basis == '100')
         
+    def test_results_dir(self):
+        #print ""
+        #print "one up is _{0}_".format(self.cspec.one_up_basis)
+        self.assertTrue(self.cspec.results_dir == '/nfs/foo/results/_PERMUTATION_CODE_')
+        
+    def test_validate_results_dir(self):
+        self.assertFalse(cluster_spec.validate_results_dir("malformed_cspecs/results_dir_missing_PERMCODE.cspec"))
+                
     def test_validate_permutes(self):
         self.assertFalse(cluster_spec.validate_permute_entries("malformed_cspecs/permute_colon_count.cspec"))
         self.assertFalse(cluster_spec.validate_permute_entries("malformed_cspecs/permute_start_integer.cspec"))
@@ -59,13 +67,11 @@ class TestClusterSpec(unittest.TestCase):
         self.assertTrue(kvm['x_dir']=='/nfs/foo/bar/(letter)/<config[(letter)]>/(number)')
         self.assertTrue(kvm['algs_dir']=='/nfs/algs')
         self.assertTrue(kvm['tools_dir']=='/nfs/algs/tools')
-        self.assertTrue(kvm['results_root']=='/nfs/foo/results/unittest')
-        self.assertTrue(kvm['results_dir']=='/nfs/foo/results/unittest/(number)/(letter)')
         self.assertTrue(kvm['outfile_root']=='<pretty[(number)]>__TEST')
             
     def test_commands(self):
         commands_as_string = "{0}".format(self.cspec.commands)
-        self.assertTrue(commands_as_string == "['ls -la /nfs/missing > <x_dir>/<pretty[(number)]>.txt']")
+        self.assertTrue(commands_as_string == "['ls -la /nfs/missing > <results_dir>/(letter)_(number)_<pretty[(number)]>.txt']")
            
     def test__qsub_commands(self):
         qsub_commands_as_string = "{0}".format(self.cspec.qsub_commands)

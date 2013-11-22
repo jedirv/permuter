@@ -111,3 +111,10 @@ def resolve_permutation(permute_dict, commands, keyValMap):
         #if_verbose("  commands after a pass2 of resolve_permutation: {0}".format(commands))  
     if_verbose("  commands after resolve_permutation: {0}".format(commands_for_this_permutation))
     return commands_for_this_permutation
+
+
+def get_job_number_width(permute_dictionary_list):
+    permute_count = len(permute_dictionary_list)
+    permute_count_as_string = str(permute_count)
+    permute_count_width = len(permute_count_as_string)
+    return permute_count_width

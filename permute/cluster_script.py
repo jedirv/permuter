@@ -1,25 +1,43 @@
 import os
 import subprocess
-
+import permutations
 
 class ClusterScript(object):
     '''
     Wraps the cluster script file
     '''
     
-    def __init__(self, user_job_number, key_val_map, permute_code, commands_for_this_permutation, cspec):
+    def __init__(self, user_job_number, key_val_map, permute_dict, cspec):
         '''
         Constructor
         '''
+        self.permute_code = permutations.generate_permutation_code(permute_dict, cspec.concise_print_map)
+        # results_dir now includes _PERMUTATION_CODE_ which means it can't be resolved until 
+        self.resolved_results_dir = cspec.results_dir.replace('_PERMUTATION_CODE_', self.permute_code)
+        
+        list_of_size_1 = [self.resolved_results_dir] 
+        self.resolved_results_dir =  permutations.resolve_permutation(permute_dict, list_of_size_1, key_val_map)[0]
+        #print "resolved_results_dir : {0}".format(self.resolved_results_dir)
         self.key_val_map = key_val_map
-        self.permute_code = permute_code
-        self.commands_for_this_permutation = commands_for_this_permutation
+        self.key_val_map['results_dir'] = self.resolved_results_dir
+        self.commands_for_this_permutation = permutations.resolve_permutation(permute_dict, cspec.commands, self.key_val_map)
+        
+        
+        #commands_for_this_permutation = self.late_resolve_results_dir(commands_for_this_permutation, resolved_results_dir)
+       
         self.qsub_commands = cspec.qsub_commands
         self.user_job_number = user_job_number
         self.script_dir = cspec.script_dir
         self.script_path_root = self.get_script_path_root()
         self.pathname = "{0}.sh".format(self.script_path_root)
 
+    #def late_resolve_results_dir(self, commands_for_this_permutation, resolved_results_dir):
+    #    revised_commands = []
+    #    for command in commands_for_this_permutation:
+    #        revised_command = command.replace('<results_dir>', resolved_results_dir)
+    #        revised_commands.append(revised_command)
+    #    return revised_commands
+            
     def get_script_path_root(self):
         if (not(os.path.isdir(self.script_dir))):
             os.makedirs(self.script_dir)

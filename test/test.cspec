@@ -23,11 +23,13 @@ concise_print:singleton_val,s
 <replace>:x_dir=<root>/(letter)/<config[(letter)]>/(number)
 <replace>:algs_dir=/nfs/algs
 <replace>:tools_dir=<algs_dir>/tools
-<replace>:results_root=/nfs/foo/results/<permutation_set_name>
-<replace>:results_dir=<results_root>/(number)/(letter)
 <replace>:outfile_root=<pretty[(number)]>__TEST
 #
-#  dir_script is where the generated scripts will be
+#  results_dir is where the generated results will be
+#
+results_dir:/nfs/foo/results/_PERMUTATION_CODE_
+#
+#  script is where the generated scripts will be
 #
 script_dir:./scripts_<permutation_set_name>
 #
@@ -36,6 +38,6 @@ qsub_command:-M someone@gmail.com
 qsub_command:-m beas
 one_up_basis:100
 
-command:ls -la /nfs/missing > <x_dir>/<pretty[(number)]>.txt
+command:ls -la /nfs/missing > <results_dir>/(letter)_(number)_<pretty[(number)]>.txt
 #
 

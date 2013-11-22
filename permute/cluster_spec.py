@@ -37,16 +37,34 @@ class ClusterSpec(object):
             
             self.permuters = self.load_permutations(self.path)
             self.concise_print_map = self.load_concise_print_map(self.path)
+            
             self.key_val_map = self.load_replaces(self.path)
+            self.results_dir = self.load_dir(self.path, "results_dir:")
+            # put the results_dir into the kvm so that permutation calculation wil find it
+            self.key_val_map['results_dir'] = self.results_dir
+            
             self.qsub_commands = self.load_qsub_commands(self.path,self.key_val_map)
             self.commands = self.load_commands(self.path,self.key_val_map)
-            self.script_dir = self.load_script_dir(self.path)
+            
+            self.script_dir = self.load_dir(self.path, "script_dir")
             self.one_up_basis = self.load_one_up_basis(self.path)
             #print "done loading cspec"
         except IOError:
             print "An error occured trying to open cspec file {0}".format(path)
             exit()
 
+
+    def load_dir(self, path, dir_flag):
+        f = open(path, 'r')
+        lines = f.readlines()
+        for line in lines:
+            line = line.rstrip()
+            if (line.startswith(dir_flag)):
+                command, dir = line.split(":")
+                dir = resolve_value(self.key_val_map, dir)
+                return dir
+        return ""
+    
     def load_one_up_basis(self, path):
         f = open(path, 'r')
         lines = f.readlines()
@@ -56,19 +74,6 @@ class ClusterSpec(object):
                 command, basis = line.split(":")
                 return basis
         return ""
-    
-      
-    def load_script_dir(self, path):
-        f = open(path, 'r')
-        lines = f.readlines()
-        for line in lines:
-            line = line.rstrip()
-            if (line.startswith("script_dir:")):
-                command, dir = line.split(":")
-                dir = resolve_value(self.key_val_map, dir)
-                return dir
-        # validation pass should prevent the following from ever happening
-        return "script_dir_not_specified"
     
     def load_permutations(self, path):
         f = open(path, 'r')
@@ -166,15 +171,42 @@ class ClusterSpec(object):
     
 def validate(path):
     result_permute = validate_permute_entries(path)
-    result_replace = validate_replace_entries(path)
-    result_script_dir = validate_script_dir(path)
     if not(result_permute):
         print "problem found in permute statements"
+        
+    result_replace = validate_replace_entries(path)
     if not(result_replace):
         print "problem found in replace statements"
+        
+    result_script_dir = validate_script_dir(path)
     if not(result_script_dir):
         print "problem found in script_dir statement"
-    return result_permute and result_replace and result_script_dir
+  
+    result_results_dir = validate_results_dir(path)
+    if not(result_results_dir):
+        print "problem found in results_dir statement"
+    
+    return result_permute and result_replace and result_script_dir and result_results_dir
+
+   
+def validate_results_dir(path):
+    result = True
+    results_dir = "unknown"
+    f = open(path, 'r')
+    lines = f.readlines()
+    f.close()
+    for line in lines:
+        line = line.rstrip()
+        if (line.startswith("results_dir:")):
+            # should be one =
+            results_dir_command, results_dir = line.split(":")
+    if (results_dir == "unknown"):
+        result = False
+        print "cluster_spec missing results_dir declaration (results_dir:some_dir) {0}".format(path)    
+    if (results_dir.find('_PERMUTATION_CODE_') == -1):
+        result = False
+        print "cluster_spec results_dir declaration must contain the string _PERMUTATION_CODE_ {0}".format(path)      
+    return result
     
 def validate_script_dir(path):
     result = True

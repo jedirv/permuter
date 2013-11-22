@@ -56,41 +56,48 @@ def preview(cspec):
     preview_scripts(cspec, permute_dictionary_list)
 
 def launch_scripts(cspec, permute_dictionary_list):
+    job_num_width = permutations.get_job_number_width(permute_dictionary_list)
     kvm = cspec.key_val_map
     user_job_number = 1
     if cspec.one_up_basis != '':
         user_job_number = int(cspec.one_up_basis)
     for permute_dict in permute_dictionary_list:
-        permute_code = permutations.generate_permutation_code(permute_dict, cspec.concise_print_map)
-        commands_for_this_permutation = permutations.resolve_permutation(permute_dict, cspec.commands, kvm)
-        cscript = cluster_script.ClusterScript(user_job_number, kvm, permute_code, commands_for_this_permutation, cspec)
+        #permute_code = permutations.generate_permutation_code(permute_dict, cspec.concise_print_map)
+        #commands_for_this_permutation = permutations.resolve_permutation(permute_dict, cspec.commands, kvm)
+        user_job_number_as_string = str(user_job_number).zfill(job_num_width)
+        cscript = cluster_script.ClusterScript(user_job_number_as_string, kvm, permute_dict, cspec)
         cscript.launch()
         user_job_number = user_job_number + 1
         time.sleep(1.5)
 
+    
 def generate_scripts(cspec, permute_dictionary_list):
+    job_num_width = permutations.get_job_number_width(permute_dictionary_list)
     kvm = cspec.key_val_map
     user_job_number = 1
-    if kvm.has_key('one_up_basis'):
-        user_job_number = int(kvm['one_up_basis'])
+    if cspec.one_up_basis != '':
+        user_job_number = int(cspec.one_up_basis)
     for permute_dict in permute_dictionary_list:
-        permute_code = permutations.generate_permutation_code(permute_dict, cspec.concise_print_map)
-        commands_for_this_permutation = permutations.resolve_permutation(permute_dict, cspec.commands, kvm)
-        cscript = cluster_script.ClusterScript(user_job_number, kvm, permute_code, commands_for_this_permutation, cspec)
+        #permute_code = permutations.generate_permutation_code(permute_dict, cspec.concise_print_map)
+        #commands_for_this_permutation = permutations.resolve_permutation(permute_dict, cspec.commands, kvm)
+        user_job_number_as_string = str(user_job_number).zfill(job_num_width)
+        cscript = cluster_script.ClusterScript(user_job_number_as_string, kvm, permute_dict, cspec)
         cscript.generate()
         user_job_number = user_job_number + 1
        
 
 def preview_scripts(cspec, permute_dictionary_list):
+    job_num_width = permutations.get_job_number_width(permute_dictionary_list)
     if_verbose("preview mode")
     kvm = cspec.key_val_map
     user_job_number = 1
-    if kvm.has_key('one_up_basis'):
-        user_job_number = int(kvm['one_up_basis'])
+    if cspec.one_up_basis != '':
+        user_job_number = int(cspec.one_up_basis)
     permute_dict = permute_dictionary_list[0]
-    permute_code = permutations.generate_permutation_code(permute_dict, cspec.concise_print_map)
-    commands_for_this_permutation = permutations.resolve_permutation(permute_dict, cspec.commands, kvm)
-    cscript = cluster_script.ClusterScript(user_job_number, kvm, permute_code, commands_for_this_permutation, cspec)
+    #permute_code = permutations.generate_permutation_code(permute_dict, cspec.concise_print_map)
+    #commands_for_this_permutation = permutations.resolve_permutation(permute_dict, cspec.commands, kvm)
+    user_job_number_as_string = str(user_job_number).zfill(job_num_width)
+    cscript = cluster_script.ClusterScript(user_job_number_as_string, kvm, permute_dict, cspec)
     cscript.preview()
        
                   
@@ -118,7 +125,7 @@ def validate_args(permute_command, cspec_path, flags):
             exit()
     
 def usage():
-    print "usage:  permute <path of cluster_spec> gen|launch|auto [-v]"
+    print "usage:  permute <path of cluster_spec> gen|launch|auto/preview [-v]"
     
 if __name__ == '__main__':
     main()
