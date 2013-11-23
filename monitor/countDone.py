@@ -42,7 +42,7 @@ def main():
 
 
 def usage():
-    print "usage:  countDoneScores <path of cluster_spec>"
+    print "usage:  python countDone.py <path of cluster_spec>"
 if __name__ == '__main__':
     main()
     

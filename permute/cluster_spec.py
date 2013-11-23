@@ -35,7 +35,7 @@ class ClusterSpec(object):
             f.close()
             
             
-            self.permuters = self.load_permutations(self.path)
+            self.permuters = self.load_permutations(self.path, 'permute:')
             self.concise_print_map = self.load_concise_print_map(self.path)
             
             self.key_val_map = self.load_replaces(self.path)
@@ -43,17 +43,39 @@ class ClusterSpec(object):
             # put the results_dir into the kvm so that permutation calculation wil find it
             self.key_val_map['results_dir'] = self.results_dir
             
-            self.qsub_commands = self.load_qsub_commands(self.path,self.key_val_map)
-            self.commands = self.load_commands(self.path,self.key_val_map)
+            self.qsub_commands = self.load_qsub_commands(self.path)
+            self.commands = self.load_commands(self.path)
             
             self.script_dir = self.load_dir(self.path, "script_dir")
-            self.one_up_basis = self.load_one_up_basis(self.path)
+            self.one_up_basis = self.load_special_value(self.path, 'one_up_basis:')
+            
+            self.scores_permuters = self.load_permutations(self.path, 'scores_permute:')
+            self.scores_from_filepath = ""
+            self.scores_from_colname = ""
+            self.scores_from_rownum = ""
+            self.load_scores_from(self.path)
+            self.scores_to = self.load_special_value(self.path,'scores_to:')
+            self.scores_x_axis = self.load_special_value(self.path, 'scores_x_axis:')
+            self.scores_y_axis = self.load_special_value(self.path, 'scores_y_axis:')
             #print "done loading cspec"
         except IOError:
             print "An error occured trying to open cspec file {0}".format(path)
             exit()
 
 
+    def load_scores_from(self, path):
+        f = open(path, 'r')
+        lines = f.readlines()
+        for line in lines:
+            line = line.rstrip()
+            if (line.startswith('scores_from:')):
+                command, scores_from_info = line.split(":")
+                file_info, column_info, row_info = scores_from_info.split(',')
+                file_flag, self.scores_from_filepath = file_info.split('=')
+                colname_flag , self.scores_from_colname = column_info.split('=')
+                rownum_flag, self.scores_from_rownum = row_info.split('=')
+        
+    
     def load_dir(self, path, dir_flag):
         f = open(path, 'r')
         lines = f.readlines()
@@ -65,23 +87,24 @@ class ClusterSpec(object):
                 return dir
         return ""
     
-    def load_one_up_basis(self, path):
+    def load_special_value(self, path, flag):
         f = open(path, 'r')
         lines = f.readlines()
         for line in lines:
             line = line.rstrip()
-            if (line.startswith("one_up_basis:")):
-                command, basis = line.split(":")
-                return basis
+            if (line.startswith(flag)):
+                flag_sans_colon, target = line.split(":")
+                return target
         return ""
-    
-    def load_permutations(self, path):
+
+       
+    def load_permutations(self, path, flag):
         f = open(path, 'r')
         permuters = {}
         lines = f.readlines()
         for line in lines:
             line = line.rstrip()
-            if (line.startswith("permute:")):
+            if (line.startswith(flag)):
                 if_verbose("  processing permute line - {0}".format(line))
                 permute_command, permute_info = line.split(':')
                 permuteKey, permute_list_string = permute_info.split('=')
@@ -122,7 +145,7 @@ class ClusterSpec(object):
         return key_val_map        
     
 
-    def load_qsub_commands(self, path, key_val_map):
+    def load_qsub_commands(self, path):
         f = open(path, 'r')
         qsub_commands = []
         lines = f.readlines()
@@ -137,7 +160,7 @@ class ClusterSpec(object):
         f.close()
         return qsub_commands
     
-    def load_commands(self, path, key_val_map):
+    def load_commands(self, path):
         f = open(path, 'r')
         commands = []
         lines = f.readlines()

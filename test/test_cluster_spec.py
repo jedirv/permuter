@@ -6,7 +6,20 @@ class TestClusterSpec(unittest.TestCase):
     def setUp(self):
         path = "./test.cspec"
         self.cspec = cluster_spec.ClusterSpec(path)
+
+    def test_scores_info(self):
+        self.assertTrue(self.cspec.scores_permuters['resolution'][0] == 'userDay')
+        self.assertTrue(self.cspec.scores_permuters['resolution'][1] == 'userMonth')
         
+        self.assertTrue(self.cspec.scores_from_filepath=='<results_dir>/score_out_(resolution).csv')
+        self.assertTrue(self.cspec.scores_from_colname=='auc')
+        self.assertTrue(self.cspec.scores_from_rownum=='1')
+        
+        self.assertTrue(self.cspec.scores_to=='./collected_results/<permutation_set_name>(resolution)_(singleton_val).csv')
+        
+        self.assertTrue(self.cspec.scores_x_axis=='number')
+        self.assertTrue(self.cspec.scores_y_axis=='letter')
+
     def test_script_dir(self):
         #print self.cspec.script_dir
         self.assertTrue(self.cspec.script_dir=='./scripts_unittest')
@@ -53,8 +66,8 @@ class TestClusterSpec(unittest.TestCase):
         
     def test_concise_print_map(self):
         self.assertTrue(self.cspec.concise_print_map['letter'] == 'l')
-        self.assertTrue(self.cspec.concise_print_map['month'] == 'm')
-           
+        self.assertTrue(self.cspec.concise_print_map['singleton_val'] == 's')
+
     def test_key_val_map(self):
         kvm = self.cspec.key_val_map
         self.assertTrue(kvm['config[AAA]']=='aaa')

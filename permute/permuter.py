@@ -125,7 +125,7 @@ def validate_args(permute_command, cspec_path, flags):
             exit()
     
 def usage():
-    print "usage:  permute <path of cluster_spec> gen|launch|auto/preview [-v]"
+    print "usage:  python permuter.py <path of cluster_spec> gen|launch|auto/preview [-v]"
     
 if __name__ == '__main__':
     main()

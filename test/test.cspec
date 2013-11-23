@@ -5,12 +5,20 @@ permute:letter=AAA,BBB
 permute:unused_vals=x,y
 permute:singleton_val=300
 concise_print:letter,l
-concise_print:month,m
 concise_print:singleton_val,s
+
+
+scores_permute:resolution=userDay,userMonth
+scores_from:file=<results_dir>/score_out_(resolution).csv,column_name=auc,row_number=1
+scores_to:./collected_results/<permutation_set_name>/(resolution)_(singleton_val).csv
+scores_y_axis:letter
+scores_x_axis:number
+
 #
 # permutation-dependent mappings can be expressed like this.  These will be matched by 
 # using permutations like this:  <config[(month)]>
 #
+
 <replace>:config[AAA]=aaa
 <replace>:config[BBB]=bbb
 
