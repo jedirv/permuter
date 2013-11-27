@@ -15,7 +15,7 @@ class TestClusterSpec(unittest.TestCase):
         self.assertTrue(self.cspec.scores_from_colname=='auc')
         self.assertTrue(self.cspec.scores_from_rownum=='1')
         
-        self.assertTrue(self.cspec.scores_to=='./collected_results/<permutation_set_name>(resolution)_(singleton_val).csv')
+        self.assertTrue(self.cspec.scores_to=='./collected_results/<permutation_set_name>/(resolution)_(singleton_val).csv')
         
         self.assertTrue(self.cspec.scores_x_axis=='number')
         self.assertTrue(self.cspec.scores_y_axis=='letter')
