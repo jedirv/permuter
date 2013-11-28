@@ -7,15 +7,40 @@ class TestClusterSpec(unittest.TestCase):
         path = "./test.cspec"
         self.cspec = cluster_spec.ClusterSpec(path)
 
+    def test_zero_pad_to_widest(self):
+        all_integers = ['0','10','345']
+        padded_integers = cluster_spec.zero_pad_to_widest(all_integers)
+        self.assertTrue(padded_integers == ['000', '010', '345'])
+        
+        all_numbers = ['0','.10','34.52']
+        padded_numbers = cluster_spec.zero_pad_to_widest(all_numbers)
+        #print "PADDED_NUMBERS {0}".format(padded_numbers)
+        self.assertTrue(padded_numbers == ['00', '00.1', '34.52'])
+        
+        non_numbers = ['a','bbb','cc']
+        padded_non_numbers = cluster_spec.zero_pad_to_widest(non_numbers)
+        self.assertTrue(padded_non_numbers == ['a','bbb','cc'])
+        
+        partial_numbers =  ['a','bbb','33','4']
+        padded_partial_numbers = cluster_spec.zero_pad_to_widest(partial_numbers)
+        self.assertTrue(padded_partial_numbers == ['a','bbb','33','4'])
+        
+    def test_get_concise_name(self):
+        #print self.cspec.concise_print_map
+        self.assertTrue(self.cspec.get_concise_name('number') == 'number')
+        self.assertTrue(self.cspec.get_concise_name('letter') == 'l')
+        self.assertTrue(self.cspec.get_concise_name('singleton_val') == 's')
+        self.assertTrue(self.cspec.get_concise_name('resolution') == 'res')
+        
     def test_scores_info(self):
         self.assertTrue(self.cspec.scores_permuters['resolution'][0] == 'userDay')
         self.assertTrue(self.cspec.scores_permuters['resolution'][1] == 'userMonth')
         
-        self.assertTrue(self.cspec.scores_from_filepath=='<results_dir>/score_out_(resolution).csv')
+        self.assertTrue(self.cspec.scores_from_filepath=='<results_dir>/(resolution).csv')
         self.assertTrue(self.cspec.scores_from_colname=='auc')
         self.assertTrue(self.cspec.scores_from_rownum=='1')
-        
-        self.assertTrue(self.cspec.scores_to=='./collected_results/<permutation_set_name>/(resolution)_(singleton_val).csv')
+        print 'self.cspec.scores_to : {0}'.format(self.cspec.scores_to)
+        self.assertTrue(self.cspec.scores_to=='./collected_results')
         
         self.assertTrue(self.cspec.scores_x_axis=='number')
         self.assertTrue(self.cspec.scores_y_axis=='letter')
@@ -32,7 +57,7 @@ class TestClusterSpec(unittest.TestCase):
     def test_results_dir(self):
         #print ""
         #print "one up is _{0}_".format(self.cspec.one_up_basis)
-        self.assertTrue(self.cspec.results_dir == '/nfs/foo/results/_PERMUTATION_CODE_')
+        self.assertTrue(self.cspec.results_dir == './sample_results/_PERMUTATION_CODE_')
         
     def test_validate_results_dir(self):
         self.assertFalse(cluster_spec.validate_results_dir("malformed_cspecs/results_dir_missing_PERMCODE.cspec"))
@@ -61,8 +86,6 @@ class TestClusterSpec(unittest.TestCase):
         self.assertTrue(self.cspec.permuters['number'][2] == '3')
         self.assertTrue(self.cspec.permuters['letter'][0] == 'AAA')
         self.assertTrue(self.cspec.permuters['letter'][1] == 'BBB')
-        self.assertTrue(self.cspec.permuters['unused_vals'][0] == 'x')
-        self.assertTrue(self.cspec.permuters['unused_vals'][1] == 'y')
         
     def test_concise_print_map(self):
         self.assertTrue(self.cspec.concise_print_map['letter'] == 'l')

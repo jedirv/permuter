@@ -62,7 +62,12 @@ class ClusterSpec(object):
             print "An error occured trying to open cspec file {0}".format(path)
             exit()
 
-
+    def get_concise_name(self, permuter_name):
+        if self.concise_print_map.has_key(permuter_name):
+            return self.concise_print_map[permuter_name]
+        else:
+            return permuter_name
+        
     def load_scores_from(self, path):
         f = open(path, 'r')
         lines = f.readlines()
@@ -112,8 +117,10 @@ class ClusterSpec(object):
                     permute_start, permute_end = permute_list_string.split(" ")
                     permute_list = range(int(permute_start), int(permute_end)+1)
                     permute_list = map(str, permute_list)
+                    permute_list = zero_pad_to_widest(permute_list)
                 elif (permute_list_string.find(",") != -1):
                     permute_list = permute_list_string.split(",")
+                    permute_list = zero_pad_to_widest(permute_list)
                 else:
                     # must be a singleton cvalue
                     permute_list = [ permute_list_string ]
@@ -191,7 +198,54 @@ class ClusterSpec(object):
                 pass
         f.close()
         return concisePrintMap
+ 
+def zero_pad_to_widest(permute_values):
+    result = permute_values
+    # if any of the entries are not numbers, just return the list
+    for val in permute_values:
+        if (not(is_string_an_int(val))) and (not(is_string_a_float(val))):
+             return result
+                                     
+    # they are all numbers, find the highest integral width
+    max_width = 0
+    for val in permute_values:
+        integer_number_string = str(int(float(val)))
+        cur_width = len(integer_number_string)
+        if cur_width > max_width:
+            max_width = cur_width
+            
+    # pad all the values to that width
+    result = []
+    for val in permute_values:
+        integer_portion = int(float(val))
+        integer_portion_as_string = str(integer_portion)
+        decimal_portion = float(val) - float(integer_portion)
+        decimal_portion_as_string = str(decimal_portion)
+        decimal_portion_as_string_sans_leading_zero = decimal_portion_as_string.lstrip("0")
+        zero_padded_integer_string = integer_portion_as_string.zfill(max_width)
+        #print "zero_padded_integer_string {0}".format(zero_padded_integer_string)
+        if (decimal_portion_as_string_sans_leading_zero == ".0"):
+            # leave out the decimal portion
+            new_val = zero_padded_integer_string
+        else:
+            new_val = "{0}{1}".format(zero_padded_integer_string,decimal_portion_as_string_sans_leading_zero)
+        result.append(new_val)
+    return result
+
+def is_string_an_int(val):
+    try:
+        x = int(val)
+        return True
+    except ValueError:
+        return False
     
+def is_string_a_float(val):
+    try:
+        x = float(val)
+        return True
+    except ValueError:
+        return False
+               
 def validate(path):
     result_permute = validate_permute_entries(path)
     if not(result_permute):

@@ -1,6 +1,7 @@
 import os, sys
 from permute import cluster_spec
 from permute import permutations
+import pooled_results_file
 
 def main():
     if (len(sys.argv) < 1):
@@ -10,22 +11,31 @@ def main():
     if (not(cluster_spec.validate(cspec_path))):
         exit()
     cspec = cluster_spec.ClusterSpec(cspec_path)
-    
-    
-
-#scores_permute:resolution=userDay,userMonth
-#scores_from:file=<results_dir>/score_out_(resolution).csv,column_name=auc,row_number=1
-#scores_to:./collected_results
-#scores_y_axis:letter
-#scores_x_axis:number
-    source_file_map = create_source_file_map
-    permuters_for_filename = gather_file_permuters(cspec)
+    source_file_map = create_source_file_map(cspec)
+    permuters_for_filename = pooled_results_file.gather_file_permuters(cspec)
     filename_permutations = permutations.expand_permutations(permuters_for_filename)
-    for permutation_dict in filename_permutations:
-        createResultFile(source_file_map, permutation_dict, cspec)
-        LEFT OFF HERE  
+    for filename_permutation_dict in filename_permutations:
+        resultsFile = pooled_results_file.PooledResultsFile(source_file_map, filename_permutation_dict, cspec)
+        resultsFile.persist()
         
-   
+def create_source_file_map(cspec):   
+    source_file_map = {}
+    results_dir = cspec.results_dir
+    permutation_list = permutations.expand_permutations(cspec.permuters)
+    for permutation_info in permutation_list:
+        input_perm_code = permutations.generate_permutation_code(permutation_info, cspec.concise_print_map)
+        results_dir_with_perm_code = results_dir.replace("_PERMUTATION_CODE_", input_perm_code)
+        from_file_path_with_results_dir_resolved = cspec.scores_from_filepath.replace('<results_dir>',results_dir_with_perm_code)
+        scores_permutations_list = permutations.expand_permutations(cspec.scores_permuters)
+        for scores_permutations_info in scores_permutations_list:
+            # resolve the scores_permutation info in the scores_from_filepath
+            list_of_one = [ from_file_path_with_results_dir_resolved ]
+            revised_list_of_one = permutations.resolve_permutation(scores_permutations_info, list_of_one, cspec.key_val_map)
+            fully_resolved_from_filepath = revised_list_of_one[0]
+            # create the full perm code (includes the scores_permutations)
+            full_perm_code = permutations.generate_permutation_code(scores_permutations_info, cspec.concise_print_map)
+            source_file_map[full_perm_code] = fully_resolved_from_filepath
+    return source_file_map
 		
 def generate_target_path(cspec):
     # keys of cluster_spec.permuters are the permute names

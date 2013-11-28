@@ -6,10 +6,35 @@ Created on Nov 26, 2013
 import unittest
 from monitor import pooled_results_file
 from monitor import monitor_exception
+from permute import cluster_spec
 
 class TestPooledResultsFile(unittest.TestCase):
 
+    def setUp(self):
+        path = "./test.cspec"
+        self.cspec = cluster_spec.ClusterSpec(path)
 
+    def test_gather_file_permuters(self):
+        perm_dict = pooled_results_file.gather_file_permuters(self.cspec)
+        keys = perm_dict.keys()
+        self.assertTrue(len(keys) == 2)
+        self.assertTrue(perm_dict.has_key('singleton_val'))
+        self.assertTrue(perm_dict.has_key('resolution'))
+
+    def test_gen_perm_code_from_pieces(self):
+        y_axis_val = 'AAA'
+        x_axis_val = 3
+        filename_perm_dict = perm_dict = {'singleton_val':'300', 'res':'userDay' }
+        result = pooled_results_file.gen_perm_code_from_pieces(y_axis_val, x_axis_val, filename_perm_dict, self.cspec)
+        #print "RESULT : {0}".format(result)
+        self.assertTrue(result == 'l_AAA_number_3_res_userDay_s_300')
+         
+    def test_generate_target_path(self):
+        perm_dict = {'singleton_val':'300', 'res':'userDay' }
+        path = pooled_results_file.generate_target_path(perm_dict, self.cspec)
+        #print "PATH IS : {0}".format(path)
+        self.assertTrue(path == './collected_results/res_userDay_s_300.csv')
+        
     def test_get_result_from_file(self):
         try:
             result = pooled_results_file.get_result_from_file('./sample_result_file.txt', 'auc', 1)
