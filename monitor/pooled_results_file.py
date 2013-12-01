@@ -3,6 +3,7 @@ Created on Nov 22, 2013
 
 @author: admin-jed
 '''
+import os
 from permute import cluster_spec
 from monitor_exception import MonitorException
 
@@ -16,7 +17,7 @@ class PooledResultsFile(object):
         '''
         Constructor
         '''
-        self.target_path = self.generate_target_path(filename_perm_dict,cspec)
+        self.target_path = generate_target_path(filename_perm_dict,cspec)
         self.cspec = cspec
         self.source_file_map = source_file_map
         self.filename_perm_dict = filename_perm_dict
@@ -25,13 +26,15 @@ class PooledResultsFile(object):
         cspec = self.cspec
         
         # generate the column names
-        f = file.open(self.target_path, 'w')
+        f = open(self.target_path, 'w')
         header = "{0},".format(cspec.scores_y_axis)
     
         x_prefix = cspec.get_concise_name(cspec.scores_x_axis)
+        print "cspec.scores_x_axis : {0}".format(cspec.scores_x_axis)
+        print "cspec.permuters : {0}".format(cspec.permuters)
         for value in cspec.permuters[cspec.scores_x_axis]:
             header = "{0}{1}_{2},".format(header, x_prefix, value)
-        header.rstrip(',')
+        header = header.rstrip(',')
         f.write("{0}\n".format(header))
         
         # generate the values
@@ -40,11 +43,11 @@ class PooledResultsFile(object):
             line = "{0},".format(y_axis_val)
             x_axis_list = cspec.permuters[cspec.scores_x_axis]
             for x_axis_val in x_axis_list:
-                perm_code = gen_perm_code_from_pieces(y_axis_val, x_axis_val, self.filename_perm_dict )
+                perm_code = gen_perm_code_from_pieces(y_axis_val, x_axis_val, self.filename_perm_dict , cspec)
                 source_file_path = self.source_file_map[perm_code]
                 value = get_result_from_file(source_file_path, cspec.scores_from_colname, cspec.scores_from_rownum)
-                line = "{0},{1},".format(line, value)
-            line.rstrip(',')
+                line = "{0}{1},".format(line, value)
+            line = line.rstrip(',')
             f.write("{0}\n".format(line))
         f.close()
         
@@ -78,28 +81,31 @@ def get_result_from_file(source_file_path, colname, rownum):
             raise MonitorException("missing header in results file")
         parts = header.split(',')
         index = parts.index(colname)
-        value_line = lines[rownum]
+        value_line = lines[int(rownum)]
         value_line = value_line.rstrip()
         value_parts = value_line.split(',')
         value = value_parts[index]
         return value
     except Exception as detail:
+        print "detail {0}".format(detail)
         raise MonitorException("Problem while reading results file : {0}".format(detail))
 
 def gather_file_permuters(cspec):
-    permuters = cspec.permuters
-    scores_permuters = cspec.scores_permuters
+    file_permuters = {}
+    for key, val in cspec.permuters.items():
+        file_permuters[key] = val
+    
     # combine permuters 
-    for key, val in scores_permuters.items():
-        permuters[key] = val
+    for key, val in cspec.scores_permuters.items():
+        file_permuters[key] = val
     # remove the x and y ones
     x_axis_permuter = cspec.scores_x_axis
     y_axis_permuter = cspec.scores_y_axis
     if (x_axis_permuter != ''):
-        del permuters[x_axis_permuter]
+        del file_permuters[x_axis_permuter]
     if (y_axis_permuter != ''):
-        del permuters[y_axis_permuter]
-    return permuters
+        del file_permuters[y_axis_permuter]
+    return file_permuters
 
 def build_code_using_dictionary(perm_dict, cspec):
     result = ''
