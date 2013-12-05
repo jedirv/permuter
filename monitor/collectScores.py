@@ -11,11 +11,14 @@ def main():
     if (not(cluster_spec.validate(cspec_path))):
         exit()
     cspec = cluster_spec.ClusterSpec(cspec_path)
+    create_pooled_results_files(cspec)
+    
+def create_pooled_results_files(cspec):
     source_file_map = create_source_file_map(cspec)
     permuters_for_filename = pooled_results_file.gather_file_permuters(cspec)
     filename_permutations = permutations.expand_permutations(permuters_for_filename)
-    for filename_permutation_dict in filename_permutations:
-        resultsFile = pooled_results_file.PooledResultsFile(source_file_map, filename_permutation_dict, cspec)
+    for filename_permutation_info in filename_permutations:
+        resultsFile = pooled_results_file.PooledResultsFile(source_file_map, filename_permutation_info, cspec)
         resultsFile.persist()
         
 def create_source_file_map(cspec):   
@@ -33,72 +36,17 @@ def create_source_file_map(cspec):
             revised_list_of_one = permutations.resolve_permutation(scores_permutations_info, list_of_one, cspec.key_val_map)
             fully_resolved_from_filepath = revised_list_of_one[0]
             # create the full perm code (includes the scores_permutations)
-            full_perm_code = permutations.generate_permutation_code(scores_permutations_info, cspec.concise_print_map)
+            master_permutation_info = {}
+            for key, val in permutation_info.items():
+                master_permutation_info[key] = val
+            for key, val in scores_permutations_info.items():
+                master_permutation_info[key] = val
+                
+            full_perm_code = permutations.generate_permutation_code(master_permutation_info, cspec.concise_print_map)
             source_file_map[full_perm_code] = fully_resolved_from_filepath
     return source_file_map
-		
-def generate_target_path(cspec):
-    # keys of cluster_spec.permuters are the permute names
-    # keys of cluster_spec.scores_permuters are other permute names
-    # make a list of all of these
-    
-    # remove the x and y axis names (as per cspec), leaving the remainder that will be used in the filename
-    # get the coded version of this remainder to build the filename
-    
-    # prepend the <permutation_set_name> as a parent dir, and tack it onto scores_to
-    
-# source_file_map key is perm_code (with scores_perm list tacked on), value is the resolved file path
-def createResultFile(source_file_map, perm_dict, cspec):
-    ----------------------------------------------
-    
-    
-    
-    
-    ----------------------------------------------
-    parent = "./ride_scores_c"
-    if (not(os.path.isdir(parent))):
-        os.makedirs(parent)
-    output_path = "{0}/rideScores_{1}_{2}.csv".format(parent,resolution, fv)
-    print("creating output {0}".format(output_path))
-    f = open(output_path, 'w')
-    # write header
-    header = "month,"
-    for perm_set in perm_sets:
-        perm_set_dir = "/nfs/guille/bugid/adams/prodigalNet/cluster_perms/{0}".format(perm_set)
-        perm_set_subdir_list = os.listdir(perm_set_dir)
-        sorted_perm_set_subdir_list = alphanum_sort(perm_set_subdir_list)
-        for perm_set_subdir in sorted_perm_set_subdir_list:
-            header = "{0}{1},".format(header,perm_set_subdir)
-    header = header.rstrip(',')
-    f.write("{0}\n".format(header))
-    
-    #write each month
-    for month in months:
-        aucs = []
-        line = "{0},".format(month)
-        for perm_set in perm_sets:
-            perm_set_dir = "/nfs/guille/bugid/adams/prodigalNet/cluster_perms/{0}".format(perm_set)
-            perm_set_subdir_list = os.listdir(perm_set_dir)
-            sorted_perm_set_subdir_list = alphanum_sort(perm_set_subdir_list)
-            for perm_set_subdir in sorted_perm_set_subdir_list:
-                print "...{0} {1} {2}".format(perm_set_subdir, perm_set, month)
-                result_path = "/nfs/guille/bugid/adams/prodigalNet/cluster_perms/{0}/{1}/{2}/{3}RIDE/score_out_{4}.csv".format(perm_set, perm_set_subdir, month, fv, resolution)
-                if (os.path.isfile(result_path)):
-                    print "load result from {0}".format(result_path)
-                    result_file = open(result_path, 'r')
-                    header = result_file.readline()
-                    line_of_interest = result_file.readline()
-                    parts = line_of_interest.split(",")
-                    auc = parts[4]
-                    line = "{0}{1},".format(line,auc)
-                    result_file.close()
-                else:
-                    line = "{0}{1},".format(line,"NA")
-        line = line.rstrip(',')
-        line = "{0}\n".format(line)
-        f.write(line)
-    f.close
-    
+
+
 #def find_longest_value(alphanum_list, index):
 #    max_len = 0
 #    for entry in alphanum_list:
