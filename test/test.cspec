@@ -1,4 +1,5 @@
 #cspec
+master_job_name:unittest
 tag=_myTag
 permute:number=1 3
 permute:letter=AAA,BBB
@@ -25,7 +26,6 @@ scores_x_axis:number
 <replace>:pretty[2]=two
 <replace>:pretty[3]=three
 #
-<replace>:permutation_set_name=unittest
 <replace>:root=/nfs/foo/bar
 <replace>:x_dir=<root>/(letter)/<config[(letter)]>/(number)
 <replace>:algs_dir=/nfs/algs
@@ -38,7 +38,7 @@ results_dir:./sample_results/_PERMUTATION_CODE_
 #
 #  script is where the generated scripts will be
 #
-script_dir:./scripts_<permutation_set_name>
+script_dir:./scripts_<master_job_name>
 #
 qsub_command:-q eecs,eecs1,eecs,share
 qsub_command:-M someone@gmail.com

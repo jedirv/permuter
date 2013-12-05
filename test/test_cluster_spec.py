@@ -48,7 +48,11 @@ class TestClusterSpec(unittest.TestCase):
     def test_script_dir(self):
         #print self.cspec.script_dir
         self.assertTrue(self.cspec.script_dir=='./scripts_unittest')
-        
+    
+    def test_master_job_name(self):
+        #print self.cspec.script_dir
+        self.assertTrue(self.cspec.master_job_name=='unittest')
+            
     def test_one_up_basis(self):
         #print ""
         #print "one up is _{0}_".format(self.cspec.one_up_basis)
@@ -58,7 +62,10 @@ class TestClusterSpec(unittest.TestCase):
         #print ""
         #print "one up is _{0}_".format(self.cspec.one_up_basis)
         self.assertTrue(self.cspec.results_dir == './sample_results/_PERMUTATION_CODE_')
-        
+    
+    def test_validate_master_job_name(self):
+        self.assertFalse(cluster_spec.validate_master_job_name("malformed_cspecs/results_dir_missing_PERMCODE.cspec"))
+            
     def test_validate_results_dir(self):
         self.assertFalse(cluster_spec.validate_results_dir("malformed_cspecs/results_dir_missing_PERMCODE.cspec"))
                 
@@ -98,7 +105,7 @@ class TestClusterSpec(unittest.TestCase):
         self.assertTrue(kvm['pretty[1]']=='one')
         self.assertTrue(kvm['pretty[2]']=='two')
         self.assertTrue(kvm['pretty[3]']=='three')
-        self.assertTrue(kvm['permutation_set_name']=='unittest')
+        self.assertTrue(kvm['master_job_name']=='unittest')
         self.assertTrue(kvm['root']=='/nfs/foo/bar')
         self.assertTrue(kvm['x_dir']=='/nfs/foo/bar/(letter)/<config[(letter)]>/(number)')
         self.assertTrue(kvm['algs_dir']=='/nfs/algs')

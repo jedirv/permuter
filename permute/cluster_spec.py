@@ -34,7 +34,7 @@ class ClusterSpec(object):
                 exit()
             f.close()
             
-            
+            self.master_job_name = self.load_special_value(self.path, 'master_job_name:')
             self.permuters = self.load_permutations(self.path, 'permute:')
             self.concise_print_map = self.load_concise_print_map(self.path)
             
@@ -42,6 +42,8 @@ class ClusterSpec(object):
             self.results_dir = self.load_dir(self.path, "results_dir:")
             # put the results_dir into the kvm so that permutation calculation wil find it
             self.key_val_map['results_dir'] = self.results_dir
+            # and the master_job_name
+            self.key_val_map['master_job_name'] = self.master_job_name
             
             self.qsub_commands = self.load_qsub_commands(self.path)
             self.commands = self.load_commands(self.path)
@@ -299,6 +301,22 @@ def validate_script_dir(path):
     if (script_dir == "unknown"):
         result = False
         print "cluster_spec missing script_dir declaration (script_dir:some_dir) {0}".format(path)      
+    return result
+
+def validate_master_job_name(path):
+    result = True
+    master_job_name = "unknown"
+    f = open(path, 'r')
+    lines = f.readlines()
+    f.close()
+    for line in lines:
+        line = line.rstrip()
+        if (line.startswith("master_job_name:")):
+            # should be one =
+            master_job_name_command, master_job_name = line.split(":")
+    if (master_job_name == "unknown"):
+        result = False
+        print "cluster_spec missing master_job_name declaration (master_job_name:some_name) {0}".format(path)      
     return result
 
 def validate_replace_entries(path):

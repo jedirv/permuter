@@ -43,7 +43,7 @@ class PooledResultsFile(object):
             line = "{0},".format(y_axis_val)
             x_axis_list = cspec.permuters[cspec.scores_x_axis]
             for x_axis_val in x_axis_list:
-                perm_code = gen_perm_code_from_pieces(y_axis_val, x_axis_val, self.filename_perm_info)
+                perm_code = gen_perm_code_from_pieces(y_axis_val, x_axis_val, self.filename_perm_info, cspec)
                 source_file_path = self.source_file_map[perm_code]
                 value = get_result_from_file(source_file_path, cspec.scores_from_colname, cspec.scores_from_rownum)
                 line = "{0}{1},".format(line, value)
