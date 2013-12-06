@@ -45,6 +45,7 @@ class PooledResultsFile(object):
             for x_axis_val in x_axis_list:
                 perm_code = gen_perm_code_from_pieces(y_axis_val, x_axis_val, self.filename_perm_info, cspec)
                 source_file_path = self.source_file_map[perm_code]
+                print "SOURCE_FILE_PATH : {0}".format(source_file_path)
                 value = get_result_from_file(source_file_path, cspec.scores_from_colname, cspec.scores_from_rownum)
                 line = "{0}{1},".format(line, value)
             line = line.rstrip(',')
@@ -53,7 +54,10 @@ class PooledResultsFile(object):
         
 def generate_target_path(filename_perm_info, cspec):
     filename = build_code_using_dictionary(filename_perm_info, cspec)
-    path = "{0}/{1}.csv".format(cspec.scores_to, filename)
+    parent = "{0}/{1}".format(cspec.scores_to, cspec.master_job_name)
+    if (not(os.path.isdir(parent))):
+        os.makedirs(parent)
+    path = "{0}/{1}.csv".format(parent, filename)
     return path
     
 def gen_perm_code_from_pieces(y_axis_val, x_axis_val, filename_perm_dict, cspec):
@@ -107,21 +111,23 @@ def gather_file_permuters(cspec):
         del file_permuters[y_axis_permuter]
     return file_permuters
 
-def build_code_using_dictionary(perm_dict, cspec):
+def build_code_using_dictionary(perm_info, cspec):
     result = ''
     # build a map using the coded keys
     # and a list of the keys
-    coded_key_dict = {}
+    coded_key_info = {}
     coded_keys = []
-    for key, val in perm_dict.items():
+    for key, val in perm_info.items():
         coded_key = cspec.get_concise_name(key)
-        coded_key_dict[coded_key] = val
+        print "coded key for {0} is {1}".format(key, coded_key)
+        coded_val = cspec.get_concise_name(val)
+        coded_key_info[coded_key] = coded_val
         coded_keys.append(coded_key)
     # sort the coded keys and iterate through to create the name
     sorted_coded_keys = sorted(coded_keys)
     
     for key in sorted_coded_keys:
-        val = coded_key_dict[key]
+        val = coded_key_info[key]
         result = "{0}{1}_{2}_".format(result, key, val)
     # strip off the right_most underscore
     result = result.rstrip('_')     

@@ -31,10 +31,15 @@ def create_source_file_map(cspec):
         from_file_path_with_results_dir_resolved = cspec.scores_from_filepath.replace('<results_dir>',results_dir_with_perm_code)
         scores_permutations_list = permutations.expand_permutations(cspec.scores_permuters)
         for scores_permutations_info in scores_permutations_list:
-            # resolve the scores_permutation info in the scores_from_filepath
+            # first resolve the regular_permutations info in the scores_from_filepath
             list_of_one = [ from_file_path_with_results_dir_resolved ]
+            revised_list_of_one = permutations.resolve_permutation(permutation_info, list_of_one, cspec.key_val_map)
+            partially_resolved_from_filepath = revised_list_of_one[0]
+            # now resolve the scores_permutation info in the scores_from_filepath
+            list_of_one = [ partially_resolved_from_filepath ]
             revised_list_of_one = permutations.resolve_permutation(scores_permutations_info, list_of_one, cspec.key_val_map)
             fully_resolved_from_filepath = revised_list_of_one[0]
+            print "RESOLVED_LIST_OF_ONE: {0}".format(fully_resolved_from_filepath)
             # create the full perm code (includes the scores_permutations)
             master_permutation_info = {}
             for key, val in permutation_info.items():
@@ -44,6 +49,7 @@ def create_source_file_map(cspec):
                 
             full_perm_code = permutations.generate_permutation_code(master_permutation_info, cspec.concise_print_map)
             source_file_map[full_perm_code] = fully_resolved_from_filepath
+            print "source_file_map[{0}] = {1}".format(full_perm_code, fully_resolved_from_filepath)
     return source_file_map
 
 

@@ -61,7 +61,7 @@ class TestClusterSpec(unittest.TestCase):
     def test_results_dir(self):
         #print ""
         #print "one up is _{0}_".format(self.cspec.one_up_basis)
-        self.assertTrue(self.cspec.results_dir == './sample_results/_PERMUTATION_CODE_')
+        self.assertTrue(self.cspec.results_dir == './sample_results/_PERMUTATION_CODE__FOO_(singleton_val)')
     
     def test_validate_master_job_name(self):
         self.assertFalse(cluster_spec.validate_master_job_name("malformed_cspecs/results_dir_missing_PERMCODE.cspec"))

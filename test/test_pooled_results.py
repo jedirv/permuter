@@ -27,13 +27,13 @@ class TestPooledResultsFile(unittest.TestCase):
         filename_perm_dict = perm_dict = {'singleton_val':'300', 'res':'userDay' }
         result = pooled_results_file.gen_perm_code_from_pieces(y_axis_val, x_axis_val, filename_perm_dict, self.cspec)
         #print "RESULT : {0}".format(result)
-        self.assertTrue(result == 'l_AAA_number_3_res_userDay_s_300')
+        self.assertTrue(result == 'l_aa_number_3_res_userDay_s_300')
          
     def test_generate_target_path(self):
         perm_dict = {'singleton_val':'300', 'res':'userDay' }
         path = pooled_results_file.generate_target_path(perm_dict, self.cspec)
         #print "PATH IS : {0}".format(path)
-        self.assertTrue(path == './collected_results/res_userDay_s_300.csv')
+        self.assertTrue(path == './collected_results/unittest/res_userDay_s_300.csv')
         
     def test_get_result_from_file(self):
         try:

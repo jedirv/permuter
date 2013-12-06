@@ -7,6 +7,8 @@ permute:singleton_val=300
 concise_print:letter,l
 concise_print:singleton_val,s
 concise_print:resolution,res
+concise_print:AAA,aa
+concise_print:BBB,bb
 
 scores_permute:resolution=userDay,userMonth
 scores_from:file=<results_dir>/(resolution).csv,column_name=auc,row_number=1
@@ -34,7 +36,7 @@ scores_x_axis:number
 #
 #  results_dir is where the generated results will be
 #
-results_dir:./sample_results/_PERMUTATION_CODE_
+results_dir:./sample_results/_PERMUTATION_CODE__FOO_(singleton_val)
 #
 #  script is where the generated scripts will be
 #
