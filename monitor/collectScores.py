@@ -19,7 +19,7 @@ def create_delta_results_files(resultsFiles):
         dirname = resultsFile.target_dir
         filename_code = resultsFile.perm_code_for_filename
         source_file_path = "{0}/{1}.csv".format(dirname, filename_code)
-        target_file_path = "{0}/{1}_deltas.csv".format(dirname, filename_code)
+        target_file_path = "deltas_{0}/{1}.csv".format(dirname, filename_code)
         f_source = open(source_file_path,'r')
         f_target = open(target_file_path,'w')
         lines = f_source.readlines()
