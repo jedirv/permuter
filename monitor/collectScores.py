@@ -12,9 +12,9 @@ def main():
         exit()
     cspec = cluster_spec.ClusterSpec(cspec_path)
     resultsFiles = create_pooled_results_files(cspec)
-    create_delta_results_file(resultsFiles)
+    create_delta_results_files(resultsFiles)
     
-def create_delta_results_file(resultsFiles):
+def create_delta_results_files(resultsFiles):
     for resultsFile in resultsFiles:
         dirname = resultsFile.target_dir
         filename_code = resultsFile.perm_code_for_filename
@@ -23,9 +23,9 @@ def create_delta_results_file(resultsFiles):
         f_source = open(source_file_path,'r')
         f_target = open(target_file_path,'w')
         lines = f_source.readlines()
-        f_target.write("{0}{1}".format(lines[0],os.linesep))
+        f_target.write(lines[0])
         for i in range(1,len(lines)):
-            delta_line = create_delta_line(lines[i])
+            delta_line = create_delta_line(lines[i].rstrip(os.linesep))
             f_target.write("{0}{1}".format(delta_line, os.linesep))
         f_source.close()
         f_target.close()
@@ -39,7 +39,7 @@ def create_delta_line(line):
     for i in range(2,len(parts)):
         cur_num_float = float(parts[i])
         cur_delta = cur_num_float - first_num_float
-        delta_string = '{0:.2}'.format(cur_delta)
+        delta_string = "%.2f" % cur_delta
         result = "{0}{1},".format(result,delta_string)
     result = result.rstrip(',')
     return result
