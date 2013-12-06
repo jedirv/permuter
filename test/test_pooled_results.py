@@ -29,11 +29,15 @@ class TestPooledResultsFile(unittest.TestCase):
         #print "RESULT : {0}".format(result)
         self.assertTrue(result == 'l_aa_number_3_res_userDay_s_300')
          
-    def test_generate_target_path(self):
+    def test_generate_target_dirname(self):
+        dirname = pooled_results_file.generate_target_dirname(self.cspec)
+        #print "DIR IS : {0}".format(dirname)
+        self.assertTrue(dirname == './collected_results/unittest')
+        
+    def test_build_code_using_dictionary(self):
         perm_dict = {'singleton_val':'300', 'res':'userDay' }
-        path = pooled_results_file.generate_target_path(perm_dict, self.cspec)
-        #print "PATH IS : {0}".format(path)
-        self.assertTrue(path == './collected_results/unittest/res_userDay_s_300.csv')
+        code = pooled_results_file.build_code_using_dictionary(perm_dict, self.cspec)
+        self.assertTrue(code == 'res_userDay_s_300')
         
     def test_get_result_from_file(self):
         try:

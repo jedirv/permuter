@@ -17,7 +17,9 @@ class PooledResultsFile(object):
         '''
         Constructor
         '''
-        self.target_path = generate_target_path(filename_perm_info,cspec)
+        self.target_dir = generate_target_dirname(cspec)
+        self.perm_code_for_filename  = build_code_using_dictionary(filename_perm_info, cspec)
+        self.target_path = "{0}/{1}.csv".format(self.target_dir, self.perm_code_for_filename)
         self.cspec = cspec
         self.source_file_map = source_file_map
         self.filename_perm_info = filename_perm_info
@@ -52,13 +54,11 @@ class PooledResultsFile(object):
             f.write("{0}\n".format(line))
         f.close()
         
-def generate_target_path(filename_perm_info, cspec):
-    filename = build_code_using_dictionary(filename_perm_info, cspec)
-    parent = "{0}/{1}".format(cspec.scores_to, cspec.master_job_name)
-    if (not(os.path.isdir(parent))):
-        os.makedirs(parent)
-    path = "{0}/{1}.csv".format(parent, filename)
-    return path
+def generate_target_dirname(cspec):
+    dir = "{0}/{1}".format(cspec.scores_to, cspec.master_job_name)
+    if (not(os.path.isdir(dir))):
+        os.makedirs(dir)
+    return dir
     
 def gen_perm_code_from_pieces(y_axis_val, x_axis_val, filename_perm_dict, cspec):
     full_perm_dict = {}

@@ -11,15 +11,50 @@ def main():
     if (not(cluster_spec.validate(cspec_path))):
         exit()
     cspec = cluster_spec.ClusterSpec(cspec_path)
-    create_pooled_results_files(cspec)
+    resultsFiles = create_pooled_results_files(cspec)
+    create_delta_results_file(resultsFiles)
+    
+def create_delta_results_file(resultsFiles):
+    for resultsFile in resultsFiles:
+        dirname = resultsFile.target_dir
+        filename_code = resultsFile.perm_code_for_filename
+        source_file_path = "{0}/{1}.csv".format(dirname, filename_code)
+        target_file_path = "{0}/{1}_deltas.csv".format(dirname, filename_code)
+        f_source = open(source_file_path,'r')
+        f_target = open(target_file_path,'w')
+        lines = f_source.readlines()
+        f_target.write("{0}{1}".format(lines[0],os.linesep))
+        for i in range(1,len(lines)):
+            delta_line = create_delta_line(lines[i])
+            f_target.write("{0}{1}".format(delta_line, os.linesep))
+        f_source.close()
+        f_target.close()
+    
+def create_delta_line(line):
+    result = ""
+    parts = line.split(',')
+    result = "{0},0,".format(parts[0])
+    first_number = parts[1]
+    first_num_float = float(first_number)
+    for i in range(2,len(parts)):
+        cur_num_float = float(parts[i])
+        cur_delta = cur_num_float - first_num_float
+        delta_string = '{0:.2}'.format(cur_delta)
+        result = "{0}{1},".format(result,delta_string)
+    result = result.rstrip(',')
+    return result
     
 def create_pooled_results_files(cspec):
     source_file_map = create_source_file_map(cspec)
     permuters_for_filename = pooled_results_file.gather_file_permuters(cspec)
     filename_permutations = permutations.expand_permutations(permuters_for_filename)
+    resultsFiles = []
     for filename_permutation_info in filename_permutations:
         resultsFile = pooled_results_file.PooledResultsFile(source_file_map, filename_permutation_info, cspec)
         resultsFile.persist()
+        resultsFiles.append(resultsFile)
+    return resultsFiles
+        
         
 def create_source_file_map(cspec):   
     source_file_map = {}
