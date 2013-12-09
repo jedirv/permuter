@@ -77,13 +77,14 @@ def generate_scripts(cspec, permute_dictionary_list):
     user_job_number = 1
     if cspec.one_up_basis != '':
         user_job_number = int(cspec.one_up_basis)
-    for permute_dict in permute_dictionary_list:
-        #permute_code = permutations.generate_permutation_code(permute_dict, cspec.concise_print_map)
-        #commands_for_this_permutation = permutations.resolve_permutation(permute_dict, cspec.commands, kvm)
-        user_job_number_as_string = str(user_job_number).zfill(job_num_width)
-        cscript = cluster_script.ClusterScript(user_job_number_as_string, kvm, permute_dict, cspec)
-        cscript.generate()
-        user_job_number = user_job_number + 1
+    for trial in range(1, cspec.trials + 1):
+        for permute_dict in permute_dictionary_list:
+            #permute_code = permutations.generate_permutation_code(permute_dict, cspec.concise_print_map)
+            #commands_for_this_permutation = permutations.resolve_permutation(permute_dict, cspec.commands, kvm)
+            user_job_number_as_string = str(user_job_number).zfill(job_num_width)
+            cscript = cluster_script.ClusterScript(user_job_number_as_string, kvm, permute_dict, cspec, trial)
+            cscript.generate()
+            user_job_number = user_job_number + 1
        
 
 def preview_scripts(cspec, permute_dictionary_list):

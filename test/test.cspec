@@ -1,5 +1,6 @@
 #cspec
 master_job_name:unittest
+trials:2
 tag=_myTag
 permute:number=1 3
 permute:letter=AAA,BBB

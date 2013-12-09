@@ -7,15 +7,16 @@ class ClusterScript(object):
     Wraps the cluster script file
     '''
     
-    def __init__(self, user_job_number, key_val_map, permute_dict, cspec):
+    def __init__(self, user_job_number, key_val_map, permute_dict, cspec, trial):
         '''
         Constructor
         '''
+        self.trial = trial
         self.permute_code = permutations.generate_permutation_code(permute_dict, cspec.concise_print_map)
         # results_dir now includes _PERMUTATION_CODE_ which means it can't be resolved until 
-        self.resolved_results_dir = cspec.results_dir.replace('_PERMUTATION_CODE_', self.permute_code)
-        
-        list_of_size_1 = [self.resolved_results_dir] 
+        partly_resolved_results_dir = cspec.results_dir.replace('_PERMUTATION_CODE_', self.permute_code)
+        partly_resolved_results_dir_with_trial = "{0}{1}trial{2}".format(partly_resolved_results_dir,os.pathsep, trial)
+        list_of_size_1 = [partly_resolved_results_dir_with_trial] 
         self.resolved_results_dir =  permutations.resolve_permutation(permute_dict, list_of_size_1, key_val_map)[0]
         #print "resolved_results_dir : {0}".format(self.resolved_results_dir)
         self.key_val_map = key_val_map
@@ -45,9 +46,9 @@ class ClusterScript(object):
         pathname_root = ""
         if (self.key_val_map.has_key('tag')):
             tag = self.key_val_map['tag']
-            pathname_root = "{0}{1}j{2}_{3}{4}".format(self.script_dir, os.sep, self.user_job_number, self.permute_code, tag)
+            pathname_root = "{0}{1}j{2}_{3}_{4}{5}".format(self.script_dir, os.sep, self.user_job_number, self.trial, self.permute_code, tag)
         else:
-            pathname_root = "{0}{1}j{2}_{3}".format(self.script_dir, os.sep, self.user_job_number, self.permute_code)
+            pathname_root = "{0}{1}j{2}_{3}_{4}".format(self.script_dir, os.sep, self.user_job_number, self.trial, self.permute_code)
         return pathname_root
     
     def generate(self):
@@ -61,9 +62,9 @@ class ClusterScript(object):
         if (self.key_val_map.has_key('tag')):
             tag = self.key_val_map['tag']
         if (tag != ""):
-            f.write("#$ -N j{0}_{1}{2}\n".format(self.user_job_number, self.permute_code, tag))
+            f.write("#$ -N j{0}_{1}_{2}{3}\n".format(self.user_job_number, self.permute_code, self.trial, tag))
         else:
-            f.write("#$ -N j{0}_{1}\n".format(self.user_job_number, self.permute_code))
+            f.write("#$ -N j{0}_{1}_{2}\n".format(self.user_job_number, self.permute_code, self.trial))
             
         f.write("#\n")
         

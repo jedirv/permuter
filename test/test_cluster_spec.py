@@ -48,6 +48,9 @@ class TestClusterSpec(unittest.TestCase):
     def test_script_dir(self):
         #print self.cspec.script_dir
         self.assertTrue(self.cspec.script_dir=='./scripts_unittest')
+        
+    def test_trials(self):
+        self.assertTrue(self.cspec.trials=='2')
     
     def test_master_job_name(self):
         #print self.cspec.script_dir
@@ -86,6 +89,9 @@ class TestClusterSpec(unittest.TestCase):
         
         self.assertTrue(cluster_spec.validate_replace_entries("well_formed_cspecs/replace_basic.cspec"))
         
+    def test_validate_trials(self):
+        self.assertFalse(cluster_spec.validate_trials("malformed_cspecs/missing_basics.cspec"))
+        self.assertTrue(cluster_spec.validate_trials("well_formed_cspecs/basics.cspec"))
         
     def test_load_permutes(self):
         self.assertTrue(self.cspec.permuters['number'][0] == '1')

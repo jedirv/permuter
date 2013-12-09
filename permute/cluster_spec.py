@@ -35,6 +35,7 @@ class ClusterSpec(object):
             f.close()
             
             self.master_job_name = self.load_special_value(self.path, 'master_job_name:')
+            self.trials = self.load_special_value(self.path, 'trials:')
             self.permuters = self.load_permutations(self.path, 'permute:')
             self.concise_print_map = self.load_concise_print_map(self.path)
             
@@ -317,6 +318,23 @@ def validate_master_job_name(path):
     if (master_job_name == "unknown"):
         result = False
         print "cluster_spec missing master_job_name declaration (master_job_name:some_name) {0}".format(path)      
+    return result
+
+
+def validate_trials(path):
+    result = True
+    trials = "unknown"
+    f = open(path, 'r')
+    lines = f.readlines()
+    f.close()
+    for line in lines:
+        line = line.rstrip()
+        if (line.startswith("trials:")):
+            # should be one =
+            trials_command, trials = line.split(":")
+    if (trials == "unknown"):
+        result = False
+        print "cluster_spec missing trials declaration (trials:some_name) {0}".format(path)      
     return result
 
 def validate_replace_entries(path):
