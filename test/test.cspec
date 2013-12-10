@@ -12,7 +12,7 @@ concise_print:AAA,aa
 concise_print:BBB,bb
 
 scores_permute:resolution=userDay,userMonth
-scores_from:file=<results_dir>/(resolution).csv,column_name=auc,row_number=1
+scores_from:file=<permutation_results_dir>/(resolution).csv,column_name=auc,row_number=1
 scores_to:./collected_results
 scores_y_axis:letter
 scores_x_axis:number
@@ -37,7 +37,7 @@ scores_x_axis:number
 #
 #  results_dir is where the generated results will be
 #
-results_dir:./sample_results/_PERMUTATION_CODE__FOO_(singleton_val)
+root_results_dir:./sample_results
 #
 #  script is where the generated scripts will be
 #
@@ -48,6 +48,6 @@ qsub_command:-M someone@gmail.com
 qsub_command:-m beas
 one_up_basis:100
 
-command:echo (letter) (number) (singleton_val) > <results_dir>/(letter)_(number)_<pretty[(number)]>.txt
+command:echo (letter) (number) (singleton_val) > <permutation_results_dir>/(letter)_(number)_<pretty[(number)]>.txt
 #
 

@@ -13,14 +13,12 @@ class ClusterScript(object):
         '''
         self.trial = trial
         self.permute_code = permutations.generate_permutation_code(permute_dict, cspec.concise_print_map, False)
-        # results_dir now includes _PERMUTATION_CODE_ which means it can't be resolved until 
-        partly_resolved_results_dir = cspec.results_dir.replace('_PERMUTATION_CODE_', self.permute_code)
-        partly_resolved_results_dir_with_trial = "{0}/trial{1}".format(partly_resolved_results_dir, trial)
-        list_of_size_1 = [partly_resolved_results_dir_with_trial] 
+        interim_results_dir = cspec.generate_results_dir_for_permutation(trial, self.permute_code) 
+        list_of_size_1 = [interim_results_dir] 
         self.resolved_results_dir =  permutations.resolve_permutation(permute_dict, list_of_size_1, key_val_map)[0]
         #print "resolved_results_dir : {0}".format(self.resolved_results_dir)
         self.key_val_map = key_val_map
-        self.key_val_map['results_dir'] = self.resolved_results_dir
+        self.key_val_map['permutation_results_dir'] = self.resolved_results_dir
         self.commands_for_this_permutation = permutations.resolve_permutation(permute_dict, cspec.commands, self.key_val_map)
         
         
@@ -32,12 +30,6 @@ class ClusterScript(object):
         self.script_path_root = self.get_script_path_root()
         self.pathname = "{0}.sh".format(self.script_path_root)
 
-    #def late_resolve_results_dir(self, commands_for_this_permutation, resolved_results_dir):
-    #    revised_commands = []
-    #    for command in commands_for_this_permutation:
-    #        revised_command = command.replace('<results_dir>', resolved_results_dir)
-    #        revised_commands.append(revised_command)
-    #    return revised_commands
             
     def get_script_path_root(self):
         if (not(os.path.isdir(self.script_dir))):

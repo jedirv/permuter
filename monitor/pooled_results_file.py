@@ -49,7 +49,7 @@ class PooledResultsFile(object):
                 for trial in trials_list:
                     perm_code = gen_perm_code_from_pieces(y_axis_val, x_axis_val, self.filename_perm_info, cspec, trial)
                     source_file_path = self.source_file_map[perm_code]
-                    print "SOURCE_FILE_PATH : {0}".format(source_file_path)
+                    #print "SOURCE_FILE_PATH : {0}".format(source_file_path)
                     value = get_result_from_file(source_file_path, cspec.scores_from_colname, cspec.scores_from_rownum)
                     trial_values.append(float(value))
                 median_value = get_median(trial_values)
@@ -133,7 +133,7 @@ def build_code_using_dictionary(perm_info, cspec):
     coded_keys = []
     for key, val in perm_info.items():
         coded_key = cspec.get_concise_name(key)
-        print "coded key for {0} is {1}".format(key, coded_key)
+        #print "coded key for {0} is {1}".format(key, coded_key)
         coded_val = cspec.get_concise_name(val)
         coded_key_info[coded_key] = coded_val
         coded_keys.append(coded_key)

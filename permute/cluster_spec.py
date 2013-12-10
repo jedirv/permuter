@@ -23,11 +23,13 @@ class ClusterSpec(object):
         Constructor
         '''
         self.path = path
+        print "opening cspec path: {0}".format(self.path)
         # verify spec path exists
         try:
             f = open(path, 'r')
             # verify first line has cspec flag
             header = f.readline()
+            print "header : {0} length {1} ".format(header, len(header))
             if (header != "#cspec\n"):
                 print "cspec file must have this header:  '#cspec', {0} does not. Exiting.".format(path)
                 f.close()
@@ -40,9 +42,11 @@ class ClusterSpec(object):
             self.concise_print_map = self.load_concise_print_map(self.path)
             
             self.key_val_map = self.load_replaces(self.path)
-            self.results_dir = self.load_dir(self.path, "results_dir:")
+            self.root_results_dir = self.load_dir(self.path, "root_results_dir:")
+            self.job_results_dir = "{0}/{1}".format(self.root_results_dir, self.master_job_name)
             # put the results_dir into the kvm so that permutation calculation wil find it
-            self.key_val_map['results_dir'] = self.results_dir
+            self.key_val_map['root_results_dir'] = self.root_results_dir
+            self.key_val_map['job_results_dir'] = self.job_results_dir
             # and the master_job_name
             self.key_val_map['master_job_name'] = self.master_job_name
             
@@ -62,9 +66,12 @@ class ClusterSpec(object):
             self.scores_y_axis = self.load_special_value(self.path, 'scores_y_axis:')
             #print "done loading cspec"
         except IOError:
-            print "An error occured trying to open cspec file {0}".format(path)
+            print "An error occurred trying to open cspec file {0}".format(path)
             exit()
 
+    def generate_results_dir_for_permutation(self, trial, permuation_code):
+        return "{0}/trial{1}/{2}".format(self.job_results_dir, trial, permuation_code)
+    
     def get_trials_list(self):
         result = []
         integer_list = range(1, int(self.trials) + 1)
@@ -269,9 +276,9 @@ def validate(path):
     if not(result_script_dir):
         print "problem found in script_dir statement"
   
-    result_results_dir = validate_results_dir(path)
-    if not(result_results_dir):
-        print "problem found in results_dir statement"
+    result_root_results_dir = validate_root_results_dir(path)
+    if not(result_root_results_dir):
+        print "problem found in root_results_dir statement"
         
     result_master_job_name = validate_master_job_name(path)
     if not(result_master_job_name):
@@ -281,26 +288,23 @@ def validate(path):
     if not(result_trials):
         print "problem found in trials statement"
     
-    return result_permute and result_replace and result_script_dir and result_results_dir and result_master_job_name and result_trials
+    return result_permute and result_replace and result_script_dir and result_root_results_dir and result_master_job_name and result_trials
 
    
-def validate_results_dir(path):
+def validate_root_results_dir(path):
     result = True
-    results_dir = "unknown"
+    root_results_dir = "unknown"
     f = open(path, 'r')
     lines = f.readlines()
     f.close()
     for line in lines:
         line = line.rstrip()
-        if (line.startswith("results_dir:")):
+        if (line.startswith("root_results_dir:")):
             # should be one =
-            results_dir_command, results_dir = line.split(":")
-    if (results_dir == "unknown"):
+            root_results_dir_command, root_results_dir = line.split(":")
+    if (root_results_dir == "unknown"):
         result = False
-        print "cluster_spec missing results_dir declaration (results_dir:some_dir) {0}".format(path)    
-    if (results_dir.find('_PERMUTATION_CODE_') == -1):
-        result = False
-        print "cluster_spec results_dir declaration must contain the string _PERMUTATION_CODE_ {0}".format(path)      
+        print "cluster_spec missing root_results_dir declaration (root_results_dir:some_dir) {0}".format(path)    
     return result
     
 def validate_script_dir(path):
