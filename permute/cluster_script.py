@@ -12,10 +12,10 @@ class ClusterScript(object):
         Constructor
         '''
         self.trial = trial
-        self.permute_code = permutations.generate_permutation_code(permute_dict, cspec.concise_print_map)
+        self.permute_code = permutations.generate_permutation_code(permute_dict, cspec.concise_print_map, False)
         # results_dir now includes _PERMUTATION_CODE_ which means it can't be resolved until 
         partly_resolved_results_dir = cspec.results_dir.replace('_PERMUTATION_CODE_', self.permute_code)
-        partly_resolved_results_dir_with_trial = "{0}{1}trial{2}".format(partly_resolved_results_dir,os.pathsep, trial)
+        partly_resolved_results_dir_with_trial = "{0}/trial{1}".format(partly_resolved_results_dir, trial)
         list_of_size_1 = [partly_resolved_results_dir_with_trial] 
         self.resolved_results_dir =  permutations.resolve_permutation(permute_dict, list_of_size_1, key_val_map)[0]
         #print "resolved_results_dir : {0}".format(self.resolved_results_dir)

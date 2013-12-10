@@ -28,7 +28,6 @@ class TestPermuter(unittest.TestCase):
         
            
     def test_resolve_permutation(self):
-        permuters = self.cspec.permuters
         permute_dict = {'number': '1', 'letter': 'AAA'}
         commands = ['ls -la /nfs/(number)/(letter)/<pretty[(letter)]>']
         kv = {}
@@ -40,10 +39,12 @@ class TestPermuter(unittest.TestCase):
 
 
     def test_generate_permutation_code(self):
-        permute_dict = {'number': '1', 'letter': 'AAA'}
+        permute_dict = {'number': '1', 'letter': 'AAA', 'trials': '1'}
         concisePrintMap = { 'number': 'n', 'AAA':'A'}
-        code = permutations.generate_permutation_code(permute_dict, concisePrintMap)
-        self.assertTrue(code == 'letter_A_n_1')        
+        code = permutations.generate_permutation_code(permute_dict, concisePrintMap, False)
+        self.assertTrue(code == 'letter_A_n_1')     
+        code = permutations.generate_permutation_code(permute_dict, concisePrintMap, True)
+        self.assertTrue(code == 'letter_A_n_1_trials_1')      
         
 if __name__ == '__main__':
     unittest.main()

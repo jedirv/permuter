@@ -25,14 +25,44 @@ class TestPooledResultsFile(unittest.TestCase):
         y_axis_val = 'AAA'
         x_axis_val = 3
         filename_perm_dict = perm_dict = {'singleton_val':'300', 'res':'userDay' }
-        result = pooled_results_file.gen_perm_code_from_pieces(y_axis_val, x_axis_val, filename_perm_dict, self.cspec)
+        result = pooled_results_file.gen_perm_code_from_pieces(y_axis_val, x_axis_val, filename_perm_dict, self.cspec, '2')
         #print "RESULT : {0}".format(result)
-        self.assertTrue(result == 'l_aa_number_3_res_userDay_s_300')
+        self.assertTrue(result == 'l_aa_number_3_res_userDay_s_300_trials_2')
          
     def test_generate_target_dirname(self):
         dirname = pooled_results_file.generate_target_dirname(self.cspec)
         #print "DIR IS : {0}".format(dirname)
         self.assertTrue(dirname == './collected_results/unittest')
+        
+    def test_get_median(self):
+        x = [0.1]
+        result = pooled_results_file.get_median(x)
+        self.assertTrue(result == 0.1)
+        
+        x = [0.2, 0.1]
+        result = pooled_results_file.get_median(x)
+        self.assertTrue(float(str(result)) == 0.15) # hack to get float 0.15 to equal float 0.15!
+        
+        x = [0.3, 0.1, 0.2]
+        result = pooled_results_file.get_median(x)
+        self.assertTrue(result == 0.2)
+        
+        x = [0.4, 0.1, 0.3, 0.2]
+        result = pooled_results_file.get_median(x)
+        self.assertTrue(result == 0.25)
+        
+        x = [0.1, 0.5, 0.2, 0.3, 0.4]
+        result = pooled_results_file.get_median(x)
+        self.assertTrue(result == 0.3)
+        
+        x = [0.1, 0.6, 0.5, 0.4, 0.2, 0.3 ]
+        result = pooled_results_file.get_median(x)
+        self.assertTrue(result == 0.35)
+        
+        x = [0.1, 0.6, 0.5, 0.7, 0.4, 0.2, 0.3 ]
+        result = pooled_results_file.get_median(x)
+        self.assertTrue(result == 0.4)
+         
         
     def test_build_code_using_dictionary(self):
         perm_dict = {'singleton_val':'300', 'res':'userDay' }

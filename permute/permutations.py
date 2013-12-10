@@ -1,7 +1,9 @@
 import cluster_spec
 
 verbose = False
-
+#constants to help with permutation processing
+IGNORE_TRIALS = False
+INCLUDE_TRIALS = True
 
 def if_verbose( message):
     global verbose
@@ -10,17 +12,20 @@ def if_verbose( message):
  
 
 
-def generate_permutation_code(permute_dict, concisePrintMap):
+def generate_permutation_code(permute_dict, concisePrintMap, include_trials):
     code = ""
     keys = permute_dict.keys()
     sorted_keys = sorted(keys)
     for key in sorted_keys:
-        val = permute_dict[key]
-        if (concisePrintMap.has_key(key)):
-            key = concisePrintMap[key]
-        if (concisePrintMap.has_key(val)):
-            val = concisePrintMap[val]
-        code = "{0}_{1}_{2}".format(code, key, val)
+        if (include_trials == IGNORE_TRIALS and key == 'trials'):
+            pass
+        else:
+            val = permute_dict[key]
+            if (concisePrintMap.has_key(key)):
+                key = concisePrintMap[key]
+            if (concisePrintMap.has_key(val)):
+                val = concisePrintMap[val]
+            code = "{0}_{1}_{2}".format(code, key, val)
     code = code.lstrip('_')
     if_verbose("code determined as : {0}".format(code))
     return code        

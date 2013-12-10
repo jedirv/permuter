@@ -4,7 +4,6 @@ Created on Nov 22, 2013
 @author: admin-jed
 '''
 import os
-from permute import cluster_spec
 from monitor_exception import MonitorException
 
 class PooledResultsFile(object):
@@ -45,14 +44,29 @@ class PooledResultsFile(object):
             line = "{0},".format(y_axis_val)
             x_axis_list = cspec.permuters[cspec.scores_x_axis]
             for x_axis_val in x_axis_list:
-                perm_code = gen_perm_code_from_pieces(y_axis_val, x_axis_val, self.filename_perm_info, cspec)
-                source_file_path = self.source_file_map[perm_code]
-                print "SOURCE_FILE_PATH : {0}".format(source_file_path)
-                value = get_result_from_file(source_file_path, cspec.scores_from_colname, cspec.scores_from_rownum)
-                line = "{0}{1},".format(line, value)
+                trials_list = cspec.get_trials_list()
+                trial_values = []
+                for trial in trials_list:
+                    perm_code = gen_perm_code_from_pieces(y_axis_val, x_axis_val, self.filename_perm_info, cspec, trial)
+                    source_file_path = self.source_file_map[perm_code]
+                    print "SOURCE_FILE_PATH : {0}".format(source_file_path)
+                    value = get_result_from_file(source_file_path, cspec.scores_from_colname, cspec.scores_from_rownum)
+                    trial_values.append(float(value))
+                median_value = get_median(trial_values)
+                line = "{0}{1},".format(line, median_value)
             line = line.rstrip(',')
             f.write("{0}\n".format(line))
         f.close()
+      
+def get_median(float_series):
+    sorted_float_series = sorted(float_series)
+    size = len(sorted_float_series)
+    if (len(sorted_float_series)%2 == 0):
+        #even number in list
+        return (sorted_float_series[(size/2)-1]+sorted_float_series[size/2])/2.0
+    else:
+        #odd number in list
+        return sorted_float_series[(size-1)/2]
         
 def generate_target_dirname(cspec):
     dir = "{0}/{1}".format(cspec.scores_to, cspec.master_job_name)
@@ -60,7 +74,7 @@ def generate_target_dirname(cspec):
         os.makedirs(dir)
     return dir
     
-def gen_perm_code_from_pieces(y_axis_val, x_axis_val, filename_perm_dict, cspec):
+def gen_perm_code_from_pieces(y_axis_val, x_axis_val, filename_perm_dict, cspec, trial):
     full_perm_dict = {}
     for key, val in filename_perm_dict.items():
         full_perm_dict[key] = val
@@ -70,7 +84,7 @@ def gen_perm_code_from_pieces(y_axis_val, x_axis_val, filename_perm_dict, cspec)
     # create a full perm_dict by adding the x and y back in
     full_perm_dict[x_axis_permute] = x_axis_val
     full_perm_dict[y_axis_permute] = y_axis_val
-    #
+    full_perm_dict['trials'] = trial
     result = build_code_using_dictionary(full_perm_dict, cspec)
     return result
     

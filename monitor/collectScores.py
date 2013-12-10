@@ -59,11 +59,20 @@ def create_pooled_results_files(cspec):
 def create_source_file_map(cspec):   
     source_file_map = {}
     results_dir = cspec.results_dir
-    permutation_list = permutations.expand_permutations(cspec.permuters)
+    
+    #need to add trials in with cspec.permuters before expanding
+    trials_list = cspec.get_trials_list() 
+    permuters_with_trials = {}
+    for key, val in cspec.permuters.items():
+        permuters_with_trials[key] = val
+    permuters_with_trials['trials'] = trials_list
+     
+    permutation_list = permutations.expand_permutations(permuters_with_trials)
     for permutation_info in permutation_list:
-        input_perm_code = permutations.generate_permutation_code(permutation_info, cspec.concise_print_map)
+        input_perm_code = permutations.generate_permutation_code(permutation_info, cspec.concise_print_map, permutations.IGNORE_TRIALS)
         results_dir_with_perm_code = results_dir.replace("_PERMUTATION_CODE_", input_perm_code)
-        from_file_path_with_results_dir_resolved = cspec.scores_from_filepath.replace('<results_dir>',results_dir_with_perm_code)
+        results_dir_with_prem_code_and_trial = "{0}/trial{1}".format(results_dir_with_perm_code, permutation_info['trials'])
+        from_file_path_with_results_dir_resolved = cspec.scores_from_filepath.replace('<results_dir>',results_dir_with_prem_code_and_trial)
         scores_permutations_list = permutations.expand_permutations(cspec.scores_permuters)
         for scores_permutations_info in scores_permutations_list:
             # first resolve the regular_permutations info in the scores_from_filepath
@@ -82,7 +91,7 @@ def create_source_file_map(cspec):
             for key, val in scores_permutations_info.items():
                 master_permutation_info[key] = val
                 
-            full_perm_code = permutations.generate_permutation_code(master_permutation_info, cspec.concise_print_map)
+            full_perm_code = permutations.generate_permutation_code(master_permutation_info, cspec.concise_print_map, permutations.INCLUDE_TRIALS)
             source_file_map[full_perm_code] = fully_resolved_from_filepath
             print "source_file_map[{0}] = {1}".format(full_perm_code, fully_resolved_from_filepath)
     return source_file_map

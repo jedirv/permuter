@@ -77,7 +77,7 @@ def generate_scripts(cspec, permute_dictionary_list):
     user_job_number = 1
     if cspec.one_up_basis != '':
         user_job_number = int(cspec.one_up_basis)
-    for trial in range(1, cspec.trials + 1):
+    for trial in range(1, int(cspec.trials) + 1):
         for permute_dict in permute_dictionary_list:
             #permute_code = permutations.generate_permutation_code(permute_dict, cspec.concise_print_map)
             #commands_for_this_permutation = permutations.resolve_permutation(permute_dict, cspec.commands, kvm)

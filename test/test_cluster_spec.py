@@ -120,7 +120,7 @@ class TestClusterSpec(unittest.TestCase):
             
     def test_commands(self):
         commands_as_string = "{0}".format(self.cspec.commands)
-        self.assertTrue(commands_as_string == "['ls -la /nfs/missing > <results_dir>/(letter)_(number)_<pretty[(number)]>.txt']")
+        self.assertTrue(commands_as_string == "['echo (letter) (number) (singleton_val) > <results_dir>/(letter)_(number)_<pretty[(number)]>.txt']")
            
     def test__qsub_commands(self):
         qsub_commands_as_string = "{0}".format(self.cspec.qsub_commands)

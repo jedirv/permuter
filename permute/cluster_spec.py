@@ -65,6 +65,13 @@ class ClusterSpec(object):
             print "An error occured trying to open cspec file {0}".format(path)
             exit()
 
+    def get_trials_list(self):
+        result = []
+        integer_list = range(1, int(self.trials) + 1)
+        for integer in integer_list:
+            result.append(str(integer))
+        return result
+    
     def get_concise_name(self, permuter_name):
         if self.concise_print_map.has_key(permuter_name):
             return self.concise_print_map[permuter_name]
@@ -265,8 +272,16 @@ def validate(path):
     result_results_dir = validate_results_dir(path)
     if not(result_results_dir):
         print "problem found in results_dir statement"
+        
+    result_master_job_name = validate_master_job_name(path)
+    if not(result_master_job_name):
+        print "problem found in master_job_name statement"
+        
+    result_trials = validate_trials(path)
+    if not(result_trials):
+        print "problem found in trials statement"
     
-    return result_permute and result_replace and result_script_dir and result_results_dir
+    return result_permute and result_replace and result_script_dir and result_results_dir and result_master_job_name and result_trials
 
    
 def validate_results_dir(path):

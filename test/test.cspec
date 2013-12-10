@@ -48,6 +48,6 @@ qsub_command:-M someone@gmail.com
 qsub_command:-m beas
 one_up_basis:100
 
-command:ls -la /nfs/missing > <results_dir>/(letter)_(number)_<pretty[(number)]>.txt
+command:echo (letter) (number) (singleton_val) > <results_dir>/(letter)_(number)_<pretty[(number)]>.txt
 #
 
