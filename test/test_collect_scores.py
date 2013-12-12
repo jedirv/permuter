@@ -8,18 +8,7 @@ class TestCollectScores(unittest.TestCase):
         path = "./test.cspec"
         self.cspec = cluster_spec.ClusterSpec(path)
         
-    def test_create_delta_line(self):
-        number_line = "2013-04,0.82333,0.92333,0.72222"
-        delta_line = collectScores.create_delta_line(number_line)
-        self.assertTrue(delta_line == "2013-04,0,0.10,-0.10")
-        
-        number_line = "2013-04,0.082333,0.092333,0.072222"
-        delta_line = collectScores.create_delta_line(number_line)
-        self.assertTrue(delta_line == "2013-04,0,0.01,-0.01")
-        
-        number_line = "2013-04,0.0082333,0.0092333,0.0072222"
-        delta_line = collectScores.create_delta_line(number_line)
-        self.assertTrue(delta_line == "2013-04,0,0.00,-0.00")
+    
         
     def test_create_source_file_map(self):
         source_file_map = collectScores.create_source_file_map(self.cspec)

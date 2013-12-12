@@ -5,6 +5,7 @@ Created on Nov 26, 2013
 '''
 import unittest
 from monitor import pooled_results_file
+from monitor import pooled_results_delta_file
 from monitor import monitor_exception
 from permute import cluster_spec
 
@@ -96,7 +97,21 @@ class TestPooledResultsFile(unittest.TestCase):
             self.fail("should have complained about non-existent column")
         except monitor_exception.MonitorException as detail:
             self.assertTrue(True)
-            
+      
+      
+    def test_create_delta_line(self):
+        number_line = "2013-04,0.82333,0.92333,0.72222"
+        delta_line = pooled_results_delta_file.create_delta_line(number_line)
+        self.assertTrue(delta_line == "2013-04,0,0.10,-0.10")
+        
+        number_line = "2013-04,0.082333,0.092333,0.072222"
+        delta_line = pooled_results_delta_file.create_delta_line(number_line)
+        self.assertTrue(delta_line == "2013-04,0,0.01,-0.01")
+        
+        number_line = "2013-04,0.0082333,0.0092333,0.0072222"
+        delta_line = pooled_results_delta_file.create_delta_line(number_line)
+        self.assertTrue(delta_line == "2013-04,0,0.00,-0.00")
+              
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
