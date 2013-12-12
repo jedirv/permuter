@@ -16,8 +16,8 @@ def main():
     if (len(sys.argv) < 3):
         usage()
         exit()
-    permute_command = sys.argv[2]
-    cspec_path = sys.argv[1]
+    permute_command = sys.argv[1]
+    cspec_path = sys.argv[2]
     flags = ""
     if (len(sys.argv) == 4):
         flags = sys.argv[3]
@@ -225,7 +225,7 @@ def create_source_file_map(cspec):
 
   
 def usage():
-    print "usage:  python permuter.py <path of cluster_spec> gen|launch|auto|preview|test_launch|collect [-v]"
+    print "usage:  python permuter.py  gen|launch|auto|preview|test_launch|collect <path of cluster_spec> [-v]"
     
 if __name__ == '__main__':
     main()
