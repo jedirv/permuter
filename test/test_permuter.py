@@ -1,17 +1,24 @@
+'''
+Created on Dec 12, 2013
+
+@author: admin-jed
+'''
 import unittest, os
 from permute import cluster_spec
-from monitor import collectScores
+from permute import permuter
 
-class TestCollectScores(unittest.TestCase):
+class TestPermuter(unittest.TestCase):
 
     def setUp(self):
         path = "./test.cspec"
         self.cspec = cluster_spec.ClusterSpec(path)
-        
+
+
+
     
         
     def test_create_source_file_map(self):
-        source_file_map = collectScores.create_source_file_map(self.cspec)
+        source_file_map = permuter.create_source_file_map(self.cspec)
         #print source_file_map
         self.assertTrue(len(source_file_map.keys()) == 24)
         self.assertTrue(source_file_map['l_aa_number_1_res_userDay_s_300_trials_1']== './sample_results/unittest/trial1/l_aa_number_1_s_300/userDay.csv')
@@ -45,7 +52,7 @@ class TestCollectScores(unittest.TestCase):
         folder = './collected_results'
         self.clean_dir(folder)
         # generate 
-        collectScores.create_pooled_results_files(self.cspec)
+        permuter.create_pooled_results_files(self.cspec)
         f1 = open('./collected_results/unittest/res_userDay_s_300.csv','r')
         lines1 = f1.readlines()
         self.assertTrue(lines1[0] == 'letter,number_1,number_2,number_3\n')
@@ -70,6 +77,8 @@ class TestCollectScores(unittest.TestCase):
                     os.unlink(file_path)
             except Exception, e:
                 print e
+                
+
 if __name__ == '__main__':
     unittest.main()
     
