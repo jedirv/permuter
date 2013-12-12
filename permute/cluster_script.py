@@ -28,19 +28,26 @@ class ClusterScript(object):
         self.user_job_number = user_job_number
         self.script_dir = cspec.script_dir
         self.script_path_root = self.get_script_path_root()
+        self.stdout_capture_filepath = "{0}_invoke.txt".format(self.script_path_root)
         self.pathname = "{0}.sh".format(self.script_path_root)
+        self.script_name = "{0}.sh".format(self.get_job_file_name())
+        self.qsub_invoke_log = "{0}_qsub_invoke_log.txt".format(self.get_job_file_name())
 
-            
+    def get_job_file_name(self):
+        tag = ""
+        job_filename = ""
+        if (self.key_val_map.has_key('tag')):
+            tag = self.key_val_map['tag']
+            job_filename = "j{0}_{1}_{2}{3}".format(self.user_job_number, self.trial, self.permute_code, tag)
+        else:
+            job_filename = "j{0}_{1}_{2}".format(self.user_job_number, self.trial, self.permute_code)
+        return job_filename   
+      
     def get_script_path_root(self):
         if (not(os.path.isdir(self.script_dir))):
             os.makedirs(self.script_dir)
-        tag = ""
-        pathname_root = ""
-        if (self.key_val_map.has_key('tag')):
-            tag = self.key_val_map['tag']
-            pathname_root = "{0}{1}j{2}_{3}_{4}{5}".format(self.script_dir, os.sep, self.user_job_number, self.trial, self.permute_code, tag)
-        else:
-            pathname_root = "{0}{1}j{2}_{3}_{4}".format(self.script_dir, os.sep, self.user_job_number, self.trial, self.permute_code)
+        job_filename = self.get_job_file_name()
+        pathname_root = "{0}{1}{2}".format(self.script_dir, os.sep, job_filename)
         return pathname_root
     
     def generate(self):
@@ -54,9 +61,9 @@ class ClusterScript(object):
         if (self.key_val_map.has_key('tag')):
             tag = self.key_val_map['tag']
         if (tag != ""):
-            f.write("#$ -N j{0}_{1}_{2}{3}\n".format(self.user_job_number, self.permute_code, self.trial, tag))
+            f.write("#$ -N j{0}_{1}_{2}_{3}{4}\n".format(self.user_job_number, self.trial, self.permute_code, self.trial, tag))
         else:
-            f.write("#$ -N j{0}_{1}_{2}\n".format(self.user_job_number, self.permute_code, self.trial))
+            f.write("#$ -N j{0}_{1}_{2}_{3}\n".format(self.user_job_number, self.trial, self.permute_code, self.trial))
             
         f.write("#\n")
         
@@ -82,8 +89,18 @@ class ClusterScript(object):
         
     def launch(self):
         try: 
+            starting_dir = os.getcwd()
+            os.chdir(self.script_dir)
             print "calling qsub {0}".format(self.pathname)
-            subprocess.check_call(["qsub", self.pathname])
+            #args = "{0}.sh > {0}__invoke.txt".format(self.get_job_file_name())
+            #args = "{0} > {1}".format(self.pathname, self.stdout_capture_filepath)
+            #print "args : {0}".format(args)  
+            command = "qsub {0} > {1}".format(self.script_name, self.qsub_invoke_log)
+            os.system(command) 
+            #subprocess.check_call(["qsub", self.pathname, ">" , self.stdout_capture_filepath])
+            #subprocess.check_call(["qsub", args])
+            os.chdir(starting_dir)
+            
         except subprocess.CalledProcessError:
             print "There was a problem invoking the script: {0}".format(self.pathname)
             print "Return code was {0}".format(subprocess.CalledProcessError.returncode)

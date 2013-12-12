@@ -35,6 +35,8 @@ def main():
         launch(cspec)
     elif (permute_command == "preview"):
         preview(cspec)
+    elif (permute_command == "test_launch"):
+        test_launch(cspec)
     else:
         pass
         
@@ -44,16 +46,25 @@ def if_verbose(message):
         print message
     
 def generate(cspec):
-    permute_dictionary_list = permutations.expand_permutations(cspec.permuters)
+    permuters_including_trials = cspec.get_permuters_trials_included()
+    permute_dictionary_list = permutations.expand_permutations(permuters_including_trials)
     generate_scripts(cspec, permute_dictionary_list)
     
 def launch(cspec):
-    permute_dictionary_list = permutations.expand_permutations(cspec.permuters)
+    permuters_including_trials = cspec.get_permuters_trials_included()
+    permute_dictionary_list = permutations.expand_permutations(permuters_including_trials)
     launch_scripts(cspec, permute_dictionary_list)
     
 def preview(cspec):
-    permute_dictionary_list = permutations.expand_permutations(cspec.permuters)
+    permuters_including_trials = cspec.get_permuters_trials_included()
+    permute_dictionary_list = permutations.expand_permutations(permuters_including_trials)
     preview_scripts(cspec, permute_dictionary_list)
+    
+    
+def test_launch(cspec):
+    permuters_including_trials = cspec.get_permuters_trials_included()
+    permute_dictionary_list = permutations.expand_permutations(permuters_including_trials)
+    test_launch_single_script(cspec, permute_dictionary_list)
 
 def launch_scripts(cspec, permute_dictionary_list):
     job_num_width = permutations.get_job_number_width(permute_dictionary_list)
@@ -61,30 +72,32 @@ def launch_scripts(cspec, permute_dictionary_list):
     user_job_number = 1
     if cspec.one_up_basis != '':
         user_job_number = int(cspec.one_up_basis)
-    for permute_dict in permute_dictionary_list:
+    for permute_info in permute_dictionary_list:
         #permute_code = permutations.generate_permutation_code(permute_dict, cspec.concise_print_map)
         #commands_for_this_permutation = permutations.resolve_permutation(permute_dict, cspec.commands, kvm)
         user_job_number_as_string = str(user_job_number).zfill(job_num_width)
-        cscript = cluster_script.ClusterScript(user_job_number_as_string, kvm, permute_dict, cspec)
+        cscript = cluster_script.ClusterScript(user_job_number_as_string, kvm, permute_info, cspec, permute_info['trials'])
         cscript.launch()
         user_job_number = user_job_number + 1
         time.sleep(1.5)
 
     
 def generate_scripts(cspec, permute_dictionary_list):
+    print permute_dictionary_list
     job_num_width = permutations.get_job_number_width(permute_dictionary_list)
+    print 'job_number_width {0}'.format(job_num_width)
     kvm = cspec.key_val_map
     user_job_number = 1
     if cspec.one_up_basis != '':
         user_job_number = int(cspec.one_up_basis)
-    for trial in range(1, int(cspec.trials) + 1):
-        for permute_dict in permute_dictionary_list:
-            #permute_code = permutations.generate_permutation_code(permute_dict, cspec.concise_print_map)
-            #commands_for_this_permutation = permutations.resolve_permutation(permute_dict, cspec.commands, kvm)
-            user_job_number_as_string = str(user_job_number).zfill(job_num_width)
-            cscript = cluster_script.ClusterScript(user_job_number_as_string, kvm, permute_dict, cspec, trial)
-            cscript.generate()
-            user_job_number = user_job_number + 1
+    #for trial in range(1, int(cspec.trials) + 1):
+    for permute_info in permute_dictionary_list:
+        #permute_code = permutations.generate_permutation_code(permute_dict, cspec.concise_print_map)
+        #commands_for_this_permutation = permutations.resolve_permutation(permute_dict, cspec.commands, kvm)
+        user_job_number_as_string = str(user_job_number).zfill(job_num_width)
+        cscript = cluster_script.ClusterScript(user_job_number_as_string, kvm, permute_info, cspec, permute_info['trials'])
+        cscript.generate()
+        user_job_number = user_job_number + 1
        
 
 def preview_scripts(cspec, permute_dictionary_list):
@@ -94,17 +107,32 @@ def preview_scripts(cspec, permute_dictionary_list):
     user_job_number = 1
     if cspec.one_up_basis != '':
         user_job_number = int(cspec.one_up_basis)
-    permute_dict = permute_dictionary_list[0]
+    permute_info = permute_dictionary_list[0]
     #permute_code = permutations.generate_permutation_code(permute_dict, cspec.concise_print_map)
     #commands_for_this_permutation = permutations.resolve_permutation(permute_dict, cspec.commands, kvm)
     user_job_number_as_string = str(user_job_number).zfill(job_num_width)
-    cscript = cluster_script.ClusterScript(user_job_number_as_string, kvm, permute_dict, cspec)
+    cscript = cluster_script.ClusterScript(user_job_number_as_string, kvm, permute_info, cspec, permute_info['trials'])
     cscript.preview()
-       
+
+
+def test_launch_single_script(cspec, permute_dictionary_list):
+    job_num_width = permutations.get_job_number_width(permute_dictionary_list)
+    if_verbose("preview mode")
+    kvm = cspec.key_val_map
+    user_job_number = 1
+    if cspec.one_up_basis != '':
+        user_job_number = int(cspec.one_up_basis)
+    permute_info = permute_dictionary_list[0]
+    #permute_code = permutations.generate_permutation_code(permute_dict, cspec.concise_print_map)
+    #commands_for_this_permutation = permutations.resolve_permutation(permute_dict, cspec.commands, kvm)
+    user_job_number_as_string = str(user_job_number).zfill(job_num_width)
+    cscript = cluster_script.ClusterScript(user_job_number_as_string, kvm, permute_info, cspec, permute_info['trials'])
+    cscript.launch()
+           
                   
  
 def validate_args(permute_command, cspec_path, flags):
-    if (not(permute_command == "gen" or permute_command == "launch" or permute_command == "auto" or permute_command == "preview")):
+    if (not(permute_command == "gen" or permute_command == "launch" or permute_command == "auto" or permute_command == "preview" or permute_command == "test_launch")):
         usage()
         exit()
     # verify spec path exists
@@ -126,7 +154,7 @@ def validate_args(permute_command, cspec_path, flags):
             exit()
     
 def usage():
-    print "usage:  python permuter.py <path of cluster_spec> gen|launch|auto/preview [-v]"
+    print "usage:  python permuter.py <path of cluster_spec> gen|launch|auto|preview|test_launch [-v]"
     
 if __name__ == '__main__':
     main()

@@ -23,13 +23,13 @@ class ClusterSpec(object):
         Constructor
         '''
         self.path = path
-        print "opening cspec path: {0}".format(self.path)
+        #print "opening cspec path: {0}".format(self.path)
         # verify spec path exists
         try:
             f = open(path, 'r')
             # verify first line has cspec flag
             header = f.readline()
-            print "header : {0} length {1} ".format(header, len(header))
+            #print "header : {0} length {1} ".format(header, len(header))
             if (header != "#cspec\n"):
                 print "cspec file must have this header:  '#cspec', {0} does not. Exiting.".format(path)
                 f.close()
@@ -69,6 +69,13 @@ class ClusterSpec(object):
             print "An error occurred trying to open cspec file {0}".format(path)
             exit()
 
+    def get_permuters_trials_included(self):
+        permuters_with_trials = {}
+        for key, val in self.permuters.items():
+            permuters_with_trials[key] = val
+        permuters_with_trials['trials'] = self.get_trials_list()
+        return permuters_with_trials
+    
     def generate_results_dir_for_permutation(self, trial, permuation_code):
         return "{0}/trial{1}/{2}".format(self.job_results_dir, trial, permuation_code)
     
@@ -353,7 +360,7 @@ def validate_trials(path):
             trials_command, trials = line.split(":")
     if (trials == "unknown"):
         result = False
-        print "cluster_spec missing trials declaration (trials:some_name) {0}".format(path)      
+        print "cluster_spec missing trials declaration (trials:some_integer) {0}".format(path)      
     return result
 
 def validate_replace_entries(path):

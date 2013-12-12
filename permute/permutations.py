@@ -73,15 +73,16 @@ def resolve_permutation(permute_dict, commands, keyValMap):
     
     # now use the copy to resolve permutations in the values
     for permKey, permVal in permute_dict.iteritems():
-        #if_verbose("  key, val in permute step 1 : {0},{1}".format(permKey, permVal))
-        keyValMap_permuation_specific_for_this_pass = {}
-        match_string = "({0})".format(permKey)
-        #if_verbose("  perm match_string : {0}".format(match_string))
-        for key, val in keyValMap_permuation_specific.iteritems():
-            resolved_val = val.replace(match_string, permVal)
-            keyValMap_permuation_specific_for_this_pass[key] = resolved_val
-        keyValMap_permuation_specific = keyValMap_permuation_specific_for_this_pass    
-        #if_verbose("  keyValMap_permuation_specific after a pass of resolve_permutation: {0}".format(keyValMap_permuation_specific))
+        if (permKey != 'trials'):
+            #if_verbose("  key, val in permute step 1 : {0},{1}".format(permKey, permVal))
+            keyValMap_permuation_specific_for_this_pass = {}
+            match_string = "({0})".format(permKey)
+            #if_verbose("  perm match_string : {0}".format(match_string))
+            for key, val in keyValMap_permuation_specific.iteritems():
+                resolved_val = val.replace(match_string, permVal)
+                keyValMap_permuation_specific_for_this_pass[key] = resolved_val
+            keyValMap_permuation_specific = keyValMap_permuation_specific_for_this_pass    
+            #if_verbose("  keyValMap_permuation_specific after a pass of resolve_permutation: {0}".format(keyValMap_permuation_specific))
         
     # now do a pass through keyValMap_permuation_specific to resolve any now-refined lookups
     # FIXME - does this need to be iterative?
@@ -94,14 +95,15 @@ def resolve_permutation(permute_dict, commands, keyValMap):
     commands_for_this_permutation = []
     for key, val in permute_dict.iteritems():
         #if_verbose("  key, val in permute step 1 : {0},{1}".format(key, val))
-        commands_for_this_permutation = []
-        match_string = "({0})".format(key)
-        #if_verbose("  perm match_string : {0}".format(match_string))
-        for command in commands:
-            resolved_command = command.replace(match_string, val)
-            commands_for_this_permutation.append(resolved_command)
-        commands = commands_for_this_permutation    
-        #if_verbose("  commands after a pass1 of resolve_permutation: {0}".format(commands))
+        if (key != 'trials'):
+            commands_for_this_permutation = []
+            match_string = "({0})".format(key)
+            #if_verbose("  perm match_string : {0}".format(match_string))
+            for command in commands:
+                resolved_command = command.replace(match_string, val)
+                commands_for_this_permutation.append(resolved_command)
+            commands = commands_for_this_permutation    
+            #if_verbose("  commands after a pass1 of resolve_permutation: {0}".format(commands))
     
     # now use keyValMap_final_for_permutation to resolve the commands
     for key, val in keyValMap_final_for_permutation.iteritems():
