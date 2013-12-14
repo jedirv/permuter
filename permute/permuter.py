@@ -7,6 +7,9 @@ import sys, os, time
 import cluster_spec
 import permutations
 import cluster_script
+import qsub_invoke_log
+import qstat_log
+import qacct_log
 from monitor import pooled_results_file
 from monitor import pooled_results_delta_file
 
@@ -41,6 +44,8 @@ def main():
         test_launch(cspec)
     elif (permute_command == "collect"):
         collect(cspec)
+    elif (permute_command == "stat"):
+        status(cspec)
         
     else:
         pass
@@ -50,26 +55,106 @@ def if_verbose(message):
     if (verbose):
         print message
     
+def status(cspec):
+    permuters_including_trials = cspec.get_permuters_trials_included()
+    permute_info_list = permutations.expand_permutations(permuters_including_trials)
+    check_status_of_runs(cspec, permute_info_list)
+    
 def collect(cspec):
+    permuters_including_trials = cspec.get_permuters_trials_included()
+    permute_info_list = permutations.expand_permutations(permuters_including_trials)
+    warn_of_incomplete_runs(cspec, permute_info_list)
     resultsFiles = create_pooled_results_files(cspec)
     create_pooled_results_delta_files(resultsFiles)
         
 def generate(cspec):
     permuters_including_trials = cspec.get_permuters_trials_included()
-    permute_dictionary_list = permutations.expand_permutations(permuters_including_trials)
-    generate_scripts(cspec, permute_dictionary_list)
+    permute_info_list = permutations.expand_permutations(permuters_including_trials)
+    generate_scripts(cspec, permute_info_list)
     
 def launch(cspec):
     permuters_including_trials = cspec.get_permuters_trials_included()
-    permute_dictionary_list = permutations.expand_permutations(permuters_including_trials)
-    launch_scripts(cspec, permute_dictionary_list)
+    permute_info_list = permutations.expand_permutations(permuters_including_trials)
+    launch_scripts(cspec, permute_info_list)
     
 def preview(cspec):
     permuters_including_trials = cspec.get_permuters_trials_included()
-    permute_dictionary_list = permutations.expand_permutations(permuters_including_trials)
-    preview_scripts(cspec, permute_dictionary_list)
+    permute_info_list = permutations.expand_permutations(permuters_including_trials)
+    preview_scripts(cspec, permute_info_list)
     
- 
+
+def warn_of_incomplete_runs(cspec, permute_info_list):
+    job_num_width = permutations.get_job_number_width(permute_info_list)
+    kvm = cspec.key_val_map
+    user_job_number = 1
+    if cspec.one_up_basis != '':
+        user_job_number = int(cspec.one_up_basis)
+        
+    still_running_permute_infos = []
+    still_running_count = 0
+    finished_healthy_count = 0
+    finished_error_count = 0
+    
+    for permute_info in permute_info_list:
+        #permute_code = permutations.generate_permutation_code(permute_dict, cspec.concise_print_map)
+        #commands_for_this_permutation = permutations.resolve_permutation(permute_dict, cspec.commands, kvm)
+        user_job_number_as_string = str(user_job_number).zfill(job_num_width)
+        qil = qsub_invoke_log.QsubInvokeLog(user_job_number_as_string, kvm, permute_info, cspec, permute_info['trials'])
+        cluster_job_number = qil.cluster_job_number
+        #print "cluster_job_number is {0}".format(cluster_job_number)
+        # first, check qstat to see if this job is still running
+        
+        statloq = qstat_log.QStatLog(user_job_number_as_string, kvm, permute_info, cspec, permute_info['trials'])
+        if (statloq.is_cluster_job_still_running(cluster_job_number)):
+            still_running_permute_infos.append(permute_info)
+            still_running_count = still_running_count + 1
+            print "{0} still running".format(cluster_job_number)
+        else:
+            #print "{0} done".format(cluster_job_number)
+            qacctlog = qacct_log.QacctLog(user_job_number_as_string, kvm, permute_info, cspec, permute_info['trials'])
+            qacctlog.ingest(cluster_job_number)
+            if (qacctlog.run_failed()):
+                finished_error_count = finished_error_count + 1
+                print "{0} run issue : {1} -> {2}".format(cluster_job_number, permute_info, qacctlog.get_failure_reason())
+            else:
+                finished_healthy_count = finished_healthy_count + 1
+        user_job_number = user_job_number + 1
+    if (still_running_count != 0):
+        print "{0} permutations still running".format(still_running_count)
+        for still_running_permute_info in still_running_permute_infos:
+            print "still running : {0}".format(still_running_permute_info) 
+    print "{0} permutations complete".format(finished_healthy_count) 
+            
+
+def check_status_of_runs(cspec, permute_info_list):
+    job_num_width = permutations.get_job_number_width(permute_info_list)
+    kvm = cspec.key_val_map
+    user_job_number = 1
+    if cspec.one_up_basis != '':
+        user_job_number = int(cspec.one_up_basis)
+    for permute_info in permute_info_list:
+        #permute_code = permutations.generate_permutation_code(permute_dict, cspec.concise_print_map)
+        #commands_for_this_permutation = permutations.resolve_permutation(permute_dict, cspec.commands, kvm)
+        user_job_number_as_string = str(user_job_number).zfill(job_num_width)
+        qil = qsub_invoke_log.QsubInvokeLog(user_job_number_as_string, kvm, permute_info, cspec, permute_info['trials'])
+        cluster_job_number = qil.cluster_job_number
+        #print "cluster_job_number is {0}".format(cluster_job_number)
+        # first, check qstat to see if this
+        statloq = qstat_log.QStatLog(user_job_number_as_string, kvm, permute_info, cspec, permute_info['trials'])
+        if (statloq.is_cluster_job_still_running(cluster_job_number)):
+            print "{0} still running".format(cluster_job_number)
+        else:
+            #print "{0} done".format(cluster_job_number)
+            qacctlog = qacct_log.QacctLog(user_job_number_as_string, kvm, permute_info, cspec, permute_info['trials'])
+            qacctlog.ingest(cluster_job_number)
+            if (qacctlog.run_failed()):
+                print "{0} FAILED -> {1}".format(cluster_job_number, qacctlog.get_failure_reason())
+            else:
+                print "{0} complete".format(cluster_job_number)
+        user_job_number = user_job_number + 1
+        
+        
+         
 def create_pooled_results_delta_files(resultsFiles):
     for resultsFile in resultsFiles:
         deltaFile = pooled_results_delta_file.PooledResultsDeltaFile(resultsFile)
@@ -87,13 +172,21 @@ def create_pooled_results_files(cspec):
         resultsFile.persist()
         resultsFiles.append(resultsFile)
     return resultsFiles
-           
+
+def delete_results(cspec):
+    source_file_map = create_source_file_map(cspec)
+    for permutation, result_path in source_file_map.items():
+        if (os.path.isfile(result_path)):
+            print "deleting result_file for {0} : {1}".format(permutation, result_path)
+            os.unlink(result_path)
+        
 def test_launch(cspec):
     permuters_including_trials = cspec.get_permuters_trials_included()
     permute_dictionary_list = permutations.expand_permutations(permuters_including_trials)
     test_launch_single_script(cspec, permute_dictionary_list)
 
 def launch_scripts(cspec, permute_dictionary_list):
+    delete_results(cspec)
     job_num_width = permutations.get_job_number_width(permute_dictionary_list)
     kvm = cspec.key_val_map
     user_job_number = 1
@@ -160,6 +253,7 @@ def test_launch_single_script(cspec, permute_dictionary_list):
  
 def validate_args(permute_command, cspec_path, flags):
     if (not(permute_command == "collect" or 
+            permute_command == "stat" or 
             permute_command == "gen" or 
             permute_command == "launch" or 
             permute_command == "auto" or 
@@ -225,7 +319,7 @@ def create_source_file_map(cspec):
 
   
 def usage():
-    print "usage:  python permuter.py  gen|launch|auto|preview|test_launch|collect <path of cluster_spec> [-v]"
+    print "usage:  python permuter.py  gen|launch|auto|preview|test_launch|collect|stat <path of cluster_spec> [-v]"
     
 if __name__ == '__main__':
     main()
