@@ -6,17 +6,15 @@ Created on Dec 12, 2013
 import unittest, os
 from permute import cluster_spec
 from permute import permuter
+from permute import cluster_runs_info
 
 class TestPermuter(unittest.TestCase):
 
     def setUp(self):
         path = "./test.cspec"
         self.cspec = cluster_spec.ClusterSpec(path)
+        self.cluster_runs = cluster_runs_info.ClusterRunsInfo(self.cspec)
 
-
-
-    
-        
     def test_create_source_file_map(self):
         source_file_map = permuter.create_source_file_map(self.cspec)
         #print source_file_map
@@ -52,7 +50,7 @@ class TestPermuter(unittest.TestCase):
         folder = './collected_results'
         self.clean_dir(folder)
         # generate 
-        permuter.create_pooled_results_files(self.cspec)
+        permuter.create_pooled_results_files(self.cluster_runs)
         f1 = open('./collected_results/unittest/res_userDay_s_300.csv','r')
         lines1 = f1.readlines()
         self.assertTrue(lines1[0] == 'letter,number_1,number_2,number_3\n')

@@ -1,16 +1,18 @@
 import unittest, os
 from permute import cluster_spec
 from permute import permuter
+from permute import cluster_runs_info
 
 class TestSystem(unittest.TestCase):
 
     def setUp(self):
         path = "./gentest.cspec"
         self.cspec = cluster_spec.ClusterSpec(path)
-
+        self.cluster_runs = cluster_runs_info.ClusterRunsInfo(self.cspec)
+        
     def test_generate(self):
         
-        permuter.generate(self.cspec)
+        permuter.generate_scripts(self.cluster_runs)
         
         self.assertTrue(os.path.isfile('./scripts_unittest/j100_1_l_aa_number_1_s_300.sh'))
         self.assertTrue(os.path.isfile('./scripts_unittest/j101_1_l_bb_number_1_s_300.sh'))

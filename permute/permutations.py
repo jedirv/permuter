@@ -12,15 +12,15 @@ def if_verbose( message):
  
 
 
-def generate_permutation_code(permute_dict, concisePrintMap, include_trials):
+def generate_permutation_code(permute_info, concisePrintMap, include_trials):
     code = ""
-    keys = permute_dict.keys()
+    keys = permute_info.keys()
     sorted_keys = sorted(keys)
     for key in sorted_keys:
         if (include_trials == IGNORE_TRIALS and key == 'trials'):
             pass
         else:
-            val = permute_dict[key]
+            val = permute_info[key]
             if (concisePrintMap.has_key(key)):
                 key = concisePrintMap[key]
             if (concisePrintMap.has_key(val)):
@@ -61,6 +61,7 @@ def expand_permutations(permuters):
                         new_dict[existingKey] = existingVal
                     expanded_dict_list.append(new_dict)
             dict_list = expanded_dict_list
+        dict_list = sorted(dict_list)
         if_verbose("  dict_list : {0}".format(dict_list))
     return dict_list                 
 
@@ -119,9 +120,3 @@ def resolve_permutation(permute_dict, commands, keyValMap):
     if_verbose("  commands after resolve_permutation: {0}".format(commands_for_this_permutation))
     return commands_for_this_permutation
 
-
-def get_job_number_width(permute_dictionary_list):
-    permute_count = len(permute_dictionary_list)
-    permute_count_as_string = str(permute_count)
-    permute_count_width = len(permute_count_as_string)
-    return permute_count_width

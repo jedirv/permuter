@@ -1,3 +1,4 @@
+
 verbose = False
 
 def resolve_value(keyValMap, given_val):
@@ -222,6 +223,7 @@ class ClusterSpec(object):
                 pass
         f.close()
         return concisePrintMap
+        
  
 def zero_pad_to_widest(permute_values):
     result = permute_values
