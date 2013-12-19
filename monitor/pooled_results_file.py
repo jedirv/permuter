@@ -23,16 +23,13 @@ class PooledResultsFile(object):
         self.target_dir = generate_target_dirname(self.cspec)
         self.perm_code_for_filename  = build_code_using_dictionary(filename_perm_info, self.cspec)
         self.target_path = "{0}/{1}.csv".format(self.target_dir, self.perm_code_for_filename)
-        self.target_timings_path = "{0}/{1}_timings.csv".format(self.target_dir, self.perm_code_for_filename)
         self.source_file_map = source_file_map
         self.filename_perm_info = filename_perm_info
        
     def persist(self):
         cspec = self.cspec
-        
         # generate the column names
         f = open(self.target_path, 'w')
-        ft = open(self.target_timings_path, 'w')
         header = "{0},".format(cspec.scores_y_axis)
     
         x_prefix = cspec.get_concise_name(cspec.scores_x_axis)
@@ -42,42 +39,30 @@ class PooledResultsFile(object):
             header = "{0}{1}_{2},".format(header, x_prefix, value)
         header = header.rstrip(',')
         f.write("{0}\n".format(header))
-        ft.write("{0}\n".format(header))
         # generate the values
         y_axis_list = cspec.permuters[cspec.scores_y_axis]
         for y_axis_val in y_axis_list:
             line = "{0},".format(y_axis_val)
-            timings_line = "{0},".format(y_axis_val)
             x_axis_list = cspec.permuters[cspec.scores_x_axis]
             for x_axis_val in x_axis_list:
                 trials_list = cspec.get_trials_list()
                 trial_values = []
-                trial_timing_values = []
                 for trial in trials_list:
-                    perm_code = gen_perm_code_from_pieces(y_axis_val, x_axis_val, self.filename_perm_info, cspec, trial)
-                    source_file_path = self.source_file_map[perm_code]
+                    result_file_perm_code = gen_perm_code_from_pieces(y_axis_val, x_axis_val, self.filename_perm_info, cspec, trial)
+                    source_file_path = self.source_file_map[result_file_perm_code]
                     #print "SOURCE_FILE_PATH : {0}".format(source_file_path)
                     value = get_result_from_file(source_file_path, cspec.scores_from_colname, cspec.scores_from_rownum)
-                    
-                    timing_value = get_timing_value_for_run(perm_code, y_axis_val, x_axis_val, self.cluster_runs, trial)
                     trial_values.append(float(value))
-                    trial_timing_values.append(timing_value)
                 median_value = get_median(trial_values)
-                median_timing = get_median_timing(trial_timing_values)
                 line = "{0}{1},".format(line, median_value)
-                timings_line = "{0}{1},".format(line, median_timing)
             line = line.rstrip(',')
-            timings_line.rstrip(',')
             f.write("{0}\n".format(line))
-            ft.write("{0}\n".format(timings_line))
         f.close()
-        ft.close()
            
 def get_median_timing(timings):
     pass
 
 def get_timing_value_for_run(perm_code, y_axis_val, x_axis_val, cluster_runs, trial): 
-    #(user_job_number, job_num_width, permute_info
     user_job_number_as_string = cluster_runs.get_job_number_string_for_permutation_code(perm_code)
     permutation_info = cluster_runs.get_permutation_info_for_permutation_code(perm_code)
     qil = qsub_invoke_log.QsubInvokeLog(user_job_number_as_string, permutation_info, cluster_runs.cspec, permutation_info['trials'])

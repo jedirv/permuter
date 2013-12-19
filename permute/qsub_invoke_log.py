@@ -1,6 +1,6 @@
 import os
 from permutation_driver_file import PermutationDriverFile
-from monitor import monitor_exception
+#from monitor import monitor_exception
 
 class QsubInvokeLog(PermutationDriverFile):
     '''
@@ -25,7 +25,8 @@ class QsubInvokeLog(PermutationDriverFile):
         parts = line.split(' ')
         os.chdir(starting_dir)
         if (len(parts) != 7):
-            raise monitor_exception.MonitorException("qsub invoke log has incorrect number of fields {0}. Should look like 'Your job 4174438 (jobname) has been submitted'")
+            #raise monitor_exception.MonitorException("qsub invoke log has incorrect number of fields {0}. Should look like 'Your job 4174438 (jobname) has been submitted'")
+            raise Exception("qsub invoke log has incorrect number of fields {0}. Should look like 'Your job 4174438 (jobname) has been submitted'")
         result = parts[2]
         return result
         

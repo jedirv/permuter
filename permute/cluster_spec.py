@@ -136,8 +136,8 @@ class ClusterSpec(object):
             line = line.rstrip()
             if (line.startswith(flag)):
                 if_verbose("  processing permute line - {0}".format(line))
-                permute_command, permute_info = line.split(':')
-                permuteKey, permute_list_string = permute_info.split('=')
+                permute_command, permutation_info = line.split(':')
+                permuteKey, permute_list_string = permutation_info.split('=')
                 if (permute_list_string.find(" ") != -1):
                     permute_start, permute_end = permute_list_string.split(" ")
                     permute_list = range(int(permute_start), int(permute_end)+1)
@@ -414,8 +414,8 @@ def validate_permute_entries(path):
                 print "   comma separated list of values  aa,bb,cc"
                 result = False
             else:
-                permutecommand, permute_info = line.split(':')
-                permuteKey, permute_list_string = permute_info.split('=')
+                permutecommand, permutation_info = line.split(':')
+                permuteKey, permute_list_string = permutation_info.split('=')
                 if (permute_list_string.find(" ") != -1):
                     permute_start, permute_end = permute_list_string.split(" ")
                     # start of range is an int?

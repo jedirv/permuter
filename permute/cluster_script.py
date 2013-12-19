@@ -9,7 +9,7 @@ class ClusterScript(PermutationDriverFile):
     '''
         
     def configure(self):
-        self.commands_for_this_permutation = permutations.resolve_permutation(self.permute_info, self.cspec.commands, self.key_val_map)
+        self.commands_for_this_permutation = permutations.resolve_permutation(self.permutation_info, self.cspec.commands, self.key_val_map)
         self.qsub_commands = self.cspec.qsub_commands
         self.script_path_root = self.get_script_path_root()
         self.stdout_capture_filepath = "{0}_invoke.txt".format(self.script_path_root)

@@ -12,15 +12,15 @@ def if_verbose( message):
  
 
 
-def generate_permutation_code(permute_info, concisePrintMap, include_trials):
+def generate_permutation_code(permutation_info, concisePrintMap, include_trials):
     code = ""
-    keys = permute_info.keys()
+    keys = permutation_info.keys()
     sorted_keys = sorted(keys)
     for key in sorted_keys:
         if (include_trials == IGNORE_TRIALS and key == 'trials'):
             pass
         else:
-            val = permute_info[key]
+            val = permutation_info[key]
             if (concisePrintMap.has_key(key)):
                 key = concisePrintMap[key]
             if (concisePrintMap.has_key(val)):
@@ -66,14 +66,14 @@ def expand_permutations(permuters):
     return dict_list                 
 
           
-def resolve_permutation(permute_dict, commands, keyValMap):
+def resolve_permutation(permutation_info, commands, keyValMap):
     # first make a copy of the keyValMap so taht we can resolve permutations with in its values
     keyValMap_permuation_specific = {}
     for key, val in keyValMap.iteritems():
         keyValMap_permuation_specific[key] = val
     
     # now use the copy to resolve permutations in the values
-    for permKey, permVal in permute_dict.iteritems():
+    for permKey, permVal in permutation_info.iteritems():
         if (permKey != 'trials'):
             #if_verbose("  key, val in permute step 1 : {0},{1}".format(permKey, permVal))
             keyValMap_permuation_specific_for_this_pass = {}
@@ -94,7 +94,7 @@ def resolve_permutation(permute_dict, commands, keyValMap):
 
     # then make a first pass through the commands and resolve permutations as some lookups will depend on that having been done
     commands_for_this_permutation = []
-    for key, val in permute_dict.iteritems():
+    for key, val in permutation_info.iteritems():
         #if_verbose("  key, val in permute step 1 : {0},{1}".format(key, val))
         if (key != 'trials'):
             commands_for_this_permutation = []

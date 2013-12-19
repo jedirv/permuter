@@ -11,6 +11,7 @@ import cluster_script
 import qsub_invoke_log
 import qstat_log
 import qacct_log
+#from monitor import pooled_timings_file
 from monitor import pooled_results_file
 from monitor import pooled_results_delta_file
 
@@ -61,66 +62,63 @@ def collect(cluster_runs):
     warn_of_incomplete_runs(cluster_runs)
     resultsFiles = create_pooled_results_files(cluster_runs)
     create_pooled_results_delta_files(resultsFiles)
+    #create_pooled_timings_files(cluster_runs)
     
 
 def warn_of_incomplete_runs(cluster_runs):
     cspec = cluster_runs.cspec
-    still_running_permute_infos = []
+    still_running_permutation_infos = []
     still_running_count = 0
     finished_healthy_count = 0
     finished_error_count = 0
     
-    for permute_info in cluster_runs.permute_info_list_full:
-        #permute_code = permutations.generate_permutation_code(permute_dict, cspec.concise_print_map)
-        #commands_for_this_permutation = permutations.resolve_permutation(permute_dict, cspec.commands, kvm)
-        user_job_number_as_string = cluster_runs.get_job_number_string_for_permutation(permute_info)
+    for permutation_info in cluster_runs.permutation_info_list_full:
+        user_job_number_as_string = cluster_runs.get_job_number_string_for_permutation_info(permutation_info)
         
-        qil = qsub_invoke_log.QsubInvokeLog(user_job_number_as_string, permute_info, cspec, permute_info['trials'])
+        qil = qsub_invoke_log.QsubInvokeLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'])
         cluster_job_number = qil.cluster_job_number
         #print "cluster_job_number is {0}".format(cluster_job_number)
         # first, check qstat to see if this job is still running
         
-        statloq = qstat_log.QStatLog(user_job_number_as_string, permute_info, cspec, permute_info['trials'])
+        statloq = qstat_log.QStatLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'])
         if (statloq.is_cluster_job_still_running(cluster_job_number)):
-            still_running_permute_infos.append(permute_info)
+            still_running_permutation_infos.append(permutation_info)
             still_running_count = still_running_count + 1
             print "{0} still running".format(cluster_job_number)
         else:
             #print "{0} done".format(cluster_job_number)
-            qacctlog = qacct_log.QacctLog(user_job_number_as_string, permute_info, cspec, permute_info['trials'])
+            qacctlog = qacct_log.QacctLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'])
             qacctlog.ingest(cluster_job_number)
             if (qacctlog.run_failed()):
                 finished_error_count = finished_error_count + 1
-                print "{0} run issue : {1} -> {2}".format(cluster_job_number, permute_info, qacctlog.get_failure_reason())
+                print "{0} run issue : {1} -> {2}".format(cluster_job_number, permutation_info, qacctlog.get_failure_reason())
             else:
                 finished_healthy_count = finished_healthy_count + 1
 
     if (still_running_count != 0):
         print "{0} permutations still running".format(still_running_count)
-        for still_running_permute_info in still_running_permute_infos:
-            print "still running : {0}".format(still_running_permute_info) 
+        for still_running_permutation_info in still_running_permutation_infos:
+            print "still running : {0}".format(still_running_permutation_info) 
     print "{0} permutations complete".format(finished_healthy_count) 
             
 
 def check_status_of_runs(cluster_runs):
     cspec = cluster_runs.cspec
-    for permute_info in cluster_runs.permute_info_list_full:
-        check_status_of_run(cluster_runs, permute_info, cspec)
+    for permutation_info in cluster_runs.permutation_info_list_full:
+        check_status_of_run(cluster_runs, permutation_info, cspec)
         
-def check_status_of_run(cluster_runs, permute_info, cspec):
-    #permute_code = permutations.generate_permutation_code(permute_dict, cspec.concise_print_map)
-    #commands_for_this_permutation = permutations.resolve_permutation(permute_dict, cspec.commands, kvm)
-    user_job_number_as_string = cluster_runs.get_job_number_string_for_permutation(permute_info)
-    qil = qsub_invoke_log.QsubInvokeLog(user_job_number_as_string, permute_info, cspec, permute_info['trials'])
+def check_status_of_run(cluster_runs, permutation_info, cspec):
+    user_job_number_as_string = cluster_runs.get_job_number_string_for_permutation_info(permutation_info)
+    qil = qsub_invoke_log.QsubInvokeLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'])
     cluster_job_number = qil.cluster_job_number
     #print "cluster_job_number is {0}".format(cluster_job_number)
     # first, check qstat to see if this
-    statloq = qstat_log.QStatLog(user_job_number_as_string, permute_info, cspec, permute_info['trials'])
+    statloq = qstat_log.QStatLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'])
     if (statloq.is_cluster_job_still_running(cluster_job_number)):
         print "{0} still running".format(cluster_job_number)
     else:
         #print "{0} done".format(cluster_job_number)
-        qacctlog = qacct_log.QacctLog(user_job_number_as_string, permute_info, cspec, permute_info['trials'])
+        qacctlog = qacct_log.QacctLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'])
         qacctlog.ingest(cluster_job_number)
         if (qacctlog.run_failed()):
             print "{0} FAILED -> {1}".format(cluster_job_number, qacctlog.get_failure_reason())
@@ -133,6 +131,14 @@ def create_pooled_results_delta_files(resultsFiles):
         deltaFile.generate()
     
     
+def create_pooled_timings_files(cluster_runs):
+    permuters_for_filename = pooled_timings_file.gather_file_permuters(cluster_runs.cspec)
+    filename_permutations = permutations.expand_permutations(permuters_for_filename)
+    for filename_permutation_info in filename_permutations:
+        timingsFile = pooled_timings_file.PooledTimingsFile(filename_permutation_info, cluster_runs)
+        timingsFile.persist()
+
+  
 def create_pooled_results_files(cluster_runs):
     source_file_map = create_source_file_map(cluster_runs.cspec)
     permuters_for_filename = pooled_results_file.gather_file_permuters(cluster_runs.cspec)
@@ -154,11 +160,9 @@ def delete_results(cspec):
 def launch_scripts(cluster_runs):
     cspec = cluster_runs.cspec
     delete_results(cspec)
-    for permute_info in cluster_runs.permute_info_list_full:
-        #permute_code = permutations.generate_permutation_code(permute_dict, cspec.concise_print_map)
-        #commands_for_this_permutation = permutations.resolve_permutation(permute_dict, cspec.commands, kvm)
-        user_job_number_as_string = cluster_runs.get_job_number_string_for_permutation(permute_info)
-        cscript = cluster_script.ClusterScript(user_job_number_as_string, permute_info, cspec, permute_info['trials'])
+    for permutation_info in cluster_runs.permutation_info_list_full:
+        user_job_number_as_string = cluster_runs.get_job_number_string_for_permutation_info(permutation_info)
+        cscript = cluster_script.ClusterScript(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'])
         cscript.launch()
         time.sleep(1.5)
 
@@ -166,33 +170,27 @@ def launch_scripts(cluster_runs):
 def generate_scripts(cluster_runs):
     cspec = cluster_runs.cspec
     #for trial in range(1, int(cspec.trials) + 1):
-    for permute_info in cluster_runs.permute_info_list_full:
-        #permute_code = permutations.generate_permutation_code(permute_dict, cspec.concise_print_map)
-        #commands_for_this_permutation = permutations.resolve_permutation(permute_dict, cspec.commands, kvm)
-        user_job_number_as_string = cluster_runs.get_job_number_string_for_permutation(permute_info)
-        cscript = cluster_script.ClusterScript(user_job_number_as_string, permute_info, cspec, permute_info['trials'])
+    for permutation_info in cluster_runs.permutation_info_list_full:
+        user_job_number_as_string = cluster_runs.get_job_number_string_for_permutation_info(permutation_info)
+        cscript = cluster_script.ClusterScript(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'])
         cscript.generate()
        
 
 def preview_scripts(cluster_runs):
     cspec = cluster_runs.cspec
     if_verbose("preview mode")
-    permute_info = cluster_runs.permute_info_list_full[0]
-    #permute_code = permutations.generate_permutation_code(permute_dict, cspec.concise_print_map)
-    #commands_for_this_permutation = permutations.resolve_permutation(permute_dict, cspec.commands, kvm)
-    user_job_number_as_string = cluster_runs.get_job_number_string_for_permutation(permute_info)
-    cscript = cluster_script.ClusterScript(user_job_number_as_string, permute_info, cspec, permute_info['trials'])
+    permutation_info = cluster_runs.permutation_info_list_full[0]
+    user_job_number_as_string = cluster_runs.get_job_number_string_for_permutation_info(permutation_info)
+    cscript = cluster_script.ClusterScript(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'])
     cscript.preview()
 
 
 def test_launch_single_script(cluster_runs):
     if_verbose("preview mode")
     cspec = cluster_runs.cspec
-    permute_info = cluster_runs.permute_info_list_full[0]
-    #permute_code = permutations.generate_permutation_code(permute_dict, cspec.concise_print_map)
-    #commands_for_this_permutation = permutations.resolve_permutation(permute_dict, cspec.commands, kvm)
-    user_job_number_as_string = cluster_runs.get_job_number_string_for_permutation(permute_info)
-    cscript = cluster_script.ClusterScript(user_job_number_as_string, permute_info, cspec, permute_info['trials'])
+    permutation_info = cluster_runs.permutation_info_list_full[0]
+    user_job_number_as_string = cluster_runs.get_job_number_string_for_permutation_info(permutation_info)
+    cscript = cluster_script.ClusterScript(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'])
     cscript.launch()
            
                   

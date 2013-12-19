@@ -28,22 +28,22 @@ class TestPermuter(unittest.TestCase):
         
            
     def test_resolve_permutation(self):
-        permute_dict = {'number': '1', 'letter': 'AAA'}
+        permutation_info = {'number': '1', 'letter': 'AAA'}
         commands = ['ls -la /nfs/(number)/(letter)/<pretty[(letter)]>']
         kv = {}
         kv['pretty[AAA]'] = 'aaa'
         kv['pretty[BBB]'] = 'bbb'
-        resolved_commands = permutations.resolve_permutation(permute_dict, commands, kv)
+        resolved_commands = permutations.resolve_permutation(permutation_info, commands, kv)
         self.assertTrue(len(resolved_commands) == 1)
         self.assertTrue(resolved_commands[0] == 'ls -la /nfs/1/AAA/aaa')
 
 
     def test_generate_permutation_code(self):
-        permute_dict = {'number': '1', 'letter': 'AAA', 'trials': '1'}
+        permutation_info = {'number': '1', 'letter': 'AAA', 'trials': '1'}
         concisePrintMap = { 'number': 'n', 'AAA':'A'}
-        code = permutations.generate_permutation_code(permute_dict, concisePrintMap, False)
+        code = permutations.generate_permutation_code(permutation_info, concisePrintMap, False)
         self.assertTrue(code == 'letter_A_n_1')     
-        code = permutations.generate_permutation_code(permute_dict, concisePrintMap, True)
+        code = permutations.generate_permutation_code(permutation_info, concisePrintMap, True)
         self.assertTrue(code == 'letter_A_n_1_trials_1')      
         
 if __name__ == '__main__':
