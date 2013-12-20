@@ -18,6 +18,7 @@ class QsubInvokeLog(PermutationDriverFile):
         starting_dir = os.getcwd()
         os.chdir(self.script_dir)
         #print "opening {0}".format(self.qsub_invoke_log)
+        #print self.script_dir
         f = open(self.qsub_invoke_log, 'r')
         line = f.readline()
         f.close()

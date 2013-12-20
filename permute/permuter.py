@@ -11,9 +11,9 @@ import cluster_script
 import qsub_invoke_log
 import qstat_log
 import qacct_log
-#from monitor import pooled_timings_file
-from monitor import pooled_results_file
-from monitor import pooled_results_delta_file
+import pooled_results_delta_file
+import pooled_timings_file
+import pooled_results_file
 
 verbose = False
 

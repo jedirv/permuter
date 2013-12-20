@@ -1,7 +1,7 @@
-from cluster.permute import qsub_invoke_log
-from permute import qacct_log
-from permute import permutations
+import qsub_invoke_log
+import qacct_log
 import pooled_results_file
+import permutations
 
 class PooledTimingsFile(object):
     '''

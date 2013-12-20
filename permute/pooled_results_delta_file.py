@@ -5,7 +5,6 @@ Created on Dec 12, 2013
 '''
 
 import os
-from monitor_exception import MonitorException
 
 class PooledResultsDeltaFile(object):
     '''

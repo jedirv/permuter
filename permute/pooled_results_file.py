@@ -4,9 +4,8 @@ Created on Nov 22, 2013
 @author: admin-jed
 '''
 import os
-from monitor_exception import MonitorException
-from permute import qsub_invoke_log
-from permute import qacct_log
+import qsub_invoke_log
+import qacct_log
 
 class PooledResultsFile(object):
     '''
@@ -113,7 +112,7 @@ def get_result_from_file(source_file_path, colname, rownum):
         header = lines[0]
         header = header.rstrip()
         if (header == ""):
-            raise MonitorException("missing header in results file")
+            raise Exception("missing header in results file")
         parts = header.split(',')
         index = parts.index(colname)
         value_line = lines[int(rownum)]
@@ -123,7 +122,7 @@ def get_result_from_file(source_file_path, colname, rownum):
         return value
     except Exception as detail:
         print "detail {0}".format(detail)
-        raise MonitorException("Problem while reading results file : {0}".format(detail))
+        raise Exception("Problem while reading results file : {0}".format(detail))
 
 def gather_file_permuters(cspec):
     file_permuters = {}

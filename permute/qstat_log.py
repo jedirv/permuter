@@ -1,6 +1,5 @@
 import os
 from permutation_driver_file import PermutationDriverFile
-from monitor import monitor_exception
 
 class QStatLog(PermutationDriverFile):
     '''
