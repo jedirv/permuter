@@ -29,7 +29,7 @@ class QacctLog(PermutationDriverFile):
         
       
     def run_failed(self):
-        return self.error_reading or self.failed != '0'
+        return self.error_reading or (self.failed != '0'  and self.failed != "?")
     
     def get_failure_reason(self):
         if (self.error_reading):

@@ -62,7 +62,7 @@ def collect(cluster_runs):
     warn_of_incomplete_runs(cluster_runs)
     resultsFiles = create_pooled_results_files(cluster_runs)
     create_pooled_results_delta_files(resultsFiles)
-    #create_pooled_timings_files(cluster_runs)
+    create_pooled_timings_files(cluster_runs)
     
 
 def warn_of_incomplete_runs(cluster_runs):
@@ -133,7 +133,9 @@ def create_pooled_results_delta_files(resultsFiles):
     
 def create_pooled_timings_files(cluster_runs):
     permuters_for_filename = pooled_timings_file.gather_file_permuters(cluster_runs.cspec)
+    print "permuters_for_filename {0}".format(permuters_for_filename)
     filename_permutations = permutations.expand_permutations(permuters_for_filename)
+    print "filename_permutations {0}".format(filename_permutations)
     for filename_permutation_info in filename_permutations:
         timingsFile = pooled_timings_file.PooledTimingsFile(filename_permutation_info, cluster_runs)
         timingsFile.persist()

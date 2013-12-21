@@ -41,8 +41,14 @@ class PooledTimingsFile(object):
                 trials_list = cspec.get_trials_list()
                 trial_timing_values = []
                 for trial in trials_list:
-                    permutation_info = pooled_results_file.gen_perm_code_from_pieces(y_axis_val, x_axis_val, self.filename_perm_info, cspec, trial)
-                    cluster_job_perm_code = permutations.generate_permutation_code(permutation_info,cspec.concise_print_map,True)
+                    permutation_info_with_trial = {}
+                    for key, val in self.filename_permutation_info.items():
+                        permutation_info_with_trial[key] = val
+                    permutation_info_with_trial['trials'] = trial
+                    print "permutation_info_with_trial{0}".format(permutation_info_with_trial)
+                    #permutation_info = pooled_results_file.gen_perm_code_from_pieces(y_axis_val, x_axis_val, self.filename_permutation_info, cspec, trial)
+                    cluster_job_perm_code = permutations.generate_permutation_code(permutation_info_with_trial,cspec.concise_print_map,True)
+                    print "cluster_job_perm_code {0}".format(cluster_job_perm_code)
                     timing_value = get_timing_value_for_run(cluster_job_perm_code, y_axis_val, x_axis_val, self.cluster_runs, trial)
                     trial_timing_values.append(timing_value)
                 median_timing = get_median_timing(trial_timing_values)
@@ -75,8 +81,10 @@ def get_timing_value_for_run(perm_code, y_axis_val, x_axis_val, cluster_runs, tr
     
    
 def gather_file_permuters(cspec):
+    print "gather file permuters..."
     file_permuters = {}
     for key, val in cspec.permuters.items():
+        print "adding key {0} val {1}".format(key, val)
         file_permuters[key] = val
     
     # remove the x and y ones

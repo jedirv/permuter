@@ -57,22 +57,6 @@ class PooledResultsFile(object):
             line = line.rstrip(',')
             f.write("{0}\n".format(line))
         f.close()
-           
-def get_median_timing(timings):
-    pass
-
-def get_timing_value_for_run(perm_code, y_axis_val, x_axis_val, cluster_runs, trial): 
-    user_job_number_as_string = cluster_runs.get_job_number_string_for_permutation_code(perm_code)
-    permutation_info = cluster_runs.get_permutation_info_for_permutation_code(perm_code)
-    qil = qsub_invoke_log.QsubInvokeLog(user_job_number_as_string, permutation_info, cluster_runs.cspec, permutation_info['trials'])
-    cluster_job_number = qil.cluster_job_number
-    qacctlog = qacct_log.QacctLog(user_job_number_as_string, permutation_info, cluster_runs.cspec, permutation_info['trials'])
-    qacctlog.ingest(cluster_job_number)
-    if (qacctlog.run_failed()):
-        return "NOT_AVAILABLE"
-    else:
-        return qacctlog.cpu
-    
     
 def get_median(float_series):
     sorted_float_series = sorted(float_series)
