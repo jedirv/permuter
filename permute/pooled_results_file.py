@@ -13,17 +13,17 @@ class PooledResultsFile(object):
     '''
 
 
-    def __init__(self,source_file_map, filename_perm_info, cluster_runs):
+    def __init__(self,source_file_map, filename_permutation_info, cluster_runs):
         '''
         Constructor
         '''
         self.cluster_runs = cluster_runs
         self.cspec = cluster_runs.cspec
         self.target_dir = generate_target_dirname(self.cspec)
-        self.perm_code_for_filename  = build_code_using_dictionary(filename_perm_info, self.cspec)
+        self.perm_code_for_filename  = build_code_using_dictionary(filename_permutation_info, self.cspec)
         self.target_path = "{0}/{1}.csv".format(self.target_dir, self.perm_code_for_filename)
         self.source_file_map = source_file_map
-        self.filename_perm_info = filename_perm_info
+        self.filename_permutation_info = filename_permutation_info
        
     def persist(self):
         cspec = self.cspec
@@ -47,7 +47,7 @@ class PooledResultsFile(object):
                 trials_list = cspec.get_trials_list()
                 trial_values = []
                 for trial in trials_list:
-                    result_file_perm_code = gen_perm_code_from_pieces(y_axis_val, x_axis_val, self.filename_perm_info, cspec, trial)
+                    result_file_perm_code = gen_perm_code_from_pieces(y_axis_val, x_axis_val, self.filename_permutation_info, cspec, trial)
                     source_file_path = self.source_file_map[result_file_perm_code]
                     #print "SOURCE_FILE_PATH : {0}".format(source_file_path)
                     value = get_result_from_file(source_file_path, cspec.scores_from_colname, cspec.scores_from_rownum)

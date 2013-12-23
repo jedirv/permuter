@@ -46,37 +46,44 @@ class PooledTimingsFile(object):
                         permutation_info_with_trial[key] = val
                     permutation_info_with_trial['trials'] = trial
                     print "permutation_info_with_trial{0}".format(permutation_info_with_trial)
+                    
+                    cluster_job_perm_code = pooled_results_file.gen_perm_code_from_pieces(y_axis_val, x_axis_val, self.filename_permutation_info, cspec, trial)
+                    
                     #permutation_info = pooled_results_file.gen_perm_code_from_pieces(y_axis_val, x_axis_val, self.filename_permutation_info, cspec, trial)
-                    cluster_job_perm_code = permutations.generate_permutation_code(permutation_info_with_trial,cspec.concise_print_map,True)
+                    #cluster_job_perm_code = permutations.generate_permutation_code(permutation_info_with_trial,cspec.concise_print_map,True)
                     print "cluster_job_perm_code {0}".format(cluster_job_perm_code)
                     timing_value = get_timing_value_for_run(cluster_job_perm_code, y_axis_val, x_axis_val, self.cluster_runs, trial)
-                    trial_timing_values.append(timing_value)
-                median_timing = get_median_timing(trial_timing_values)
-                timings_line = "{0}{1},".format(timings_line, median_timing)
+                    trial_timing_values.append(float(timing_value))
+                median_timing = pooled_results_file.get_median(trial_timing_values)
+                timings_line = "{0}{1},".format(timings_line, int(median_timing))
             timings_line.rstrip(',')
             ft.write("{0}\n".format(timings_line))
         ft.close()
            
-def get_median_timing(int_series):
-    sorted_int_series = sorted(int_series)
-    size = len(sorted_int_series)
-    if (len(sorted_int_series)%2 == 0):
+#def get_median_timing(int_series):
+#    sorted_int_series = sorted(int_series)
+#    size = len(sorted_int_series)
+#    if (len(sorted_int_series)%2 == 0):
         #even number in list
-        return (sorted_int_series[(size/2)-1]+sorted_int_series[size/2])/2.0
-    else:
+#        return (sorted_int_series[(size/2)-1]+sorted_int_series[size/2])/2.0
+#    else:
         #odd number in list
-        return sorted_int_series[(size-1)/2]
+#        return sorted_int_series[(size-1)/2]
 
 def get_timing_value_for_run(perm_code, y_axis_val, x_axis_val, cluster_runs, trial): 
     user_job_number_as_string = cluster_runs.get_job_number_string_for_permutation_code(perm_code)
+    print "user_job_number_as_string {0}".format(user_job_number_as_string)
     permutation_info = cluster_runs.get_permutation_info_for_permutation_code(perm_code)
+    print "permutation_info {0}".format(permutation_info)
     qil = qsub_invoke_log.QsubInvokeLog(user_job_number_as_string, permutation_info, cluster_runs.cspec, permutation_info['trials'])
     cluster_job_number = qil.cluster_job_number
+    print  "cluster_job_number {0}".format(cluster_job_number)
     qacctlog = qacct_log.QacctLog(user_job_number_as_string, permutation_info, cluster_runs.cspec, permutation_info['trials'])
     qacctlog.ingest(cluster_job_number)
     if (qacctlog.run_failed()):
         return "NOT_AVAILABLE"
     else:
+        print  "qacctlog.cpu {0}".format(qacctlog.cpu)
         return qacctlog.cpu
     
    

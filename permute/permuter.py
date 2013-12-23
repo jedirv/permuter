@@ -59,7 +59,7 @@ def if_verbose(message):
         print message
     
 def collect(cluster_runs):
-    warn_of_incomplete_runs(cluster_runs)
+    #warn_of_incomplete_runs(cluster_runs)
     resultsFiles = create_pooled_results_files(cluster_runs)
     create_pooled_results_delta_files(resultsFiles)
     create_pooled_timings_files(cluster_runs)
