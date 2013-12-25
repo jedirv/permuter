@@ -124,7 +124,11 @@ class ClusterSpec(object):
             line = line.rstrip()
             if (line.startswith(flag)):
                 flag_sans_colon, target = line.split(":")
-                return target
+                if (hasattr(self, 'key_val_map')):
+                    resolved_target = resolve_value(self.key_val_map, target)
+                    return resolved_target
+                else:
+                    return target
         return ""
 
        

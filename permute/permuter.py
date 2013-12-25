@@ -108,6 +108,17 @@ def check_status_of_runs(cluster_runs):
         check_status_of_run(cluster_runs, permutation_info, cspec)
         
 def check_status_of_run(cluster_runs, permutation_info, cspec):
+    permutation_code = permutations.generate_permutation_code(permutation_info, cspec.concisePrintMap, True)
+    results_dir = cluster_runs.get_results_dir_for_permutation_code(permutation_code)
+    
+    LEFT OFF HERE GETTING the status from the don_marker file 
+    
+    also need to detect presence of at least one of the output files - need to key off the following
+    scores_from:file=<permutation_results_dir>/score_out_(color).csv,column_name=auc,row_number=1
+    ...need to generate list of all output files for permutation, keying off
+    scores_permute:color=red,blue,
+    so write a cspec.get_permutation_results_files_for_permutation(permutation_info)
+    
     user_job_number_as_string = cluster_runs.get_job_number_string_for_permutation_info(permutation_info)
     qil = qsub_invoke_log.QsubInvokeLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'])
     cluster_job_number = qil.cluster_job_number
@@ -158,6 +169,11 @@ def delete_results(cspec):
         if (os.path.isfile(result_path)):
             print "deleting result_file for {0} : {1}".format(permutation, result_path)
             os.unlink(result_path)
+        pardir = os.path.dirname(result_path)
+        done_marker_path = "{0}/permutation_done_marker.txt".format(pardir)
+        if (os.path.isfile(done_marker_path)):
+            print "deleting done_marker_path for {0} : {1}".format(permutation, done_marker_path)
+            os.unlink(done_marker_path)
      
 def launch_scripts(cluster_runs):
     cspec = cluster_runs.cspec

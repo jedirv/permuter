@@ -12,6 +12,7 @@ class ClusterRunsInfo(object):
         
         self.job_number_for_permutation_code_map = {}
         self.permutation_info_for_permutation_code_map = {}
+        self.result_dir_for_permutation_code_map = {}
         
         self.permuters_including_trials = cspec.get_permuters_trials_included()
         self.permutation_info_list_full = permutations.expand_permutations(self.permuters_including_trials)
@@ -24,9 +25,16 @@ class ClusterRunsInfo(object):
             permutation_code = permutations.generate_permutation_code(permutation_info, cspec.concise_print_map, True)
             self.job_number_for_permutation_code_map[permutation_code] = get_formatted_user_job_number(user_job_number, self.job_num_width)
             self.permutation_info_for_permutation_code_map[permutation_code] = permutation_info
+        
+            resolved_results_dir =  permutations.get_resolved_results_dir_for_permutation(permutation_info, cspec)
+            self.result_dir_for_permutation_code_map[permutation_code] = resolved_results_dir
+            
             user_job_number = user_job_number + 1
             
             
+    def get_results_dir_for_permutation_code(self, permutation_code):
+        result = self.result_dir_for_permutation_code_map[permutation_code]
+        return result
         
     def get_job_number_width(self, permutation_info_list):
         highest_permutation_number = len(permutation_info_list)

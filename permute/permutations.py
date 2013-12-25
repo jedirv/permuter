@@ -120,3 +120,11 @@ def resolve_permutation(permutation_info, commands, keyValMap):
     if_verbose("  commands after resolve_permutation: {0}".format(commands_for_this_permutation))
     return commands_for_this_permutation
 
+def get_resolved_results_dir_for_permutation(permutation_info, cspec):
+    permute_code_sans_trial = generate_permutation_code(permutation_info, cspec.concise_print_map, False)
+    interim_results_dir = cspec.generate_results_dir_for_permutation(permutation_info['trials'], permute_code_sans_trial)
+    list_of_size_1 = [interim_results_dir]
+    resolved_results_dir =  resolve_permutation(permutation_info, list_of_size_1, cspec.key_val_map)[0]
+    return resolved_results_dir
+    
+    

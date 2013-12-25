@@ -29,6 +29,7 @@ class PooledResultsFile(object):
         cspec = self.cspec
         # generate the column names
         f = open(self.target_path, 'w')
+        print "persisting {0}".format(self.target_path)
         header = "{0},".format(cspec.scores_y_axis)
     
         x_prefix = cspec.get_concise_name(cspec.scores_x_axis)
@@ -103,6 +104,7 @@ def get_result_from_file(source_file_path, colname, rownum):
         value_line = value_line.rstrip()
         value_parts = value_line.split(',')
         value = value_parts[index]
+        print "value found for {0} is {1}".format(source_file_path, value)
         return value
     except Exception as detail:
         print "detail {0}".format(detail)

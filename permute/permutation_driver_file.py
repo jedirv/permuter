@@ -20,10 +20,8 @@ class PermutationDriverFile(object):
         self.trial = trial
         self.permutation_info = permutation_info
         self.permute_code = permutations.generate_permutation_code(permutation_info, cspec.concise_print_map, False)
-        interim_results_dir = cspec.generate_results_dir_for_permutation(trial, self.permute_code) 
-        list_of_size_1 = [interim_results_dir] 
         self.key_val_map = cspec.key_val_map
-        self.resolved_results_dir =  permutations.resolve_permutation(permutation_info, list_of_size_1, self.key_val_map)[0]
+        self.resolved_results_dir =  permutations.get_resolved_results_dir_for_permutation(permutation_info, cspec)
         #print "resolved_results_dir : {0}".format(self.resolved_results_dir)
         self.key_val_map['permutation_results_dir'] = self.resolved_results_dir
         self.user_job_number = user_job_number

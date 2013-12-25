@@ -41,6 +41,7 @@ class ClusterScript(PermutationDriverFile):
         f.write("hostname\n")
         for cur_command in self.commands_for_this_permutation:
             f.write("{0}\n".format(cur_command))
+        f.write("touch {0}/permutation_done_marker.txt\n".format(self.resolved_results_dir))
         f.close()  
     
     def preview(self):
