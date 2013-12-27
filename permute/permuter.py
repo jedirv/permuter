@@ -108,33 +108,46 @@ def check_status_of_runs(cluster_runs):
         check_status_of_run(cluster_runs, permutation_info, cspec)
         
 def check_status_of_run(cluster_runs, permutation_info, cspec):
-    permutation_code = permutations.generate_permutation_code(permutation_info, cspec.concisePrintMap, True)
+    permutation_code = permutations.generate_permutation_code(permutation_info, cspec.concise_print_map, True)
     results_dir = cluster_runs.get_results_dir_for_permutation_code(permutation_code)
+    done_marker_file_path = "{0}/permutation_done_marker.txt".format(results_dir)
+    run_finished = False
+    if (os.path.isfile(done_marker_file_path)):
+        run_finished=True
     
-    LEFT OFF HERE GETTING the status from the don_marker file 
-    
-    also need to detect presence of at least one of the output files - need to key off the following
-    scores_from:file=<permutation_results_dir>/score_out_(color).csv,column_name=auc,row_number=1
-    ...need to generate list of all output files for permutation, keying off
-    scores_permute:color=red,blue,
-    so write a cspec.get_permutation_results_files_for_permutation(permutation_info)
-    
+    missing_output_file = False
+    list_of_output_files = permutations.get_list_of_output_files(permutation_info, cspec)
+    for output_file_path in list_of_output_files:
+        if (not(os.path.isfile(output_file_path))):
+            missing_output_file = True
+
     user_job_number_as_string = cluster_runs.get_job_number_string_for_permutation_info(permutation_info)
     qil = qsub_invoke_log.QsubInvokeLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'])
     cluster_job_number = qil.cluster_job_number
-    #print "cluster_job_number is {0}".format(cluster_job_number)
-    # first, check qstat to see if this
-    statloq = qstat_log.QStatLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'])
-    if (statloq.is_cluster_job_still_running(cluster_job_number)):
+    if (not(run_finished)):
         print "{0} still running".format(cluster_job_number)
+    elif (run_finished and not(missing_output_file)):
+        #done
+        print "{0} complete".format(cluster_job_number)
     else:
-        #print "{0} done".format(cluster_job_number)
+        #fun finished but missing an output file, find out the error
         qacctlog = qacct_log.QacctLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'])
         qacctlog.ingest(cluster_job_number)
-        if (qacctlog.run_failed()):
-            print "{0} FAILED -> {1}".format(cluster_job_number, qacctlog.get_failure_reason())
-        else:
-            print "{0} complete".format(cluster_job_number)        
+        print "{0} FAILED -> {1}".format(cluster_job_number, qacctlog.get_failure_reason())
+    
+    #print "cluster_job_number is {0}".format(cluster_job_number)
+    # first, check qstat to see if this
+    #statloq = qstat_log.QStatLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'])
+    #if (statloq.is_cluster_job_still_running(cluster_job_number)):
+    #    print "{0} still running".format(cluster_job_number)
+    #else:
+    #    #print "{0} done".format(cluster_job_number)
+    #    qacctlog = qacct_log.QacctLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'])
+    #    qacctlog.ingest(cluster_job_number)
+    #    if (qacctlog.run_failed()):
+    #        print "{0} FAILED -> {1}".format(cluster_job_number, qacctlog.get_failure_reason())
+    #    else:
+    #        print "{0} complete".format(cluster_job_number)        
          
 def create_pooled_results_delta_files(resultsFiles):
     for resultsFile in resultsFiles:

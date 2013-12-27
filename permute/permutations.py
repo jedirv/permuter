@@ -10,8 +10,30 @@ def if_verbose( message):
     if (verbose):
         print message
  
-
-
+def get_list_of_output_files(permutation_info, cspec):
+    output_file_paths = []
+    scores_permutations = expand_permutations(cspec.scores_permuters)
+    complete_permutation_infos = []
+    for scores_permutation in scores_permutations:
+        complete_permutation = {}
+        for key, val in permutation_info.items():
+            complete_permutation[key] = val
+        for key, val in scores_permutation.items():
+            complete_permutation[key] = val
+        complete_permutation_infos.append(complete_permutation)
+        
+    for complete_permutation_info in complete_permutation_infos:        
+        unresolved_output_files = []
+        unresolved_output_files.append(cspec.scores_from_filepath)    
+        resolved_list_of_one = resolve_permutation(complete_permutation_info, unresolved_output_files, cspec.key_val_map)
+        print resolved_list_of_one
+        output_file_paths.append(resolved_list_of_one[0])
+    return output_file_paths
+    #resolve_permutation(permutation_info, commands, keyValMap)
+    #scores_from:file=<permutation_results_dir>/score_out_(color).csv,column_name=auc,row_number=1
+    #...need to generate list of all output files for permutation, keying off
+    #scores_permute:color=red,blue,
+    
 def generate_permutation_code(permutation_info, concisePrintMap, include_trials):
     code = ""
     keys = permutation_info.keys()
