@@ -13,6 +13,7 @@ class QsubInvokeLog(PermutationDriverFile):
         self.pathname = "{0}.sh".format(self.script_path_root)
         self.script_name = "{0}.sh".format(self.get_job_file_name())
         self.cluster_job_number = self.load_job_number()
+        self.type = "qsub_invoke_log"
         
     def load_job_number(self):
         starting_dir = os.getcwd()

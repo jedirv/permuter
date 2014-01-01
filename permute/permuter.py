@@ -111,15 +111,20 @@ def check_status_of_run(cluster_runs, permutation_info, cspec):
     permutation_code = permutations.generate_permutation_code(permutation_info, cspec.concise_print_map, True)
     results_dir = cluster_runs.get_results_dir_for_permutation_code(permutation_code)
     done_marker_file_path = "{0}/permutation_done_marker.txt".format(results_dir)
+    #print "done_marker_file_path {0}".format(done_marker_file_path)
     run_finished = False
     if (os.path.isfile(done_marker_file_path)):
         run_finished=True
     
     missing_output_file = False
+    missing_output_files = []
+#    maybe the following line should pass in the results_dir
     list_of_output_files = permutations.get_list_of_output_files(permutation_info, cspec)
     for output_file_path in list_of_output_files:
         if (not(os.path.isfile(output_file_path))):
             missing_output_file = True
+            missing_output_files.append(output_file_path)
+            
 
     user_job_number_as_string = cluster_runs.get_job_number_string_for_permutation_info(permutation_info)
     qil = qsub_invoke_log.QsubInvokeLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'])
@@ -134,7 +139,9 @@ def check_status_of_run(cluster_runs, permutation_info, cspec):
         qacctlog = qacct_log.QacctLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'])
         qacctlog.ingest(cluster_job_number)
         print "{0} FAILED -> {1}".format(cluster_job_number, qacctlog.get_failure_reason())
-    
+        for missing_file in missing_output_files:
+            print "output file missing: {0}".format(missing_file)
+    #print "DONE checking run status"
     #print "cluster_job_number is {0}".format(cluster_job_number)
     # first, check qstat to see if this
     #statloq = qstat_log.QStatLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'])

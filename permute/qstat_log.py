@@ -10,7 +10,7 @@ class QStatLog(PermutationDriverFile):
         self.script_path_root = self.get_script_path_root()
         self.pathname = "{0}.qstat".format(self.script_path_root)
         self.qstat_log = "{0}.qstat".format(self.get_job_file_name())
-        
+        self.type = "qstat_log"
         
     def is_cluster_job_still_running(self, cluster_job_number):
         self.cluster_job_number = cluster_job_number

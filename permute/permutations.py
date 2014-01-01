@@ -13,6 +13,7 @@ def if_verbose( message):
 def get_list_of_output_files(permutation_info, cspec):
     output_file_paths = []
     scores_permutations = expand_permutations(cspec.scores_permuters)
+    #print "scores_permutations {0}".format(scores_permutations)
     complete_permutation_infos = []
     for scores_permutation in scores_permutations:
         complete_permutation = {}
@@ -21,12 +22,18 @@ def get_list_of_output_files(permutation_info, cspec):
         for key, val in scores_permutation.items():
             complete_permutation[key] = val
         complete_permutation_infos.append(complete_permutation)
-        
+    #print "complete_permutation_infos {0}".format(complete_permutation_infos)   
     for complete_permutation_info in complete_permutation_infos:        
         unresolved_output_files = []
-        unresolved_output_files.append(cspec.scores_from_filepath)    
-        resolved_list_of_one = resolve_permutation(complete_permutation_info, unresolved_output_files, cspec.key_val_map)
-        print resolved_list_of_one
+        #print "cspec.scores_from_filepath {0}".format(cspec.scores_from_filepath)
+        #print "cspec.key_val_map {0}".format(cspec.key_val_map)
+        unresolved_output_files.append(cspec.scores_from_filepath)
+        kvm_with_results_dir_resolved = {}
+        for key, val in cspec.key_val_map.items():
+            kvm_with_results_dir_resolved[key] = val
+        kvm_with_results_dir_resolved['permutation_results_dir'] = get_resolved_results_dir_for_permutation(permutation_info, cspec)      
+        resolved_list_of_one = resolve_permutation(complete_permutation_info, unresolved_output_files, kvm_with_results_dir_resolved)
+        #print resolved_list_of_one
         output_file_paths.append(resolved_list_of_one[0])
     return output_file_paths
     #resolve_permutation(permutation_info, commands, keyValMap)
@@ -98,22 +105,22 @@ def resolve_permutation(permutation_info, commands, keyValMap):
     for permKey, permVal in permutation_info.iteritems():
         if (permKey != 'trials'):
             #if_verbose("  key, val in permute step 1 : {0},{1}".format(permKey, permVal))
-            keyValMap_permuation_specific_for_this_pass = {}
+            keyValMap_permutation_specific_for_this_pass = {}
             match_string = "({0})".format(permKey)
             #if_verbose("  perm match_string : {0}".format(match_string))
             for key, val in keyValMap_permuation_specific.iteritems():
                 resolved_val = val.replace(match_string, permVal)
-                keyValMap_permuation_specific_for_this_pass[key] = resolved_val
-            keyValMap_permuation_specific = keyValMap_permuation_specific_for_this_pass    
+                keyValMap_permutation_specific_for_this_pass[key] = resolved_val
+            keyValMap_permuation_specific = keyValMap_permutation_specific_for_this_pass  
             #if_verbose("  keyValMap_permuation_specific after a pass of resolve_permutation: {0}".format(keyValMap_permuation_specific))
-        
+    #print "keyValMap_permuation_specific {0}".format(keyValMap_permuation_specific) 
     # now do a pass through keyValMap_permuation_specific to resolve any now-refined lookups
     # FIXME - does this need to be iterative?
     keyValMap_final_for_permutation = {}
     for key, val in keyValMap_permuation_specific.iteritems():
         resolved_val = cluster_spec.resolve_value(keyValMap, val)
         keyValMap_final_for_permutation[key] = resolved_val
-
+    #print "keyValMap_final_for_permutation {0}".format(keyValMap_final_for_permutation) 
     # then make a first pass through the commands and resolve permutations as some lookups will depend on that having been done
     commands_for_this_permutation = []
     for key, val in permutation_info.iteritems():
@@ -139,6 +146,7 @@ def resolve_permutation(permutation_info, commands, keyValMap):
             commands_for_this_permutation.append(resolved_command)
         commands = commands_for_this_permutation    
         #if_verbose("  commands after a pass2 of resolve_permutation: {0}".format(commands))  
+    #print "  commands after resolve_permutation: {0}".format(commands_for_this_permutation)
     if_verbose("  commands after resolve_permutation: {0}".format(commands_for_this_permutation))
     return commands_for_this_permutation
 

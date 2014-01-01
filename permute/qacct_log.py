@@ -11,7 +11,7 @@ class QacctLog(PermutationDriverFile):
         self.script_path_root = self.get_script_path_root()
         self.pathname = "{0}.qacct".format(self.script_path_root)
         self.qacct_log = "{0}.qacct".format(self.get_job_file_name())
- 
+        self.type = "qacct_log"
         self.cpu = "?"
         self.mem = "?"
         self.maxvmem = "?"
