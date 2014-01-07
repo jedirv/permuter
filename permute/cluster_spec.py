@@ -97,6 +97,7 @@ class ClusterSpec(object):
     def load_scores_from(self, path):
         f = open(path, 'r')
         lines = f.readlines()
+        f.close()
         for line in lines:
             line = line.rstrip()
             if (line.startswith('scores_from:')):
@@ -110,6 +111,7 @@ class ClusterSpec(object):
     def load_dir(self, path, dir_flag):
         f = open(path, 'r')
         lines = f.readlines()
+        f.close()
         for line in lines:
             line = line.rstrip()
             if (line.startswith(dir_flag)):
@@ -121,6 +123,7 @@ class ClusterSpec(object):
     def load_special_value(self, path, flag):
         f = open(path, 'r')
         lines = f.readlines()
+        f.close()
         for line in lines:
             line = line.rstrip()
             if (line.startswith(flag)):
@@ -135,6 +138,7 @@ class ClusterSpec(object):
     def load_list(self, path, flag):
         f = open(path, 'r')
         lines = f.readlines()
+        f.close()
         for line in lines:
             line = line.rstrip()
             if (line.startswith(flag)):
@@ -150,8 +154,9 @@ class ClusterSpec(object):
         return ""    
     def load_permuters(self, path, flag):
         f = open(path, 'r')
-        permuters = {}
         lines = f.readlines()
+        f.close()
+        permuters = {}
         for line in lines:
             line = line.rstrip()
             if (line.startswith(flag)):
@@ -172,15 +177,16 @@ class ClusterSpec(object):
                 permuters[permuteKey] = permute_list
             else:
                 pass
-        f.close()
+
         return permuters
     
     def load_replaces(self, path):
         f = open(path, 'r')
+        lines = f.readlines()
+        f.close()
         key_val_map = {}
         # set default tag as empty string
         key_val_map['tag'] = ""
-        lines = f.readlines()
         for line in lines:
             line = line.rstrip()
             if (line.startswith("#")):
@@ -193,14 +199,14 @@ class ClusterSpec(object):
                 key_val_map[key] = val
             else:
                 pass
-        f.close()
         return key_val_map        
     
 
     def load_qsub_commands(self, path):
         f = open(path, 'r')
-        qsub_commands = []
         lines = f.readlines()
+        f.close()
+        qsub_commands = []
         for line in lines:
             line = line.rstrip()
             if (line.startswith("qsub_command:")):
@@ -209,13 +215,13 @@ class ClusterSpec(object):
                 qsub_commands.append(this_command)
             else:
                 pass
-        f.close()
         return qsub_commands
     
     def load_commands(self, path):
         f = open(path, 'r')
-        commands = []
         lines = f.readlines()
+        f.close()
+        commands = []
         for line in lines:
             line = line.rstrip()
             if (line.startswith("command:")):
@@ -224,14 +230,14 @@ class ClusterSpec(object):
                 commands.append(this_command)
             else:
                 pass
-        f.close()
         return commands
         
      
     def load_concise_print_map(self, path):
         f = open(path, 'r')
-        concisePrintMap = {}
         lines = f.readlines()
+        f.close()
+        concisePrintMap = {}
         for line in lines:
             line = line.rstrip()
             if (line.startswith("concise_print:")):
@@ -241,7 +247,6 @@ class ClusterSpec(object):
                 concisePrintMap[key] = val
             else:
                 pass
-        f.close()
         return concisePrintMap
         
  
@@ -325,11 +330,11 @@ def validate(path):
 
    
 def validate_root_results_dir(path):
-    result = True
-    root_results_dir = "unknown"
     f = open(path, 'r')
     lines = f.readlines()
     f.close()
+    result = True
+    root_results_dir = "unknown"
     for line in lines:
         line = line.rstrip()
         if (line.startswith("root_results_dir:")):
@@ -341,11 +346,11 @@ def validate_root_results_dir(path):
     return result
     
 def validate_script_dir(path):
-    result = True
-    script_dir = "unknown"
     f = open(path, 'r')
     lines = f.readlines()
     f.close()
+    result = True
+    script_dir = "unknown"
     for line in lines:
         line = line.rstrip()
         if (line.startswith("script_dir:")):
@@ -357,11 +362,11 @@ def validate_script_dir(path):
     return result
 
 def validate_master_job_name(path):
-    result = True
-    master_job_name = "unknown"
     f = open(path, 'r')
     lines = f.readlines()
     f.close()
+    result = True
+    master_job_name = "unknown"
     for line in lines:
         line = line.rstrip()
         if (line.startswith("master_job_name:")):
@@ -374,11 +379,11 @@ def validate_master_job_name(path):
 
 
 def validate_trials(path):
-    result = True
-    trials = "unknown"
     f = open(path, 'r')
     lines = f.readlines()
     f.close()
+    result = True
+    trials = "unknown"
     for line in lines:
         line = line.rstrip()
         if (line.startswith("trials:")):
@@ -390,10 +395,10 @@ def validate_trials(path):
     return result
 
 def validate_replace_entries(path):
-    result = True
     f = open(path, 'r')
     lines = f.readlines()
     f.close()
+    result = True
     for line in lines:
         line = line.rstrip()
         if (line.startswith("<replace>:")):
@@ -423,9 +428,10 @@ def validate_replace_entries(path):
     return result
     
 def validate_permute_entries(path):
-    result = True
     f = open(path, 'r')
     lines = f.readlines()
+    f.close()
+    result = True
     for line in lines:
         line = line.rstrip()
         if (line.startswith("permute:")):
@@ -467,7 +473,6 @@ def validate_permute_entries(path):
                     # must be a singleton cvalue
                     # no way I can think of to mess this up
                     pass
-    f.close()
     return result
 
 def lines_contains_prefix(lines, prefix):
