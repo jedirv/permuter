@@ -516,12 +516,16 @@ def validate_scores_gathering_info_from_lines(lines):
         return False
     
     if (not(validate_axis_list(lines,'scores_x_axis:'))):
+        print 'problem in scores_x_axis: declaration'
         return False
     if (not(validate_axis_list(lines,'scores_y_axis:'))):
+        print 'problem in scores_y_axis: declaration'
         return False
     if (not(validate_scores_to(lines))):
+        print 'problem in scores_to: declaration'
         return False
     if (not(validate_scores_from(lines))):
+        print 'problem in scores_from: declaration'
         return False
     return True
 
