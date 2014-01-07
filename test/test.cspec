@@ -17,7 +17,7 @@ scores_permute:resolution=userDay,userMonth
 scores_from:file=<permutation_results_dir>/(resolution).csv,column_name=auc,row_number=1
 scores_to:./collected_results
 scores_y_axis:letter
-scores_x_axis:number, animal
+scores_x_axis:number,animal
 
 #
 # permutation-dependent mappings can be expressed like this.  These will be matched by 

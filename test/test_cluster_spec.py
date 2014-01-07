@@ -42,8 +42,8 @@ class TestClusterSpec(unittest.TestCase):
         print 'self.cspec.scores_to : {0}'.format(self.cspec.scores_to)
         self.assertTrue(self.cspec.scores_to=='./collected_results')
         
-        self.assertTrue(self.cspec.scores_x_axis=='number')
-        self.assertTrue(self.cspec.scores_y_axis=='letter')
+        self.assertTrue(self.cspec.scores_x_axis==['number', 'animal'])
+        self.assertTrue(self.cspec.scores_y_axis==['letter'])
 
     def test_script_dir(self):
         #print self.cspec.script_dir

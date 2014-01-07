@@ -6,6 +6,7 @@ Created on Nov 22, 2013
 import os
 import qsub_invoke_log
 import qacct_log
+import permutations
 
 class PooledResultsFile(object):
     '''
@@ -30,25 +31,34 @@ class PooledResultsFile(object):
         # generate the column names
         f = open(self.target_path, 'w')
         print "persisting {0}".format(self.target_path)
+        
+        # scores_y_axis:letter
+        # scores_x_axis:number,animal
+        x_permuters = {}
+        y_permuters = {}
+        for item in cspec.scores_x_axis:
+            x_permuters[item] = cspec.permuters[item]
+        for item in cspec.scores_y_axis:
+            y_permuters[item] = cspec.permuters[item]
+        x_permutations = permutations.expand_permutations(x_permuters)
+        y_permutations = permutations.expand_permutations(y_permuters)
+        
+        # write the x_axis column names
         header = "{0},".format(cspec.scores_y_axis)
-    
-        x_prefix = cspec.get_concise_name(cspec.scores_x_axis)
-        print "cspec.scores_x_axis : {0}".format(cspec.scores_x_axis)
-        print "cspec.permuters : {0}".format(cspec.permuters)
-        for value in cspec.permuters[cspec.scores_x_axis]:
-            header = "{0}{1}_{2},".format(header, x_prefix, value)
+        for x_permutation in x_permutations:
+            concise_x_permutation = permutations.generate_permutation_code(x_permutation, cspec.concise_print_map, False)
+            header = "{0}{1},".format(header, concise_x_permutation)
         header = header.rstrip(',')
         f.write("{0}\n".format(header))
-        # generate the values
-        y_axis_list = cspec.permuters[cspec.scores_y_axis]
-        for y_axis_val in y_axis_list:
-            line = "{0},".format(y_axis_val)
-            x_axis_list = cspec.permuters[cspec.scores_x_axis]
-            for x_axis_val in x_axis_list:
+        
+        for y_permutation in y_permutations:
+            concise_y_permutation = permutations.generate_permutation_code(y_permutation, cspec.concise_print_map, False)
+            line = "{0},".format(concise_y_permutation)
+            for x_permutation in x_permutations:
                 trials_list = cspec.get_trials_list()
                 trial_values = []
                 for trial in trials_list:
-                    result_file_perm_code = gen_perm_code_from_pieces(y_axis_val, x_axis_val, self.filename_permutation_info, cspec, trial)
+                    result_file_perm_code = gen_perm_code_from_pieces(y_permutation, x_permutation, self.filename_permutation_info, cspec, trial)
                     source_file_path = self.source_file_map[result_file_perm_code]
                     #print "SOURCE_FILE_PATH : {0}".format(source_file_path)
                     value = get_result_from_file(source_file_path, cspec.scores_from_colname, cspec.scores_from_rownum)
@@ -75,16 +85,15 @@ def generate_target_dirname(cspec):
         os.makedirs(dir)
     return dir
     
-def gen_perm_code_from_pieces(y_axis_val, x_axis_val, filename_perm_dict, cspec, trial):
+def gen_perm_code_from_pieces(y_axis_permutation, x_axis_permutation, filename_perm_dict, cspec, trial):
     full_perm_dict = {}
     for key, val in filename_perm_dict.items():
         full_perm_dict[key] = val
-    # get the x and y permuter keys
-    x_axis_permute = cspec.scores_x_axis
-    y_axis_permute = cspec.scores_y_axis
-    # create a full perm_dict by adding the x and y back in
-    full_perm_dict[x_axis_permute] = x_axis_val
-    full_perm_dict[y_axis_permute] = y_axis_val
+    # create a full perm_dict by adding the x and y vals back in
+    for key, val in y_axis_permutation.items():
+        full_perm_dict[key] = val
+    for key, val in x_axis_permutation.items():
+        full_perm_dict[key] = val
     full_perm_dict['trials'] = trial
     result = build_code_using_dictionary(full_perm_dict, cspec)
     return result
@@ -119,12 +128,12 @@ def gather_file_permuters(cspec):
     for key, val in cspec.scores_permuters.items():
         file_permuters[key] = val
     # remove the x and y ones
-    x_axis_permuter = cspec.scores_x_axis
-    y_axis_permuter = cspec.scores_y_axis
-    if (x_axis_permuter != ''):
-        del file_permuters[x_axis_permuter]
-    if (y_axis_permuter != ''):
-        del file_permuters[y_axis_permuter]
+    x_permuters = cspec.scores_x_axis
+    y_permuters = cspec.scores_y_axis
+    for x_permuter in x_permuters:
+        del file_permuters[x_permuter]
+    for y_permuter in y_permuters:
+        del file_permuters[y_permuter]
     return file_permuters
 
 def build_code_using_dictionary(perm_info, cspec):

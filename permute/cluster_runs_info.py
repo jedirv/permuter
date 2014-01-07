@@ -58,5 +58,6 @@ class ClusterRunsInfo(object):
     def get_permutation_info_for_permutation_code(self, permutation_code):
         result = self.permutation_info_for_permutation_code_map[permutation_code]
         return result
+    
 def get_formatted_user_job_number(user_job_number, width):
     return str(user_job_number).zfill(width)

@@ -22,12 +22,12 @@ class TestPooledResultsFile(unittest.TestCase):
         self.assertTrue(perm_dict.has_key('resolution'))
 
     def test_gen_perm_code_from_pieces(self):
-        y_axis_val = 'AAA'
-        x_axis_val = 3
-        filename_perm_dict = perm_dict = {'singleton_val':'300', 'res':'userDay' }
-        result = pooled_results_file.gen_perm_code_from_pieces(y_axis_val, x_axis_val, filename_perm_dict, self.cspec, '2')
+        y_permutation = {'letter': 'AAA' }
+        x_permutation = {'number': '3', 'animal':'dog'}
+        filename_perm_dict = {'singleton_val':'300', 'res':'userDay' }
+        result = pooled_results_file.gen_perm_code_from_pieces(y_permutation, x_permutation, filename_perm_dict, self.cspec, '2')
         #print "RESULT : {0}".format(result)
-        self.assertTrue(result == 'l_aa_number_3_res_userDay_s_300_trials_2')
+        self.assertTrue(result == 'an_dog_l_aa_number_3_res_userDay_s_300_trials_2')
          
     def test_generate_target_dirname(self):
         dirname = pooled_results_file.generate_target_dirname(self.cspec)

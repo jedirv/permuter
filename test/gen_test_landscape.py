@@ -18,69 +18,69 @@ import os
 #concise_print:BBB,bb
 #scores_permute:resolution=userDay,userMonth
 def main():
-    dir = '/nfs/stak/students/i/irvine/python/cluster/test/sample_results2'
+    dir = '/nfs/stak/students/i/irvine/python/cluster/test/sample_results/unittest'
     if os.path.isdir(dir):
         shutil.rmtree(dir)
     trials = ['1','2']
     # rm for result_map
     rm = {}
     #userDay
-    ##trial1
-    # animal
+    #    trial1
+    #         animal
     rm['trial1_userDay_cat'] = '1'
     rm['trial1_userDay_dog'] = '2'
-    #letter
+    #        letter
     rm['trial1_userDay_aa'] = '1'
     rm['trial1_userDay_bb'] = '2'
-    #number
+    #        number
     rm['trial1_userDay_1'] = '1'
     rm['trial1_userDay_2'] = '2'
     rm['trial1_userDay_3'] = '3'
-    #singleton_val
-    rm['trial1_userDay_s'] = '1'
+    #        singleton_val
+    rm['trial1_userDay_300'] = '1'
         
-    ##trial2
-    #animal
+    #    trial2
+    #        animal
     rm['trial2_userDay_cat'] = '5'
     rm['trial2_userDay_dog'] = '6'
-    #letter
+    #        letter
     rm['trial2_userDay_aa'] = '1'
     rm['trial2_userDay_bb'] = '2'
-    #number
+    #        number
     rm['trial2_userDay_1'] = '1'
     rm['trial2_userDay_2'] = '2'
     rm['trial2_userDay_3'] = '3'
     #singleton_val
-    rm['trial2_userDay_s'] = '1'
+    rm['trial2_userDay_300'] = '1'
     
     #userMonth
-    ##trial1
-    # animal
+    #    trial1
+    #         animal
     rm['trial1_userMonth_cat'] = '3'
     rm['trial1_userMonth_dog'] = '4'
-    #letter
+    #        letter
     rm['trial1_userMonth_aa'] = '1'
     rm['trial1_userMonth_bb'] = '2'
-    #number
+    #        number
     rm['trial1_userMonth_1'] = '1'
     rm['trial1_userMonth_2'] = '2'
     rm['trial1_userMonth_3'] = '3'
-    #singleton_val
-    rm['trial1_userMonth_s'] = '1'
+    #        singleton_val
+    rm['trial1_userMonth_300'] = '1'
         
-    ##trial2
-    #animal
+    #    trial2
+    #        animal
     rm['trial2_userMonth_cat'] = '7'
     rm['trial2_userMonth_dog'] = '8'
-    #letter
+    #        letter
     rm['trial2_userMonth_aa'] = '1'
     rm['trial2_userMonth_bb'] = '2'
-    #number
+    #        number
     rm['trial2_userMonth_1'] = '1'
     rm['trial2_userMonth_2'] = '2'
     rm['trial2_userMonth_3'] = '3'
-    #singleton_val
-    rm['trial2_userMonth_s'] = '1'
+    #        singleton_val
+    rm['trial2_userMonth_300'] = '1'
     os.mkdir(dir)
     for trial in trials:
         trialdir =  "{0}/trial{1}".format(dir,trial)
@@ -88,7 +88,7 @@ def main():
         animals = ['cat','dog']
         letters = ['aa','bb']
         numbers =['1','2','3']
-        singleton_values = ['s']
+        singleton_values = ['300']
         for animal in animals:
             for letter in letters:
                 for number in numbers:

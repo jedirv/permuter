@@ -39,7 +39,7 @@ class ClusterSpec(object):
             
             self.master_job_name = self.load_special_value(self.path, 'master_job_name:')
             self.trials = self.load_special_value(self.path, 'trials:')
-            self.permuters = self.load_permutations(self.path, 'permute:')
+            self.permuters = self.load_permuters(self.path, 'permute:')
             self.concise_print_map = self.load_concise_print_map(self.path)
             
             self.key_val_map = self.load_replaces(self.path)
@@ -57,14 +57,14 @@ class ClusterSpec(object):
             self.script_dir = self.load_dir(self.path, "script_dir")
             self.one_up_basis = self.load_special_value(self.path, 'one_up_basis:')
             
-            self.scores_permuters = self.load_permutations(self.path, 'scores_permute:')
+            self.scores_permuters = self.load_permuters(self.path, 'scores_permute:')
             self.scores_from_filepath = ""
             self.scores_from_colname = ""
             self.scores_from_rownum = ""
             self.load_scores_from(self.path)
             self.scores_to = self.load_special_value(self.path,'scores_to:')
-            self.scores_x_axis = self.load_special_value(self.path, 'scores_x_axis:')
-            self.scores_y_axis = self.load_special_value(self.path, 'scores_y_axis:')
+            self.scores_x_axis = self.load_list(self.path, 'scores_x_axis:')
+            self.scores_y_axis = self.load_list(self.path, 'scores_y_axis:')
             #print "done loading cspec"
         except IOError:
             print "An error occurred trying to open cspec file {0}".format(path)
@@ -131,8 +131,23 @@ class ClusterSpec(object):
                     return target
         return ""
 
-       
-    def load_permutations(self, path, flag):
+    def load_list(self, path, flag):
+        f = open(path, 'r')
+        lines = f.readlines()
+        for line in lines:
+            line = line.rstrip()
+            if (line.startswith(flag)):
+                flag_sans_colon, target_list = line.split(":")
+                list_items = target_list.split(',')
+                if (not(hasattr(self, 'key_val_map'))):
+                    return list_items
+                resolved_list = []
+                for item in list_items:
+                    resolved_item = resolve_value(self.key_val_map, item)
+                    resolved_list.append(resolved_item)
+                return resolved_list
+        return ""    
+    def load_permuters(self, path, flag):
         f = open(path, 'r')
         permuters = {}
         lines = f.readlines()
@@ -449,4 +464,31 @@ def validate_permute_entries(path):
                     pass
     f.close()
     return result
+
+def validate_scores_x_axis(path):
+    return validate_axis_list(path,'scores_x_axis:')
     
+def validate_scores_y_axis(path):
+    return validate_axis_list(path,'scores_y_axis:')
+
+def validate_axis_list(path, axis_choice):
+    result = True
+    axis_info = "unknown"
+    f = open(path, 'r')
+    lines = f.readlines()
+    f.close()
+    for line in lines:
+        line = line.rstrip()
+        if (line.startswith(axis_choice)):
+            # should be one =
+            axis_flag, list_info = line.split(":")
+            axis_var_list = list_info.split(',')
+            for axis_var in axis_var_list:
+                if (not(is_valid_permuter_for_spec(axis_var, path))):
+                    result = False
+                    print "cluster_spec has axis choice for {0} that is not a valid permuter {1} in {2}".format(axis_choice, axis_var, path) 
+                    return result   
+    if (axis_info == "unknown"):
+        result = False
+        print "cluster_spec missing declaration for {0} in {1}".format(axis_choice, path)      
+    return result
