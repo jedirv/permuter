@@ -62,22 +62,35 @@ class PooledResultsFile(object):
                     source_file_path = self.source_file_map[result_file_perm_code]
                     #print "SOURCE_FILE_PATH : {0}".format(source_file_path)
                     value = get_result_from_file(source_file_path, cspec.scores_from_colname, cspec.scores_from_rownum)
-                    trial_values.append(float(value))
+                    trial_values.append(value)
                 median_value = get_median(trial_values)
                 line = "{0}{1},".format(line, median_value)
             line = line.rstrip(',')
             f.write("{0}\n".format(line))
         f.close()
     
-def get_median(float_series):
+def get_median(string_series):
+    missing_count = 0
+    float_series = []
+    for item in string_series:
+        if (item=='missing'):
+            missing_count = missing_count + 1
+        else:
+            float_series.append(float(item))
+       
     sorted_float_series = sorted(float_series)
     size = len(sorted_float_series)
+    result = 0.0
     if (len(sorted_float_series)%2 == 0):
         #even number in list
-        return (sorted_float_series[(size/2)-1]+sorted_float_series[size/2])/2.0
+        result = (sorted_float_series[(size/2)-1]+sorted_float_series[size/2])/2.0
     else:
         #odd number in list
-        return sorted_float_series[(size-1)/2]
+        result = sorted_float_series[(size-1)/2]
+    result_string = '{0}'.format(result)
+    for i in range(0,missing_count):
+        result_string = '{0}_X'.format(result_string)
+    return result_string
         
 def generate_target_dirname(cspec):
     dir = "{0}/{1}".format(cspec.scores_to, cspec.master_job_name)
@@ -100,6 +113,9 @@ def gen_perm_code_from_pieces(y_axis_permutation, x_axis_permutation, filename_p
     
 def get_result_from_file(source_file_path, colname, rownum):
     try:
+        if (not(os.path.exists(source_file_path))):
+            print 'MISSING {0}'.format(source_file_path)
+            return 'missing'
         f = open(source_file_path, 'r')
         # determine columne number of colname
         lines = f.readlines()
