@@ -80,14 +80,20 @@ def get_median(string_series):
        
     sorted_float_series = sorted(float_series)
     size = len(sorted_float_series)
-    result = 0.0
-    if (len(sorted_float_series)%2 == 0):
-        #even number in list
-        result = (sorted_float_series[(size/2)-1]+sorted_float_series[size/2])/2.0
+    median = ''
+    if (size == 0):
+        median = ''
+    elif (size == 1):
+        median = sorted_float_series[0]
     else:
-        #odd number in list
-        result = sorted_float_series[(size-1)/2]
-    result_string = '{0}'.format(result)
+        result = 0.0
+        if (len(sorted_float_series)%2 == 0):
+            #even number in list
+            median = (sorted_float_series[(size/2)-1]+sorted_float_series[size/2])/2.0
+        else:
+            #odd number in list
+            median = sorted_float_series[(size-1)/2]
+    result_string = '{0}'.format(median)
     for i in range(0,missing_count):
         result_string = '{0}_X'.format(result_string)
     return result_string

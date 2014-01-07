@@ -35,34 +35,45 @@ class TestPooledResultsFile(unittest.TestCase):
         self.assertTrue(dirname == './collected_results/unittest')
         
     def test_get_median(self):
-        x = [0.1]
+        x = ['0.1']
         result = pooled_results_file.get_median(x)
-        self.assertTrue(result == 0.1)
+        self.assertTrue(result == '0.1')
         
-        x = [0.2, 0.1]
+        x = ['0.2', '0.1']
         result = pooled_results_file.get_median(x)
         self.assertTrue(float(str(result)) == 0.15) # hack to get float 0.15 to equal float 0.15!
         
-        x = [0.3, 0.1, 0.2]
+        x = ['0.3', '0.1', '0.2']
         result = pooled_results_file.get_median(x)
-        self.assertTrue(result == 0.2)
+        self.assertTrue(result == '0.2')
         
-        x = [0.4, 0.1, 0.3, 0.2]
+        x = ['0.4', '0.1', '0.3', '0.2']
         result = pooled_results_file.get_median(x)
-        self.assertTrue(result == 0.25)
+        self.assertTrue(result == '0.25')
         
-        x = [0.1, 0.5, 0.2, 0.3, 0.4]
+        x = ['0.1', '0.5', '0.2', '0.3', '0.4']
         result = pooled_results_file.get_median(x)
-        self.assertTrue(result == 0.3)
+        self.assertTrue(result == '0.3')
         
-        x = [0.1, 0.6, 0.5, 0.4, 0.2, 0.3 ]
+        x = ['0.1', '0.6', '0.5', '0.4', '0.2', '0.3' ]
         result = pooled_results_file.get_median(x)
-        self.assertTrue(result == 0.35)
+        self.assertTrue(result == '0.35')
         
-        x = [0.1, 0.6, 0.5, 0.7, 0.4, 0.2, 0.3 ]
+        x = ['0.1', '0.6', '0.5', '0.7', '0.4', '0.2', '0.3' ]
         result = pooled_results_file.get_median(x)
-        self.assertTrue(result == 0.4)
+        self.assertTrue(result == '0.4')
          
+        x = ['missing', 'missing', 'missing']
+        result = pooled_results_file.get_median(x)
+        self.assertTrue(result == '_X_X_X')
+        
+        x = ['0.1', 'missing', 'missing']
+        result = pooled_results_file.get_median(x)
+        self.assertTrue(result == '0.1_X_X')
+        
+        x = ['0.1', 'missing', '0.3']
+        result = pooled_results_file.get_median(x)
+        self.assertTrue(result == '0.2_X')
         
     def test_build_code_using_dictionary(self):
         perm_dict = {'singleton_val':'300', 'res':'userDay' }
