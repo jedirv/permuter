@@ -615,6 +615,7 @@ def is_valid_permuter(name, lines):
             permuter_name, vals = permute_info.split('=')
             if permuter_name == name:
                 return True
+    print 'invalid permuter detected: {0}'.format(name)
     return False
             
             
