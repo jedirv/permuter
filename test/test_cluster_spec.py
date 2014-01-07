@@ -134,6 +134,165 @@ class TestClusterSpec(unittest.TestCase):
         kv['x'] = 'foo'
         self.assertTrue('somethingfoo' == cluster_spec.resolve_value(kv, 'something<x>'))
         
+    def test_is_valid_permuter(self):
+        lines = []
+        lines.append('something_irrelevant\n')
+        lines.append('permute:foo=1,2\n')
+        lines.append('scores_permute:bar=a,b\n')
+        self.assertTrue(cluster_spec.is_valid_permuter('foo', lines))
+        self.assertTrue(cluster_spec.is_valid_permuter('bar', lines))
+        self.assertFalse(cluster_spec.is_valid_permuter('whim', lines))
+        
+        
+    def test_validate_axis_list(self):
+        # more than one entry
+        lines = []
+        lines.append('permute:foo=1,2\n')
+        lines.append('permute:bar=a,b\n')
+        lines.append('scores_x_axis:foo\n')
+        lines.append('scores_x_axis:bar\n')
+        self.assertFalse(cluster_spec.validate_axis_list(lines,'scores_x_axis'))
+        
+        # no entry
+        lines = []
+        lines.append('permute:foo=1,2\n')
+        lines.append('permute:bar=a,b\n')
+        self.assertFalse(cluster_spec.validate_axis_list(lines,'scores_x_axis'))
+        
+        # entry has one good, one bad permuter
+        lines = []
+        lines.append('permute:foo=1,2\n')
+        lines.append('permute:bar=a,b\n')
+        lines.append('scores_x_axis:foo,baz\n')
+        self.assertFalse(cluster_spec.validate_axis_list(lines,'scores_x_axis'))
+        
+        # entry has three bad permuters
+        lines = []
+        lines.append('permute:foo=1,2\n')
+        lines.append('permute:bar=a,b\n')
+        lines.append('scores_x_axis:eeny,meeny,miny\n')
+        self.assertFalse(cluster_spec.validate_axis_list(lines,'scores_x_axis'))
+        
+        # entry has one good permuter
+        lines = []
+        lines.append('permute:foo=1,2\n')
+        lines.append('permute:bar=a,b\n')
+        lines.append('scores_x_axis:foo\n')
+        self.assertTrue(cluster_spec.validate_axis_list(lines,'scores_x_axis'))
+        
+        # entry has two good permuters
+        lines = []
+        lines.append('permute:foo=1,2\n')
+        lines.append('permute:bar=a,b\n')
+        lines.append('scores_x_axis:foo,bar\n')
+        self.assertTrue(cluster_spec.validate_axis_list(lines,'scores_x_axis'))
+        
+    def test_validate_scores_to(self):
+        lines = []
+        lines.append('scores_to:./junk\n')
+        lines.append('scores_to:./junk2\n')
+        self.assertFalse(cluster_spec.validate_scores_to(lines))
+        
+        lines = []
+        lines.append('scores_to:./junk\n')
+        self.assertTrue(cluster_spec.validate_scores_to(lines))
+        
+    def test_validate_scores_from(self):
+        #scores_from:file=<permutation_results_dir>/(resolution).csv,column_name=auc,row_number=1
+        # multiple entries
+        lines = []
+        lines.append('scores_from:file=<permutation_results_dir>/(resolution).csv,column_name=auc,row_number=1')
+        lines.append('scores_from:file=<permutation_results_dir>/foo.csv,column_name=auc,row_number=1')
+        self.assertFalse(cluster_spec.validate_scores_from(lines))
+        
+        #no permuteion_results_dir
+        lines = []
+        lines.append('scores_from:file=./(resolution).csv,column_name=auc,row_number=1')
+        self.assertFalse(cluster_spec.validate_scores_from(lines))
+        
+        # not a csv file
+        lines = []
+        lines.append('scores_from:file=<permutation_results_dir>/(resolution).txt,column_name=auc,row_number=1')
+        self.assertFalse(cluster_spec.validate_scores_from(lines))
+        
+        # wrong colname flag
+        lines = []
+        lines.append('scores_from:file=<permutation_results_dir>/(resolution).csv,col_name=auc,row_number=1')
+        self.assertFalse(cluster_spec.validate_scores_from(lines))
+        
+        #wrong rownum flag
+        lines = []
+        lines.append('scores_from:file=<permutation_results_dir>/(resolution).csv,column_name=auc,row_num=1')
+        self.assertFalse(cluster_spec.validate_scores_from(lines))
+        
+        
+        #non integer rownum
+        lines = []
+        lines.append('scores_from:file=<permutation_results_dir>/(resolution).csv,column_name=auc,row_number=a')
+        self.assertFalse(cluster_spec.validate_scores_from(lines))
+        
+        #good one
+        lines = []
+        lines.append('scores_from:file=<permutation_results_dir>/(resolution).csv,column_name=auc,row_number=1')
+        self.assertTrue(cluster_spec.validate_scores_from(lines))
+        
+        
+    def test_single_entry_present(self):
+        lines = []
+        lines.append('prefixA:foo\n')
+        lines.append('prefixB:foo\n')
+        lines.append('prefixB:foo\n')
+        self.assertTrue(cluster_spec.single_entry_present(lines,'prefixA'))
+        self.assertFalse(cluster_spec.single_entry_present(lines,'prefixB'))
+        self.assertFalse(cluster_spec.single_entry_present(lines,'prefixC'))
+
+
+    def test_validate_scores_gathering_info_from_lines(self):
+        # none present is ok
+        lines = []
+        lines.append("foo\n")
+        self.assertTrue(cluster_spec.validate_scores_gathering_info_from_lines(lines))
+        
+        #if any present, then 4 need to be present
+        
+        #missing from
+        lines = []
+        lines.append('scores_to:./collected_results')
+        lines.append('scores_y_axis:letter')
+        lines.append('scores_x_axis:number,animal')
+        self.assertFalse(cluster_spec.validate_scores_gathering_info_from_lines(lines))
+        
+        #missing to
+        lines = []
+        lines.append('scores_from:file=<permutation_results_dir>/foo.csv,column_name=auc,row_number=1')
+        lines.append('scores_y_axis:letter')
+        lines.append('scores_x_axis:number,animal')
+        self.assertFalse(cluster_spec.validate_scores_gathering_info_from_lines(lines))
+        
+        #missing x axis
+        lines = []
+        lines.append('scores_from:file=<permutation_results_dir>/foo.csv,column_name=auc,row_number=1')
+        lines.append('scores_to:./collected_results')
+        lines.append('scores_y_axis:letter')
+        self.assertFalse(cluster_spec.validate_scores_gathering_info_from_lines(lines))
+        
+        #missing y axis
+        lines = []
+        lines.append('scores_from:file=<permutation_results_dir>/foo.csv,column_name=auc,row_number=1')
+        lines.append('scores_to:./collected_results')
+        lines.append('scores_x_axis:number,animal')
+        self.assertFalse(cluster_spec.validate_scores_gathering_info_from_lines(lines))
+        
+
+        
+    def test_lines_contains_prefix(self):
+        lines = []
+        lines.append('lineA\n')
+        lines.append('prefix3:lineB\n')
+        lines.append('lineC\n')
+        self.assertFalse(cluster_spec.lines_contains_prefix(lines,'prefix2'))
+        self.assertTrue(cluster_spec.lines_contains_prefix(lines,'prefix3'))
+    
 if __name__ == '__main__':
     unittest.main()
     

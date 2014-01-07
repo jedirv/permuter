@@ -1,3 +1,4 @@
+import os
 
 verbose = False
 
@@ -316,7 +317,11 @@ def validate(path):
     if not(result_trials):
         print "problem found in trials statement"
     
-    return result_permute and result_replace and result_script_dir and result_root_results_dir and result_master_job_name and result_trials
+    result_scores_info = validate_scores_gathering_info(path)
+    if not(result_scores_info):
+        print "problem found in scores gathering info entries"
+        
+    return result_permute and result_replace and result_script_dir and result_root_results_dir and result_master_job_name and result_trials and result_scores_info
 
    
 def validate_root_results_dir(path):
@@ -465,30 +470,154 @@ def validate_permute_entries(path):
     f.close()
     return result
 
-def validate_scores_x_axis(path):
-    return validate_axis_list(path,'scores_x_axis:')
-    
-def validate_scores_y_axis(path):
-    return validate_axis_list(path,'scores_y_axis:')
+def lines_contains_prefix(lines, prefix):
+    for line in lines:
+        if (line.startswith(prefix)):
+            return True
+    return False
 
-def validate_axis_list(path, axis_choice):
-    result = True
-    axis_info = "unknown"
+def validate_scores_gathering_info(path):
     f = open(path, 'r')
     lines = f.readlines()
     f.close()
+    validate_scores_gathering_info_from_lines(lines)
+    
+def validate_scores_gathering_info_from_lines(lines):
+    x_axis_info_present = lines_contains_prefix(lines, 'scores_x_axis')
+    y_axis_info_present = lines_contains_prefix(lines, 'scores_y_axis')
+    permute_info_present = lines_contains_prefix(lines, 'scores_permute')
+    from_info_present = lines_contains_prefix(lines, 'scores_from')
+    to_info_present = lines_contains_prefix(lines, 'scores_to')
+    # since scores collection is optional, if none of them are present, cspec is still ok
+    if (not(x_axis_info_present) and
+        not(y_axis_info_present) and
+        not(permute_info_present) and
+        not(from_info_present) and
+        not(to_info_present)):
+        return True
+    
+    # if any of them are present, then all but the permute line MUST be present
+    if (not(x_axis_info_present)):
+        print ('missing scores_x_axis: declaration')
+        return False
+    if (not(y_axis_info_present)):
+        print ('missing scores_y_axis: declaration')
+        return False
+    if (not(from_info_present)):
+        print ('missing scores_from: declaration')
+        return False
+    if (not(to_info_present)):
+        print ('missing scores_to: declaration')
+        return False
+    
+    if (not(validate_axis_list(lines,'scores_x_axis:'))):
+        return False
+    if (not(validate_axis_list(lines,'scores_y_axis:'))):
+        return False
+    if (not(validate_scores_to(lines))):
+        return False
+    if (not(validate_scores_from(lines))):
+        return False
+    return True
+
+def single_entry_present(lines, prefix):
+    count = 0
+    for line in lines:
+        if (line.startswith(prefix)):
+            count = count + 1
+    if (count == 1):
+        return True
+    else:
+        return False
+
+def validate_scores_from(lines):
+    #scores_from:file=<permutation_results_dir>/(resolution).csv,column_name=auc,row_number=1
+    if (not(single_entry_present(lines, 'scores_from:'))):
+        print 'more than one entry for scores_from:  Should be one entry'
+        return False
+    for line in lines:
+        line = line.rstrip()
+        if (line.startswith('scores_from:')):
+            flag, from_info = line.split(':')
+            path_info, column_info, row_info = from_info.split(',')
+            path_flag, path = path_info.split('=')
+            if (not(path.startswith('<permutation_results_dir>'))):
+                print 'scores_from: entry should start with "<permutation_results_dir>"'
+                print 'currently is:  {0}'.format(line)
+                return False
+            if (not(path.endswith('.csv'))):
+                print 'scores_from: entry should have a file that is a .csv file'
+                print 'currently is:  {0}'.format(line)
+                return False
+            column_flag, column_name = column_info.split('=')
+            if (not(column_flag == 'column_name')):
+                print 'scores_from should be of this form: scores_from:file=<permutation_results_dir>/some_name.csv,column_name=some_col,row_number=some_int'
+                print 'currently is:  {0}'.format(line)
+                return False
+            row_flag, row_num = row_info.split('=')
+            if (not(row_flag == 'row_number')):
+                print 'scores_from should be of this form: scores_from:file=<permutation_results_dir>/some_name.csv,column_name=some_col,row_number=some_int'
+                print 'currently is:  {0}'.format(line)
+                return False
+            if (not(row_num.isdigit())):
+                print 'scores_from should have integer row number'
+                print 'currently is:  {0}'.format(line)
+                return False
+    return True
+        
+def validate_scores_to(lines):
+    if (not(single_entry_present(lines, 'scores_to:'))):
+        print 'more than one entry for scores_to:  Should be one entry'
+        return False
+    for line in lines:
+        line = line.rstrip()
+        if (line.startswith('scores_to:')):
+            flag, dir = line.split(':')
+            if (os.path.exists(dir)):
+                return True
+            else:
+                os.mkdir(dir)
+                if (os.path.exists(dir)):
+                    return True
+                else:
+                    print 'Could not create directory specified in scores_to:'
+    return False
+    
+def validate_axis_list(lines, axis_choice):
+    if (not(single_entry_present(lines, axis_choice))):
+        print 'more than one entry for {0}.  Should be one entry'.format(axis_choice)
+        return False
     for line in lines:
         line = line.rstrip()
         if (line.startswith(axis_choice)):
-            # should be one =
+            # grab the list and make sure each entry is a valid permuter
             axis_flag, list_info = line.split(":")
             axis_var_list = list_info.split(',')
             for axis_var in axis_var_list:
-                if (not(is_valid_permuter_for_spec(axis_var, path))):
-                    result = False
-                    print "cluster_spec has axis choice for {0} that is not a valid permuter {1} in {2}".format(axis_choice, axis_var, path) 
-                    return result   
-    if (axis_info == "unknown"):
-        result = False
-        print "cluster_spec missing declaration for {0} in {1}".format(axis_choice, path)      
-    return result
+                if (not(is_valid_permuter(axis_var, lines))):
+                    print "cluster_spec has axis choice for {0} that is not a valid permuter: {1}".format(axis_choice, axis_var) 
+                    return False   
+    return True
+
+def is_valid_permuter(name, lines):
+    for line in lines:
+        if (line.startswith('permute:') or line.startswith('scores_permute')):
+            permute_flag, permute_info = line.split(':')
+            permuter_name, vals = permute_info.split('=')
+            if permuter_name == name:
+                return True
+    return False
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
