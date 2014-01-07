@@ -485,7 +485,7 @@ def validate_scores_gathering_info(path):
     f = open(path, 'r')
     lines = f.readlines()
     f.close()
-    validate_scores_gathering_info_from_lines(lines)
+    return validate_scores_gathering_info_from_lines(lines)
     
 def validate_scores_gathering_info_from_lines(lines):
     x_axis_info_present = lines_contains_prefix(lines, 'scores_x_axis')
