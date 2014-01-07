@@ -505,28 +505,36 @@ def validate_scores_gathering_info_from_lines(lines):
     if (not(x_axis_info_present)):
         print ('missing scores_x_axis: declaration')
         return False
+    print('1')
     if (not(y_axis_info_present)):
         print ('missing scores_y_axis: declaration')
         return False
+    
+    print('2')
     if (not(from_info_present)):
         print ('missing scores_from: declaration')
         return False
+    print('3')
     if (not(to_info_present)):
         print ('missing scores_to: declaration')
         return False
-    
+    print('4')
     if (not(validate_axis_list(lines,'scores_x_axis:'))):
         print 'problem in scores_x_axis: declaration'
         return False
+    print('5')
     if (not(validate_axis_list(lines,'scores_y_axis:'))):
         print 'problem in scores_y_axis: declaration'
         return False
+    print('6')
     if (not(validate_scores_to(lines))):
         print 'problem in scores_to: declaration'
         return False
+    print('7')
     if (not(validate_scores_from(lines))):
         print 'problem in scores_from: declaration'
         return False
+    print('8')
     return True
 
 def single_entry_present(lines, prefix):
