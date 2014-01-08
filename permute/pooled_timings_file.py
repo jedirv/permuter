@@ -56,7 +56,7 @@ class PooledTimingsFile(object):
                     #cluster_job_perm_code = permutations.generate_permutation_code(permutation_info_with_trial,cspec.concise_print_map,True)
                     print "cluster_job_perm_code {0}".format(cluster_job_perm_code)
                     timing_value = get_timing_value_for_run(cluster_job_perm_code,self.cluster_runs)
-                    trial_timing_values.append(float(timing_value))
+                    trial_timing_values.append(timing_value)
                 median_timing = pooled_results_file.get_median(trial_timing_values)
                 print 'median_timing {0}'.format(median_timing)
                 timings_line = "{0}{1},".format(timings_line, median_timing)
@@ -103,7 +103,7 @@ def get_timing_value_for_run(perm_code, cluster_runs):
     qacctlog = qacct_log.QacctLog(user_job_number_as_string, permutation_info, cluster_runs.cspec, permutation_info['trials'])
     qacctlog.ingest(cluster_job_number)
     if (qacctlog.run_failed()):
-        return "NOT_AVAILABLE"
+        return "X"
     else:
         print  "qacctlog.cpu {0}".format(qacctlog.cpu)
         return qacctlog.cpu
