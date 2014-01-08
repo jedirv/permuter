@@ -103,7 +103,7 @@ def get_timing_value_for_run(perm_code, cluster_runs):
     qacctlog = qacct_log.QacctLog(user_job_number_as_string, permutation_info, cluster_runs.cspec, permutation_info['trials'])
     qacctlog.ingest(cluster_job_number)
     if (qacctlog.run_failed()):
-        return "X"
+        return "missing"
     else:
         print  "qacctlog.cpu {0}".format(qacctlog.cpu)
         return qacctlog.cpu
