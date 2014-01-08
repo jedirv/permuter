@@ -91,7 +91,7 @@ class QacctLog(PermutationDriverFile):
                 self.qsub_time = parts[1]
             elif (parts[0] == 'start_time'):
                 if (parts[1] == '-/-'):
-                    print 'start time is -/-'
+                    print 'start time is -/- {0}'.format(parts[1])
                     self.start_time = parts[1]
                 else:
                     print 'start time parts : {0}'.format(line)
