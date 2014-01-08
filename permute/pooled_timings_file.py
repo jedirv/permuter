@@ -59,7 +59,7 @@ class PooledTimingsFile(object):
                     trial_timing_values.append(float(timing_value))
                 median_timing = pooled_results_file.get_median(trial_timing_values)
                 print 'median_timing {0}'.format(median_timing)
-                timings_line = "{0}{1},".format(timings_line, int(median_timing))
+                timings_line = "{0}{1},".format(timings_line, median_timing)
             timings_line.rstrip(',')
             ft.write("{0}\n".format(timings_line))
         ft.close()
