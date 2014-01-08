@@ -90,6 +90,7 @@ class QacctLog(PermutationDriverFile):
             elif (parts[0] == 'qsub_time'):
                 self.qsub_time = parts[1]
             elif (parts[0] == 'start_time'):
+                print 'start time parts : {0}'.format(line)
                 self.start_time = "{0} {1} {2} {3} {4}".format(parts[1], parts[2], parts[3], parts[4], parts[5])
             elif (parts[0] == 'end_time'):
                 self.end_time = "{0} {1} {2} {3} {4}".format(parts[1], parts[2], parts[3], parts[4], parts[5])
