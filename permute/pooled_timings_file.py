@@ -50,7 +50,7 @@ class PooledTimingsFile(object):
                 trials_list = cspec.get_trials_list()
                 trial_timing_values = []
                 for trial in trials_list:
-                    cluster_job_perm_code = pooled_results_file.gen_perm_code_from_pieces(y_permutation, x_permutation, self.filename_permutation_info, cspec, trial)
+                    cluster_job_perm_code = gen_cluster_job_perm_code_from_pieces(y_permutation, x_permutation, self.filename_permutation_info, cspec, trial)
                     
                     #permutation_info = pooled_results_file.gen_perm_code_from_pieces(y_axis_val, x_axis_val, self.filename_permutation_info, cspec, trial)
                     #cluster_job_perm_code = permutations.generate_permutation_code(permutation_info_with_trial,cspec.concise_print_map,True)
@@ -62,6 +62,24 @@ class PooledTimingsFile(object):
             timings_line.rstrip(',')
             ft.write("{0}\n".format(timings_line))
         ft.close()
+
+
+def gen_cluster_job_perm_code_from_pieces(y_axis_permutation, x_axis_permutation, filename_perm_dict, cspec, trial):
+    full_perm_dict = {}
+    for key, val in filename_perm_dict.items():
+        full_perm_dict[key] = val
+    # create a full perm_dict by adding the x and y vals back in
+    for key, val in y_axis_permutation.items():
+        full_perm_dict[key] = val
+    for key, val in x_axis_permutation.items():
+        full_perm_dict[key] = val
+    full_perm_dict['trials'] = trial
+    # remove the scores_permute entries
+    for key, vals in cspec.scores_permuters.items():
+        if full_perm_dict.has_key(key):
+            full_perm_dict.pop(key, None)
+    result = pooled_results_file.build_code_using_dictionary(full_perm_dict, cspec)
+    return result
            
 #def get_median_timing(int_series):
 #    sorted_int_series = sorted(int_series)

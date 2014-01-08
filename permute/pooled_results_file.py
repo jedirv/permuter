@@ -58,7 +58,7 @@ class PooledResultsFile(object):
                 trials_list = cspec.get_trials_list()
                 trial_values = []
                 for trial in trials_list:
-                    result_file_perm_code = gen_perm_code_from_pieces(y_permutation, x_permutation, self.filename_permutation_info, cspec, trial)
+                    result_file_perm_code = gen_result_perm_code_from_pieces(y_permutation, x_permutation, self.filename_permutation_info, cspec, trial)
                     source_file_path = self.source_file_map[result_file_perm_code]
                     #print "SOURCE_FILE_PATH : {0}".format(source_file_path)
                     value = get_result_from_file(source_file_path, cspec.scores_from_colname, cspec.scores_from_rownum)
@@ -104,7 +104,7 @@ def generate_target_dirname(cspec):
         os.makedirs(dir)
     return dir
     
-def gen_perm_code_from_pieces(y_axis_permutation, x_axis_permutation, filename_perm_dict, cspec, trial):
+def gen_result_perm_code_from_pieces(y_axis_permutation, x_axis_permutation, filename_perm_dict, cspec, trial):
     full_perm_dict = {}
     for key, val in filename_perm_dict.items():
         full_perm_dict[key] = val

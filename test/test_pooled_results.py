@@ -6,6 +6,7 @@ Created on Nov 26, 2013
 import unittest
 from permute import pooled_results_file
 from permute import pooled_results_delta_file
+from permute import pooled_timings_file
 from permute import cluster_spec
 
 class TestPooledResultsFile(unittest.TestCase):
@@ -21,13 +22,21 @@ class TestPooledResultsFile(unittest.TestCase):
         self.assertTrue(perm_dict.has_key('singleton_val'))
         self.assertTrue(perm_dict.has_key('resolution'))
 
-    def test_gen_perm_code_from_pieces(self):
+    def test_gen_result_perm_code_from_pieces(self):
         y_permutation = {'letter': 'AAA' }
         x_permutation = {'number': '3', 'animal':'dog'}
-        filename_perm_dict = {'singleton_val':'300', 'res':'userDay' }
-        result = pooled_results_file.gen_perm_code_from_pieces(y_permutation, x_permutation, filename_perm_dict, self.cspec, '2')
+        filename_perm_dict = {'singleton_val':'300', 'resolution':'userDay' }
+        result = pooled_results_file.gen_result_perm_code_from_pieces(y_permutation, x_permutation, filename_perm_dict, self.cspec, '2')
         #print "RESULT : {0}".format(result)
         self.assertTrue(result == 'an_dog_l_aa_number_3_res_userDay_s_300_trials_2')
+        
+    def test_gen_cluster_job_perm_code_from_pieces(self):
+        y_permutation = {'letter': 'AAA' }
+        x_permutation = {'number': '3', 'animal':'dog'}
+        filename_perm_dict = {'singleton_val':'300', 'resolution':'userDay' }
+        result = pooled_timings_file.gen_cluster_job_perm_code_from_pieces(y_permutation, x_permutation, filename_perm_dict, self.cspec, '2')
+        print "RESULT : {0}".format(result)
+        self.assertTrue(result == 'an_dog_l_aa_number_3_s_300_trials_2')
          
     def test_generate_target_dirname(self):
         dirname = pooled_results_file.generate_target_dirname(self.cspec)
