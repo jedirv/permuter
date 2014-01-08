@@ -12,18 +12,18 @@ class QacctLog(PermutationDriverFile):
         self.pathname = "{0}.qacct".format(self.script_path_root)
         self.qacct_log = "{0}.qacct".format(self.get_job_file_name())
         self.type = "qacct_log"
-        self.cpu = "?"
-        self.mem = "?"
-        self.maxvmem = "?"
-        self.hostname = "?"
-        self.owner = "?"
-        self.jobname = "?"
-        self.qsub_time = "?"
-        self.start_time = "?"
-        self.end_time = "?"
-        self.failed = "?"
-        self.exit_status = "?"
-        self.io = "?"
+        self.cpu = "missing"
+        self.mem = "missing"
+        self.maxvmem = "missing"
+        self.hostname = "missing"
+        self.owner = "missing"
+        self.jobname = "missing"
+        self.qsub_time = "missing"
+        self.start_time = "missing"
+        self.end_time = "missing"
+        self.failed = "missing"
+        self.exit_status = "missing"
+        self.io = "missing"
         
         self.error_reading = False
         
@@ -100,7 +100,7 @@ class QacctLog(PermutationDriverFile):
             elif (parts[0] == 'io'):
                 self.io = parts[1]
             
-        if (self.cpu == '?' or self.maxvmem == '?'):
+        if (self.cpu == 'missing' or self.maxvmem == 'missing'):
             self.error_reading = True
             #print "{0} CANNOT LOAD".format(self.cluster_job_number)
         #else:
