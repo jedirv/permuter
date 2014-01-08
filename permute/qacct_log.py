@@ -49,7 +49,7 @@ class QacctLog(PermutationDriverFile):
         os.chdir(self.script_dir)
         self.cluster_job_number = cluster_job_number
 
-        if (os.path.isfile(self.qacct_log)):
+        if (os.path.isfile(self.qacct_log) and self.has_content()):
             #print "file exists"
             self.load_qacct_log()
             if (self.error_reading):
@@ -67,7 +67,13 @@ class QacctLog(PermutationDriverFile):
         os.chdir(starting_dir)
         #os.unlink(self.qstat_log)
         #print "closed {0}".format(self.qstat_log)
-        
+    def has_content(self):
+        f = open(self.qacct_log, 'r') 
+        lines = f.readlines()
+        f.close()
+        if (len(lines) > 10):
+            return True
+        return False
     def load_qacct_log(self):
         self.error_reading = False
         f = open(self.qacct_log, 'r')
