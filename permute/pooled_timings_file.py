@@ -56,6 +56,7 @@ class PooledTimingsFile(object):
                     #cluster_job_perm_code = permutations.generate_permutation_code(permutation_info_with_trial,cspec.concise_print_map,True)
                     print "cluster_job_perm_code {0}".format(cluster_job_perm_code)
                     timing_value = get_timing_value_for_run(cluster_job_perm_code,self.cluster_runs)
+                    print 'timing_value : {0}'.format(timing_value)
                     trial_timing_values.append(timing_value)
                 median_timing = pooled_results_file.get_median(trial_timing_values)
                 print 'median_timing {0}'.format(median_timing)
