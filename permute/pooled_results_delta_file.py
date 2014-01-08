@@ -33,15 +33,57 @@ class PooledResultsDeltaFile(object):
         f_source.close()
         f_target.close()
         
+# median_expression could look like 0.123, 0.123_X, 0.123_x_x, etc
+def median_expression_has_float(median_expression):
+    new_val = median_expression.replace('_X','')
+    if (new_val == ''):
+        return False
+    return True
+    
+def get_float_from_median_expression(val):
+    new_val = val.replace('_X','')
+    return float(new_val)
+    
 def create_delta_line(line):
     parts = line.split(',')
-    result = "{0},0,".format(parts[0])
-    first_number = parts[1]
-    first_num_float = float(first_number)
-    for i in range(2,len(parts)):
-        cur_num_float = float(parts[i])
-        cur_delta = cur_num_float - first_num_float
-        delta_string = "%.2f" % cur_delta
-        result = "{0}{1},".format(result,delta_string)
+    result = "{0}".format(parts[0])
+
+    index_first_float = get_index_first_float(parts,1)
+    # if no numbers at all - this means all results are missing, the input line is all Xs, so just return it 
+    if (-1 == index_first_float):
+        return line
+    
+    # copy the missing values until we have a float
+    for i in range(1,index_first_float):
+        result = "{0},{1}".format(result,parts[i])
+    
+    # establish reference float
+    first_val_with_float = parts[index_first_float]
+    first_float = get_float_from_median_expression(first_val_with_float)
+    X_count = first_val_with_float.count('X')
+    result = "{0},0".format(result)
+    for i in range(0, X_count):
+        result = "{0}_X".format(result)
+    
+    # 
+    for i in range(index_first_float+1, len(parts)):
+        median_expression = parts[i]
+        if (median_expression_has_float(median_expression)):
+            this_float = get_float_from_median_expression(median_expression)
+            X_count = median_expression.count('X')
+            cur_delta = this_float - first_float
+            delta_string = "%.2f" % cur_delta
+            for i in range(0, X_count):
+                delta_string = "{0}_X".format(delta_string) 
+            result = "{0},{1}".format(result,delta_string)
+        else:
+            result = "{0},{1}".format(result,median_expression)
     result = result.rstrip(',')
     return result
+
+def get_index_first_float(parts, starting_index):
+    for i in range(starting_index, len(parts)):
+        new_val = parts[i].replace('_X','')
+        if (len(new_val) != 0):
+            return i
+    return -1

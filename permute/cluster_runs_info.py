@@ -45,6 +45,10 @@ class ClusterRunsInfo(object):
         return permute_count_width
     
     def get_job_number_string_for_permutation_code(self, permutation_code):
+        #print 'START'
+        #for key, val in self.job_number_for_permutation_code_map.items():
+        #    print '{0} {1}'.format(key, val)
+        #print 'END'
         result = self.job_number_for_permutation_code_map[permutation_code]
         return result
         

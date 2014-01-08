@@ -108,7 +108,51 @@ class TestPooledResultsFile(unittest.TestCase):
         except Exception as detail:
             self.assertTrue(True)
       
-      
+    def test_median_expression_has_float(self):
+        self.assertTrue(pooled_results_delta_file.median_expression_has_float('0.123'))
+        self.assertTrue(pooled_results_delta_file.median_expression_has_float('0.123_X'))
+        self.assertTrue(pooled_results_delta_file.median_expression_has_float('0.123_X_X'))
+        self.assertTrue(pooled_results_delta_file.median_expression_has_float('0.123_X_X_X'))
+        self.assertFalse(pooled_results_delta_file.median_expression_has_float('_X_X_X'))
+    
+    def test_get_float_from_median_expression(self):
+        self.assertTrue(pooled_results_delta_file.get_float_from_median_expression('0.123') == 0.123)
+        self.assertTrue(pooled_results_delta_file.get_float_from_median_expression('0.123_X') == 0.123)
+        self.assertTrue(pooled_results_delta_file.get_float_from_median_expression('0.123_X_X') == 0.123)
+        self.assertTrue(pooled_results_delta_file.get_float_from_median_expression('0.123_X_X_X') == 0.123)
+        # only called after its determined that a float is present, so no need to test the '_X_X_X' case
+        
+    def test_get_index_first_float(self):
+        parts = []
+        parts.append('foo')
+        parts.append('0.123')
+        parts.append('0.3_X_X')
+        self.assertTrue(pooled_results_delta_file.get_index_first_float(parts, 1) == 1)
+        
+        parts = []
+        parts.append('foo')
+        parts.append('_X_X_X')
+        parts.append('0.123')
+        self.assertTrue(pooled_results_delta_file.get_index_first_float(parts, 1) == 2)
+        
+        parts = []
+        parts.append('foo')
+        parts.append('_X_X_X')
+        parts.append('0.123_X')
+        self.assertTrue(pooled_results_delta_file.get_index_first_float(parts, 1) == 2)
+        
+        parts = []
+        parts.append('foo')
+        parts.append('0.123_X_X')
+        parts.append('_X_X_X')
+        self.assertTrue(pooled_results_delta_file.get_index_first_float(parts, 1) == 1)
+        
+        parts = []
+        parts.append('foo')
+        parts.append('_X_X_X')
+        parts.append('_X_X_X')
+        self.assertTrue(pooled_results_delta_file.get_index_first_float(parts, 1) == -1)
+            
     def test_create_delta_line(self):
         number_line = "2013-04,0.82333,0.92333,0.72222"
         delta_line = pooled_results_delta_file.create_delta_line(number_line)
@@ -121,6 +165,21 @@ class TestPooledResultsFile(unittest.TestCase):
         number_line = "2013-04,0.0082333,0.0092333,0.0072222"
         delta_line = pooled_results_delta_file.create_delta_line(number_line)
         self.assertTrue(delta_line == "2013-04,0,0.00,-0.00")
+        
+        
+        number_line = "2013-04,0.82333,0.92333_X,0.72222"
+        delta_line = pooled_results_delta_file.create_delta_line(number_line)
+        self.assertTrue(delta_line == "2013-04,0,0.10_X,-0.10")
+        
+        
+        number_line = "2013-04,0.82333,0.92333_X_X,0.72222"
+        delta_line = pooled_results_delta_file.create_delta_line(number_line)
+        self.assertTrue(delta_line == "2013-04,0,0.10_X_X,-0.10")
+        
+        
+        number_line = "2013-04,0.82333,_X_X_X,0.72222"
+        delta_line = pooled_results_delta_file.create_delta_line(number_line)
+        self.assertTrue(delta_line == "2013-04,0,_X_X_X,-0.10")
               
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

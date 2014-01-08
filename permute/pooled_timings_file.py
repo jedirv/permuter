@@ -21,8 +21,8 @@ class PooledTimingsFile(object):
     def persist(self):
         cspec = self.cspec
         # generate the column names
-        ft = open(self.target_path, 'w')
-        print "persisting {0}".format(self.target_path)
+        ft = open(self.target_timings_path, 'w')
+        print "persisting {0}".format(self.target_timings_path)
         
         # scores_y_axis:letter
         # scores_x_axis:number,animal
