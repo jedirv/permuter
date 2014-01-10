@@ -82,14 +82,15 @@ class TestPermuter(unittest.TestCase):
         permuter.create_pooled_results_files(self.cluster_runs)
         f1 = open('./collected_results/unittest/res_userDay_s_300.csv','r')
         lines1 = f1.readlines()
-        self.assertTrue(lines1[0] == '[\'letter\'],an_cat_number_1,an_cat_number_2,an_cat_number_3,an_dog_number_1,an_dog_number_2,an_dog_number_3\n')
+        print lines1
+        self.assertTrue(lines1[0] == 'letter,an_cat_number_1,an_cat_number_2,an_cat_number_3,an_dog_number_1,an_dog_number_2,an_dog_number_3\n')
         self.assertTrue(lines1[1] == 'l_aa,3111.0,3121.0,3131.0,4111.0,4121.0,4131.0\n')
         self.assertTrue(lines1[2] == 'l_bb,3211.0,3221.0,3231.0,4211.0,4221.0,4231.0\n')
         f1.close()
         
         f2 = open('./collected_results/unittest/res_userMonth_s_300.csv','r')
         lines2 = f2.readlines()
-        self.assertTrue(lines2[0] == '[\'letter\'],an_cat_number_1,an_cat_number_2,an_cat_number_3,an_dog_number_1,an_dog_number_2,an_dog_number_3\n')
+        self.assertTrue(lines2[0] == 'letter,an_cat_number_1,an_cat_number_2,an_cat_number_3,an_dog_number_1,an_dog_number_2,an_dog_number_3\n')
         self.assertTrue(lines2[1] == 'l_aa,5111.0,5121.0,5131.0,6111.0,6121.0,6131.0\n')
         self.assertTrue(lines2[2] == 'l_bb,5211.0,5221.0,5231.0,6211.0,6221.0,6231.0\n')
         f2.close()

@@ -5,6 +5,7 @@ Created on Dec 12, 2013
 '''
 
 import os
+import pooled_results_file
 
 class PooledResultsDeltaFile(object):
     '''
@@ -33,17 +34,6 @@ class PooledResultsDeltaFile(object):
         f_source.close()
         f_target.close()
         
-# median_expression could look like 0.123, 0.123_X, 0.123_x_x, etc
-def median_expression_has_float(median_expression):
-    new_val = median_expression.replace('_X','')
-    if (new_val == ''):
-        return False
-    return True
-    
-def get_float_from_median_expression(val):
-    new_val = val.replace('_X','')
-    return float(new_val)
-    
 def create_delta_line(line):
     parts = line.split(',')
     result = "{0}".format(parts[0])
@@ -59,22 +49,22 @@ def create_delta_line(line):
     
     # establish reference float
     first_val_with_float = parts[index_first_float]
-    first_float = get_float_from_median_expression(first_val_with_float)
-    X_count = first_val_with_float.count('X')
+    first_float = pooled_results_file.get_float_from_median_expression(first_val_with_float)
+    X_count = first_val_with_float.count('x')
     result = "{0},0".format(result)
     for i in range(0, X_count):
-        result = "{0}_X".format(result)
+        result = "{0}x".format(result)
     
     # 
     for i in range(index_first_float+1, len(parts)):
         median_expression = parts[i]
-        if (median_expression_has_float(median_expression)):
-            this_float = get_float_from_median_expression(median_expression)
-            X_count = median_expression.count('X')
+        if (pooled_results_file.median_expression_has_float(median_expression)):
+            this_float = pooled_results_file.get_float_from_median_expression(median_expression)
+            X_count = median_expression.count('x')
             cur_delta = this_float - first_float
             delta_string = "%.2f" % cur_delta
             for i in range(0, X_count):
-                delta_string = "{0}_X".format(delta_string) 
+                delta_string = "{0}x".format(delta_string) 
             result = "{0},{1}".format(result,delta_string)
         else:
             result = "{0},{1}".format(result,median_expression)
@@ -83,7 +73,7 @@ def create_delta_line(line):
 
 def get_index_first_float(parts, starting_index):
     for i in range(starting_index, len(parts)):
-        new_val = parts[i].replace('_X','')
+        new_val = parts[i].replace('x','')
         if (len(new_val) != 0):
             return i
     return -1

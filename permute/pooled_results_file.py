@@ -44,13 +44,18 @@ class PooledResultsFile(object):
         y_permutations = permutations.expand_permutations(y_permuters)
         
         # write the x_axis column names
-        header = "{0},".format(cspec.scores_y_axis)
+        header = "{0},".format(beautify_header("{0}".format(cspec.scores_y_axis)))
         for x_permutation in x_permutations:
             concise_x_permutation = permutations.generate_permutation_code(x_permutation, cspec.concise_print_map, False)
             header = "{0}{1},".format(header, concise_x_permutation)
         header = header.rstrip(',')
         f.write("{0}\n".format(header))
-        
+        medians = {}
+        # make a list of x permutation codes for use later
+        x_perm_codes = []
+        for x_permutation in x_permutations:
+            x_perm_codes.append(permutations.generate_permutation_code(x_permutation, cspec.concise_print_map, False))
+        # the main loop    
         for y_permutation in y_permutations:
             concise_y_permutation = permutations.generate_permutation_code(y_permutation, cspec.concise_print_map, False)
             line = "{0},".format(concise_y_permutation)
@@ -63,13 +68,90 @@ class PooledResultsFile(object):
                     #print "SOURCE_FILE_PATH : {0}".format(source_file_path)
                     value = get_result_from_file(source_file_path, cspec.scores_from_colname, cspec.scores_from_rownum)
                     trial_values.append(value)
-                median_value = get_median(trial_values)
+                median_value = get_median(trial_values, False)
                 line = "{0}{1},".format(line, median_value)
+                x_perm_code = permutations.generate_permutation_code(x_permutation, cspec.concise_print_map, False)
+                record_median(x_perm_code, medians, median_value)
             line = line.rstrip(',')
             f.write("{0}\n".format(line))
+        line = "averages,"
+        for x_perm_code in x_perm_codes:
+            medians_list = medians[x_perm_code]
+            average = compute_average_medians(medians_list, False)
+            
+            line = "{0}{1},".format(line,average)
+        line = line.rstrip(',')
+        f.write("{0}\n".format(line))
         f.close()
+
+# convert this:  ['month', 'fv_type'] to this: month-fv_type
+def beautify_header(header):
+    header = header.replace("[","")
+    header = header.replace("]","")
+    header = header.replace("'","")
+    header = header.replace(",","-")
+    header = header.replace(" ", "")
+    return header
+# median_expression could look like 0.123, 0.123_X, 0.123_x_x, etc
+def median_expression_has_float(median_expression):
+    new_val = median_expression.replace('x','')
+    if (new_val == ''):
+        return False
+    return True
     
-def get_median(string_series):
+# median_expression could look like 0.123, 0.123_X, 0.123_x_x, etc
+def median_expression_has_Xs(median_expression):
+    X_count = median_expression.count('x')
+    if (X_count > 0):
+        return True
+    return False
+
+def get_float_from_median_expression(median_expression):
+    new_val = median_expression.replace('x','')
+    return float(new_val)
+
+def get_Xs_from_median_expression(median_expression):
+    X_count = median_expression.count('x')
+    result = ''
+    for i in range(0, X_count):
+        result = "{0}x".format(result)
+    return result
+
+def compute_average_medians(medians_list, as_integer):
+    float_count = 0
+    total_count = 0
+    median_float_sum = 0.0
+    x_all = ''
+    for median in medians_list:
+        total_count = total_count + 1
+        if median_expression_has_float(median):
+            median_float = get_float_from_median_expression(median)
+            median_float_sum = median_float_sum + median_float
+            float_count = float_count + 1
+        if median_expression_has_Xs(median):
+            x_portion = get_Xs_from_median_expression(median)
+            x_all = '{0}{1}'.format(x_all, x_portion)
+    result = ""
+    if float_count > 0:
+        average = median_float_sum / float_count
+        if as_integer:
+            average_int = int(average)
+            result = "{0}{1}".format(result,average_int)
+        else:
+            average_rounded = "%.3f" % average
+            result = "{0}{1}".format(result,average_rounded)
+    result = "{0}{1}".format(result, x_all)
+    return result
+    
+def record_median(x_perm_code, medians, median_value):
+    if (not(medians.has_key(x_perm_code))):
+        new_list = []
+        new_list.append(median_value)
+        medians[x_perm_code] = new_list
+    else:
+        medians[x_perm_code].append(median_value)
+    
+def get_median(string_series, as_integer):
     missing_count = 0
     float_series = []
     for item in string_series:
@@ -93,9 +175,16 @@ def get_median(string_series):
         else:
             #odd number in list
             median = sorted_float_series[(size-1)/2]
-    result_string = '{0}'.format(median)
+    result_string = ''
+    if as_integer:
+        if (median == ''):
+            pass
+        else:
+            result_string = '{0}'.format(int(median))
+    else:
+        result_string = '{0}'.format(median)
     for i in range(0,missing_count):
-        result_string = '{0}_X'.format(result_string)
+        result_string = '{0}x'.format(result_string)
     return result_string
         
 def generate_target_dirname(cspec):
@@ -135,8 +224,10 @@ def get_result_from_file(source_file_path, colname, rownum):
         value_line = value_line.rstrip()
         value_parts = value_line.split(',')
         value = value_parts[index]
-        print "value found for {0} is {1}".format(source_file_path, value)
-        return value
+        float_value = float(value)
+        value_rounded = "%.3f" % float_value
+        #print "value found for {0} is {1}".format(source_file_path, value)
+        return value_rounded
     except Exception as detail:
         print "detail {0}".format(detail)
         raise Exception("Problem while reading results file : {0}".format(detail))
