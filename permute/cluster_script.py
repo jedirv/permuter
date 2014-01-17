@@ -17,7 +17,7 @@ class ClusterScript(PermutationDriverFile):
         self.script_name = "{0}.sh".format(self.get_job_file_name())
         
     def generate(self):
-        #print "  pathname of script file: {0}".format(self.pathname)
+        print "  generating script file: {0}".format(self.pathname)
         f = open(self.pathname, 'w')
         f.write("#!/bin/csh\n")
         f.write("#\n")

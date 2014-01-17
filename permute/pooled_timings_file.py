@@ -70,7 +70,7 @@ class PooledTimingsFile(object):
                 pooled_results_file.record_median(x_perm_code, medians, median_timing)
             timings_line.rstrip(',')
             ft.write("{0}\n".format(timings_line))
-        
+        # add the averages line
         line = "averages,"    
         for x_perm_code in x_perm_codes:
             medians_list = medians[x_perm_code]

@@ -1,20 +1,14 @@
 import os
-
-verbose = False
+import logging
 
 def resolve_value(keyValMap, given_val):
     result = given_val
     for key, val in keyValMap.iteritems():
         match_string = "<{0}>".format(key)
         result = result.replace(match_string, val)
-    if_verbose("  value resolved to : {0}".format(result))
+    logging.debug("  value resolved to : {0}".format(result))
     return result
     
-def if_verbose(message):
-    global verbose
-    if (verbose):
-        print message
-            
 class ClusterSpec(object):
     '''
     Wraps the cluster specification file *.cspec
@@ -160,7 +154,7 @@ class ClusterSpec(object):
         for line in lines:
             line = line.rstrip()
             if (line.startswith(flag)):
-                if_verbose("  processing permute line - {0}".format(line))
+                logging.debug("  processing permute line - {0}".format(line))
                 permute_command, permutation_info = line.split(':')
                 permuteKey, permute_list_string = permutation_info.split('=')
                 if (permute_list_string.find(" ") != -1):
@@ -192,7 +186,7 @@ class ClusterSpec(object):
             if (line.startswith("#")):
                 pass
             elif (line.startswith("<replace>")):
-                if_verbose("  processing keyVal line - {0}".format(line))
+                logging.debug("  processing keyVal line - {0}".format(line))
                 replace_command, keyVal = line.split(":")
                 key, val = keyVal.split("=")
                 val = resolve_value(key_val_map, val)
@@ -210,7 +204,7 @@ class ClusterSpec(object):
         for line in lines:
             line = line.rstrip()
             if (line.startswith("qsub_command:")):
-                if_verbose("  processing qsub_command line - {0}".format(line))
+                logging.debug("  processing qsub_command line - {0}".format(line))
                 x, this_command = line.split(":")
                 qsub_commands.append(this_command)
             else:
@@ -225,7 +219,7 @@ class ClusterSpec(object):
         for line in lines:
             line = line.rstrip()
             if (line.startswith("command:")):
-                if_verbose("  processing command line - {0}".format(line))
+                logging.debug("  processing command line - {0}".format(line))
                 x, this_command = line.split(":")
                 commands.append(this_command)
             else:
@@ -241,7 +235,7 @@ class ClusterSpec(object):
         for line in lines:
             line = line.rstrip()
             if (line.startswith("concise_print:")):
-                if_verbose("  processing concise_print line - {0}".format(line))
+                logging.debug("  processing concise_print line - {0}".format(line))
                 command, conciseKeyVal = line.split(":")
                 key, val = conciseKeyVal.split(",")
                 concisePrintMap[key] = val

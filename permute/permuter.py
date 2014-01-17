@@ -14,8 +14,8 @@ import qacct_log
 import pooled_results_delta_file
 import pooled_timings_file
 import pooled_results_file
-
-verbose = False
+import ranked_results_file
+import logging
 
 def main():
     if (len(sys.argv) < 3):
@@ -31,41 +31,53 @@ def main():
         exit()
     cspec = cluster_spec.ClusterSpec(cspec_path)
     cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
-    if (flags == "-v"):
-        global verbose
-        verbose = True
+    
+    # set up logging dir
+    home_dir_permuter = os.path.expanduser('~/permuter')
+    if (not(os.path.isdir(home_dir_permuter))):
+            os.makedirs(home_dir_permuter)
+            
     if (permute_command == "gen"):
+        logging.basicConfig(filename='{0}/gen.log'.format(home_dir_permuter), filemode='w', level=logging.DEBUG)
         generate_scripts(cluster_runs)
     elif (permute_command == "launch"):
+        logging.basicConfig(filename='{0}/launch.log'.format(home_dir_permuter), filemode='w', level=logging.DEBUG)
         launch_scripts(cluster_runs)
     elif (permute_command == "auto"):
+        logging.basicConfig(filename='{0}/auto.log'.format(home_dir_permuter), filemode='w', level=logging.DEBUG)
         generate_scripts(cluster_runs)
         launch_scripts(cluster_runs)
     elif (permute_command == "preview"):
+        logging.basicConfig(filename='{0}/preview.log'.format(home_dir_permuter), filemode='w', level=logging.DEBUG)
         preview_scripts(cluster_runs)
     elif (permute_command == "test_launch"):
+        logging.basicConfig(filename='{0}/test_launch.log'.format(home_dir_permuter), filemode='w', level=logging.DEBUG)
         test_launch_single_script(cluster_runs)
     elif (permute_command == "collect"):
+        #log_filename = '{0}/collect.log'.format(home_dir_permuter)
+        #print "log_filename {0}".format(log_filename)
+        #logging.basicConfig(filename=log_filename, filemode='w', level=logging.DEBUG)
+        logging.info("hello world")
         collect(cluster_runs)
     elif (permute_command == "stat"):
+        logging.basicConfig(filename='{0}/stat.log'.format(home_dir_permuter), filemode='w', level=logging.DEBUG)
         check_status_of_runs(cluster_runs)
         
     else:
         pass
-        
-def if_verbose(message):
-    global verbose
-    if (verbose):
-        print message
+    logging.shutdown()    
     
 def collect(cluster_runs):
     #warn_of_incomplete_runs(cluster_runs)
+    logging.info('COLLECTING results')
     resultsFiles = create_pooled_results_files(cluster_runs)
     create_pooled_results_delta_files(resultsFiles)
     create_pooled_timings_files(cluster_runs)
+    create_ranked_results_files(cluster_runs)
     
 
 def warn_of_incomplete_runs(cluster_runs):
+    logging.info('CHECKING for incomplete runs')
     cspec = cluster_runs.cspec
     still_running_permutation_infos = []
     still_running_count = 0
@@ -103,11 +115,13 @@ def warn_of_incomplete_runs(cluster_runs):
             
 
 def check_status_of_runs(cluster_runs):
+    logging.info('CHECKING status of runs')
     cspec = cluster_runs.cspec
     for permutation_info in cluster_runs.permutation_info_list_full:
         check_status_of_run(cluster_runs, permutation_info, cspec)
         
 def check_status_of_run(cluster_runs, permutation_info, cspec):
+    logging.debug('CHECKING status of run')
     permutation_code = permutations.generate_permutation_code(permutation_info, cspec.concise_print_map, True)
     results_dir = cluster_runs.get_results_dir_for_permutation_code(permutation_code)
     done_marker_file_path = "{0}/permutation_done_marker.txt".format(results_dir)
@@ -130,10 +144,10 @@ def check_status_of_run(cluster_runs, permutation_info, cspec):
     qil = qsub_invoke_log.QsubInvokeLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'])
     cluster_job_number = qil.cluster_job_number
     if (not(run_finished)):
-        print "{0} still running".format(cluster_job_number)
+        print "{0}\t{1}\tstill running".format(cluster_job_number, qil.get_job_file_name())
     elif (run_finished and not(missing_output_file)):
         #done
-        print "{0} complete".format(cluster_job_number)
+        print "{0}\t{1}\tcomplete".format(cluster_job_number, qil.get_job_file_name())
     else:
         #fun finished but missing an output file, find out the error
         qacctlog = qacct_log.QacctLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'])
@@ -157,12 +171,14 @@ def check_status_of_run(cluster_runs, permutation_info, cspec):
     #        print "{0} complete".format(cluster_job_number)        
          
 def create_pooled_results_delta_files(resultsFiles):
+    logging.info('CREATING results delta files')
     for resultsFile in resultsFiles:
         deltaFile = pooled_results_delta_file.PooledResultsDeltaFile(resultsFile)
         deltaFile.generate()
     
     
 def create_pooled_timings_files(cluster_runs):
+    logging.info('CREATING timings files')
     permuters_for_filename = pooled_timings_file.gather_file_permuters(cluster_runs.cspec)
     print "permuters_for_filename {0}".format(permuters_for_filename)
     filename_permutations = permutations.expand_permutations(permuters_for_filename)
@@ -171,11 +187,25 @@ def create_pooled_timings_files(cluster_runs):
         timingsFile = pooled_timings_file.PooledTimingsFile(filename_permutation_info, cluster_runs)
         timingsFile.persist()
 
+
   
-def create_pooled_results_files(cluster_runs):
-    source_file_map = create_source_file_map(cluster_runs.cspec)
+def create_ranked_results_files(cluster_runs):
+    logging.info('CREATING ranked results file')
     permuters_for_filename = pooled_results_file.gather_file_permuters(cluster_runs.cspec)
     filename_permutations = permutations.expand_permutations(permuters_for_filename)
+    for filename_permutation_info in filename_permutations:
+        rankFile = ranked_results_file.RankedResultsFile(filename_permutation_info, cluster_runs)
+        rankFile.persist()
+        
+  
+def create_pooled_results_files(cluster_runs):
+    logging.info("CREATING pooled results files")
+    source_file_map = create_source_file_map(cluster_runs.cspec)
+    logging.debug("...source_file_map : {0}".format(source_file_map))
+    permuters_for_filename = pooled_results_file.gather_file_permuters(cluster_runs.cspec)
+    logging.debug("...permuters_for_filename : {0}".format(permuters_for_filename))
+    filename_permutations = permutations.expand_permutations(permuters_for_filename)
+    logging.debug("...filename permutations : {0}".format(filename_permutations))
     resultsFiles = []
     for filename_permutation_info in filename_permutations:
         resultsFile = pooled_results_file.PooledResultsFile(source_file_map, filename_permutation_info, cluster_runs)
@@ -184,6 +214,7 @@ def create_pooled_results_files(cluster_runs):
     return resultsFiles
 
 def delete_results(cspec):
+    logging.info('DELETING results')
     source_file_map = create_source_file_map(cspec)
     for permutation, result_path in source_file_map.items():
         if (os.path.isfile(result_path)):
@@ -196,6 +227,7 @@ def delete_results(cspec):
             os.unlink(done_marker_path)
      
 def launch_scripts(cluster_runs):
+    logging.info('LAUNCHING scripts')
     cspec = cluster_runs.cspec
     delete_results(cspec)
     for permutation_info in cluster_runs.permutation_info_list_full:
@@ -206,6 +238,7 @@ def launch_scripts(cluster_runs):
 
     
 def generate_scripts(cluster_runs):
+    logging.info('GENERATING scripts')
     cspec = cluster_runs.cspec
     #for trial in range(1, int(cspec.trials) + 1):
     for permutation_info in cluster_runs.permutation_info_list_full:
@@ -215,8 +248,8 @@ def generate_scripts(cluster_runs):
        
 
 def preview_scripts(cluster_runs):
+    logging.info('PREVIEWING scripts')
     cspec = cluster_runs.cspec
-    if_verbose("preview mode")
     permutation_info = cluster_runs.permutation_info_list_full[0]
     user_job_number_as_string = cluster_runs.get_job_number_string_for_permutation_info(permutation_info)
     cscript = cluster_script.ClusterScript(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'])
@@ -224,7 +257,7 @@ def preview_scripts(cluster_runs):
 
 
 def test_launch_single_script(cluster_runs):
-    if_verbose("preview mode")
+    logging.info('TEST_LAUNCH single script')
     cspec = cluster_runs.cspec
     permutation_info = cluster_runs.permutation_info_list_full[0]
     user_job_number_as_string = cluster_runs.get_job_number_string_for_permutation_info(permutation_info)
@@ -257,11 +290,11 @@ def validate_args(permute_command, cspec_path, flags):
         print "An error occured trying to open {0}".format(cspec_path)
         exit()
     if (flags != ""):
-        if (flags != "-v"):
-            print "Invalid flag {0}. Only -v for verbose is supported".format(flags)
-            exit()
+        print "Invalid flag {0}. Flags not yet supported".format(flags)
+        exit()
   
-def create_source_file_map(cspec):   
+def create_source_file_map(cspec):
+    logging.info('CREATING source file map')   
     source_file_map = {}
     #need to add trials in with cspec.permuters before expanding
     trials_list = cspec.get_trials_list() 

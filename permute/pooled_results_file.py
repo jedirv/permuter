@@ -7,6 +7,7 @@ import os
 import qsub_invoke_log
 import qacct_log
 import permutations
+import logging
 
 class PooledResultsFile(object):
     '''
@@ -74,6 +75,7 @@ class PooledResultsFile(object):
                 record_median(x_perm_code, medians, median_value)
             line = line.rstrip(',')
             f.write("{0}\n".format(line))
+        # add the averages line
         line = "averages,"
         for x_perm_code in x_perm_codes:
             medians_list = medians[x_perm_code]
@@ -235,6 +237,7 @@ def get_result_from_file(source_file_path, colname, rownum):
 def gather_file_permuters(cspec):
     file_permuters = {}
     for key, val in cspec.permuters.items():
+        logging.debug("......file_permuters[{0}] = {1}".format(key, val))
         file_permuters[key] = val
     
     # combine permuters 

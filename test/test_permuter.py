@@ -106,7 +106,12 @@ class TestPermuter(unittest.TestCase):
             except Exception, e:
                 print e
                 
-
+#    def test_create_dir_under_tilde(self):
+#        dir = os.path.expanduser('~/permuter')
+#        if (not(os.path.isdir(dir))):
+#            os.makedirs(dir)
+#        file_created = os.path.isdir(dir)
+#        self.asserTrue(file_created)
 if __name__ == '__main__':
     unittest.main()
     
