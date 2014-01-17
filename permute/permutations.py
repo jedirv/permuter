@@ -56,12 +56,18 @@ def generate_permutation_code(permutation_info, concisePrintMap, include_trials)
     
 def expand_permutations(permuters):
     dict_list = []
+    keys = permuters.keys()
+    sorted_keys = sorted(keys)
+    
     # permuteKey: someKey   permuteList:[valx, valy, valz]
-    for permuteKey, permuteList in permuters.iteritems():
-        logging.debug("  permute_key {0}, permute_list {1}".format(permuteKey, permuteList))
+    #for permuteKey, permuteList in permuters.iteritems():
+    for permuteKey in sorted_keys:
+        permuteList = permuters[permuteKey]
+        sortedPermuteList = sorted(permuteList)
+        logging.debug("  permute_key {0}, permute_list {1}".format(permuteKey, sortedPermuteList))
         if (len(dict_list) == 0):
             # first time through
-            for permuteListValue in permuteList:
+            for permuteListValue in sortedPermuteList:
                 new_dict = {}
                 # new dictionaries just have the one item
                 new_dict[permuteKey] = permuteListValue
@@ -73,7 +79,7 @@ def expand_permutations(permuters):
             # dict_list might look like [ { amount=5 } { amount = 10 } ]
             for existing_dict in dict_list:
                 # {amount = 5}, for example
-                for permuteListValue in permuteList:
+                for permuteListValue in sortedPermuteList:
                     new_dict = {}
                     #add each new value
                     new_dict[permuteKey] = permuteListValue
