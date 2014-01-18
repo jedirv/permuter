@@ -37,6 +37,7 @@ def main():
     if (not(os.path.isdir(home_dir_permuter))):
             os.makedirs(home_dir_permuter)
             
+    # why isn't logging working?
     if (permute_command == "gen"):
         logging.basicConfig(filename='{0}/gen.log'.format(home_dir_permuter), filemode='w', level=logging.DEBUG)
         generate_scripts(cluster_runs)
