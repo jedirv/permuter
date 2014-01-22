@@ -3,7 +3,7 @@ Created on Jan 22, 2014
 
 @author: irvine
 '''
-import sys
+import sys, os
 import time
 
 def main():
@@ -17,6 +17,8 @@ def main():
     for i in range(1,product):
         time.sleep(30)
         print "sleeping at i: {0}".format(i)
+    dir = os.path.dirname(outpath)
+    os.makedirs(dir);
     f = open(outpath, 'w')
     f.write("foo,auc,bar\n")
     f.write("NA,{0},NA\n".format(product))
