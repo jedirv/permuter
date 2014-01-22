@@ -65,3 +65,21 @@ class ClusterRunsInfo(object):
     
 def get_formatted_user_job_number(user_job_number, width):
     return str(user_job_number).zfill(width)
+
+
+def did_run_finish(cluster_runs, permutation_code):
+    results_dir = cluster_runs.get_results_dir_for_permutation_code(permutation_code)
+    done_marker_file_path = "{0}/permutation_done_marker.txt".format(results_dir)
+    #print "done_marker_file_path {0}".format(done_marker_file_path)
+    run_finished = False
+    if (os.path.isfile(done_marker_file_path)):
+        run_finished=True
+    return run_finished
+
+def get_missing_output_files(permutation_info, cspec):
+    missing_output_files = []
+    list_of_output_files = permutations.get_list_of_output_files(permutation_info, cspec)
+    for output_file_path in list_of_output_files:
+        if (not(os.path.isfile(output_file_path))):
+            missing_output_files.append(output_file_path)
+    return missing_output_files

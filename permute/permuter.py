@@ -16,6 +16,7 @@ import pooled_timings_file
 import pooled_results_file
 import ranked_results_file
 import logging
+import subprocess
 
 def main():
     if (len(sys.argv) < 3):
@@ -60,6 +61,10 @@ def main():
         collect(cluster_runs)
     elif (permute_command == "stat"):
         check_status_of_runs(cluster_runs)
+    elif (permute_command == "stop"):
+        stop_runs(cluster_runs)
+    elif (permute_command == "clean_scripts"):
+        clean_scripts(cluster_runs)
         
     else:
         pass
@@ -118,6 +123,39 @@ def warn_of_incomplete_runs(cluster_runs):
     print "{0} permutations complete".format(finished_healthy_count) 
             
 
+def stop_runs(cluster_runs):
+    logging.info('STOPPING runs that are still going')
+    cspec = cluster_runs.cspec
+    for permutation_info in cluster_runs.permutation_info_list_full:
+        stop_run_if_running(cluster_runs, permutation_info, cspec)
+
+
+def stop_run_if_running(cluster_runs, permutation_info, cspec):
+    logging.debug('STOPPING run if still running')
+    permutation_code = permutations.generate_permutation_code(permutation_info, cspec.concise_print_map, True)
+    run_finished = cluster_runs_info.did_run_finish(cluster_runs, permutation_code)
+
+    user_job_number_as_string = cluster_runs.get_job_number_string_for_permutation_info(permutation_info)
+    qil = qsub_invoke_log.QsubInvokeLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'])
+    cluster_job_number = qil.cluster_job_number
+    if (cluster_job_number == "NA"):
+        print "{0} - no evidence of having launched".format(user_job_number_as_string)
+    else:
+        if (not(run_finished)):
+            #print "{0}\t{1}\tstill running".format(cluster_job_number, qil.get_job_file_name())
+            stop_run(cluster_job_number)
+        else:
+            print "{0} detected as finished {1}".format(cluster_job_number, user_job_number_as_string)
+    
+def stop_run(cluster_job_number):
+    try: 
+        print "calling qdel {0}".format(cluster_job_number)
+        command = "qdel {0}".format(cluster_job_number)
+        os.system(command) 
+    except subprocess.CalledProcessError:
+        print "There was a problem calling qdel on job {0}".format(cluster_job_number)
+        print "Return code was {0}".format(subprocess.CalledProcessError.returncode)
+                    
 def check_status_of_runs(cluster_runs):
     logging.info('CHECKING status of runs')
     cspec = cluster_runs.cspec
@@ -127,21 +165,11 @@ def check_status_of_runs(cluster_runs):
 def check_status_of_run(cluster_runs, permutation_info, cspec):
     logging.debug('CHECKING status of run')
     permutation_code = permutations.generate_permutation_code(permutation_info, cspec.concise_print_map, True)
-    results_dir = cluster_runs.get_results_dir_for_permutation_code(permutation_code)
-    done_marker_file_path = "{0}/permutation_done_marker.txt".format(results_dir)
-    #print "done_marker_file_path {0}".format(done_marker_file_path)
-    run_finished = False
-    if (os.path.isfile(done_marker_file_path)):
-        run_finished=True
-    
+    run_finished = cluster_runs_info.did_run_finish(cluster_runs, permutation_code)
     missing_output_file = False
-    missing_output_files = []
-#    maybe the following line should pass in the results_dir
-    list_of_output_files = permutations.get_list_of_output_files(permutation_info, cspec)
-    for output_file_path in list_of_output_files:
-        if (not(os.path.isfile(output_file_path))):
-            missing_output_file = True
-            missing_output_files.append(output_file_path)
+    missing_output_files = cluster_runs_info.get_missing_output_files(permutation_info, cspec)
+    if len(missing_output_files != 0):
+        missing_output_file = True 
             
 
     user_job_number_as_string = cluster_runs.get_job_number_string_for_permutation_info(permutation_info)
@@ -253,7 +281,14 @@ def generate_scripts(cluster_runs):
         user_job_number_as_string = cluster_runs.get_job_number_string_for_permutation_info(permutation_info)
         cscript = cluster_script.ClusterScript(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'])
         cscript.generate()
-       
+
+def clean_scripts(cluster_runs):
+    logging.info('GENERATING scripts')
+    script_dir = cluster_runs.cspec.script_dir
+    files = os.listdir(script_dir)
+    for f in files:
+        path = "{0}/{1}".format(script_dir, f)
+        os.remove(path)
 
 def preview_scripts(cluster_runs):
     logging.info("PREVIEWING scripts")
@@ -281,6 +316,8 @@ def validate_args(permute_command, cspec_path, flags):
             permute_command == "launch" or 
             permute_command == "auto" or 
             permute_command == "preview" or 
+            permute_command == "stop" or 
+            permute_command == "clean_scripts" or 
             permute_command == "test_launch")):
         usage()
         exit()
@@ -342,7 +379,7 @@ def create_source_file_map(cspec):
 
   
 def usage():
-    print "usage:  python permuter.py  gen|launch|auto|preview|test_launch|collect|stat <path of cluster_spec>  [-debug]"
+    print "usage:  python permuter.py  gen|launch|auto|preview|test_launch|collect|stat|stop|clean_scripts <path of cluster_spec>  [-debug]"
     
 if __name__ == '__main__':
     main()
