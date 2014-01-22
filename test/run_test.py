@@ -10,8 +10,8 @@ def main():
     if (len(sys.argv) < 4):
         usage()
         exit()
-    x = sys.argv[1]
-    y = sys.argv[2]
+    x = int(sys.argv[1])
+    y = int(sys.argv[2])
     outpath = sys.argv[3]
     product = x * y
     for i in range[1,product]:

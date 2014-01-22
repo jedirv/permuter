@@ -34,6 +34,6 @@ qsub_command:-q eecs,eecs1,eecs,share
 #qsub_command:-m beas
 one_up_basis:0
 
-command:python run_test.python (x) (y) <permutation_results_dir>/run_test.csv
+command:python run_test.py (x) (y) <permutation_results_dir>/run_test.csv
 #
 
