@@ -14,7 +14,7 @@ def main():
     y = int(sys.argv[2])
     outpath = sys.argv[3]
     product = x * y
-    for i in range(1,product):
+    for i in range(0,product):
         time.sleep(30)
         print "sleeping at i: {0}".format(i)
     dir = os.path.dirname(outpath)
