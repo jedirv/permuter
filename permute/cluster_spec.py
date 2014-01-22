@@ -590,7 +590,7 @@ def validate_scores_to(lines):
             if (os.path.exists(dir)):
                 return True
             else:
-                os.mkdir(dir)
+                os.makedirs(dir)
                 if (os.path.exists(dir)):
                     return True
                 else:
