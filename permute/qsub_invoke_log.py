@@ -20,16 +20,19 @@ class QsubInvokeLog(PermutationDriverFile):
         os.chdir(self.script_dir)
         #print "opening {0}".format(self.qsub_invoke_log)
         #print self.script_dir
-        f = open(self.qsub_invoke_log, 'r')
-        line = f.readline()
-        f.close()
-        #print "closed {0}".format(self.qsub_invoke_log)
-        parts = line.split(' ')
-        os.chdir(starting_dir)
-        if (len(parts) != 7):
-            #raise monitor_exception.MonitorException("qsub invoke log has incorrect number of fields {0}. Should look like 'Your job 4174438 (jobname) has been submitted'")
-            raise Exception("qsub invoke log has incorrect number of fields {0}. Should look like 'Your job 4174438 (jobname) has been submitted'")
-        result = parts[2]
+        if (os.path.exists(self.qsub_invoke_log)):
+            f = open(self.qsub_invoke_log, 'r')
+            line = f.readline()
+            f.close()
+            #print "closed {0}".format(self.qsub_invoke_log)
+            parts = line.split(' ')
+            os.chdir(starting_dir)
+            if (len(parts) != 7):
+                #raise monitor_exception.MonitorException("qsub invoke log has incorrect number of fields {0}. Should look like 'Your job 4174438 (jobname) has been submitted'")
+                raise Exception("qsub invoke log has incorrect number of fields {0}. Should look like 'Your job 4174438 (jobname) has been submitted'")
+            result = parts[2]
+        else:
+            result = "NA"
         return result
         
 

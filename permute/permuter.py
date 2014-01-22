@@ -79,6 +79,7 @@ def warn_of_incomplete_runs(cluster_runs):
     cspec = cluster_runs.cspec
     still_running_permutation_infos = []
     still_running_count = 0
+    not_started_count = 0
     finished_healthy_count = 0
     finished_error_count = 0
     
@@ -89,22 +90,27 @@ def warn_of_incomplete_runs(cluster_runs):
         cluster_job_number = qil.cluster_job_number
         #print "cluster_job_number is {0}".format(cluster_job_number)
         # first, check qstat to see if this job is still running
-        
-        statloq = qstat_log.QStatLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'])
-        if (statloq.is_cluster_job_still_running(cluster_job_number)):
-            still_running_permutation_infos.append(permutation_info)
-            still_running_count = still_running_count + 1
-            print "{0} still running".format(cluster_job_number)
+        if (cluster_job_number == "NA"):
+            not_started_count = not_started_count + 1
+            print "{0} - no evidence of having launched".format(user_job_number_as_string)
         else:
-            #print "{0} done".format(cluster_job_number)
-            qacctlog = qacct_log.QacctLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'])
-            qacctlog.ingest(cluster_job_number)
-            if (qacctlog.run_failed()):
-                finished_error_count = finished_error_count + 1
-                print "{0} run issue : {1} -> {2}".format(cluster_job_number, permutation_info, qacctlog.get_failure_reason())
+            statloq = qstat_log.QStatLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'])
+            if (statloq.is_cluster_job_still_running(cluster_job_number)):
+                still_running_permutation_infos.append(permutation_info)
+                still_running_count = still_running_count + 1
+                print "{0} still running".format(cluster_job_number)
             else:
-                finished_healthy_count = finished_healthy_count + 1
+                #print "{0} done".format(cluster_job_number)
+                qacctlog = qacct_log.QacctLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'])
+                qacctlog.ingest(cluster_job_number)
+                if (qacctlog.run_failed()):
+                    finished_error_count = finished_error_count + 1
+                    print "{0} run issue : {1} -> {2}".format(cluster_job_number, permutation_info, qacctlog.get_failure_reason())
+                else:
+                    finished_healthy_count = finished_healthy_count + 1
 
+    if (not_started_count != 0):
+        print "{0} permutations not started".format(not_started_count)
     if (still_running_count != 0):
         print "{0} permutations still running".format(still_running_count)
         for still_running_permutation_info in still_running_permutation_infos:
