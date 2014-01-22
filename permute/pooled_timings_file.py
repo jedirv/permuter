@@ -117,14 +117,17 @@ def get_timing_value_for_run(perm_code, cluster_runs):
     #print "permutation_info {0}".format(permutation_info)
     qil = qsub_invoke_log.QsubInvokeLog(user_job_number_as_string, permutation_info, cluster_runs.cspec, permutation_info['trials'])
     cluster_job_number = qil.cluster_job_number
-    #print  "cluster_job_number {0}".format(cluster_job_number)
-    qacctlog = qacct_log.QacctLog(user_job_number_as_string, permutation_info, cluster_runs.cspec, permutation_info['trials'])
-    qacctlog.ingest(cluster_job_number)
-    if (qacctlog.run_failed()):
+    if (cluster_job_number == "NA"):
         return "missing"
     else:
-        #print  "qacctlog.cpu {0}".format(qacctlog.cpu)
-        return qacctlog.cpu
+        #print  "cluster_job_number {0}".format(cluster_job_number)
+        qacctlog = qacct_log.QacctLog(user_job_number_as_string, permutation_info, cluster_runs.cspec, permutation_info['trials'])
+        qacctlog.ingest(cluster_job_number)
+        if (qacctlog.run_failed()):
+            return "missing"
+        else:
+            #print  "qacctlog.cpu {0}".format(qacctlog.cpu)
+            return qacctlog.cpu
     
    
 def gather_file_permuters(cspec):

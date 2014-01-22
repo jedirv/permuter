@@ -1,5 +1,6 @@
 import os
 from permutation_driver_file import PermutationDriverFile
+import logging
 #from monitor import monitor_exception
 
 class QacctLog(PermutationDriverFile):
@@ -40,26 +41,34 @@ class QacctLog(PermutationDriverFile):
             return "no failure detected"
         
     def create_log(self, cluster_job_number):
-        #print "opening {0}".format(self.qstat_log)
-        command = "qacct -j {0} > {1}".format(cluster_job_number, self.qacct_log)
-        os.system(command) 
+        if (cluster_job_number == "NA"):
+            print "skipping qacct, job not started yet"
+        else:
+            #print "opening {0}".format(self.qstat_log)
+            command = "qacct -j {0} > {1}".format(cluster_job_number, self.qacct_log)
+            os.system(command) 
         
     def ingest(self, cluster_job_number):
-        starting_dir = os.getcwd()
-        os.chdir(self.script_dir)
-        self.cluster_job_number = cluster_job_number
+        if (cluster_job_number == "NA"):
+            error = "qacct_log cannot ingest job number 'NA'"
+            logging.error(error)
+            print error
+        else:
+            starting_dir = os.getcwd()
+            os.chdir(self.script_dir)
+            self.cluster_job_number = cluster_job_number
 
-        if (os.path.isfile(self.qacct_log) and has_content(self.qacct_log)):
-            #print "file exists"
-            self.load_qacct_log()
-            if (self.error_reading):
-                # pre-existing log was corrupted, try again
-                print "pre-existing log for {0} was corrupted, try again".format(cluster_job_number)
-                self.create_log(self.cluster_job_number)
+            if (os.path.isfile(self.qacct_log) and has_content(self.qacct_log)):
+                #print "file exists"
                 self.load_qacct_log()
-                #print "done reloading"
-        else:    
-            self.create_log(self.cluster_job_number)
+                if (self.error_reading):
+                    # pre-existing log was corrupted, try again
+                    print "pre-existing log for {0} was corrupted, try again".format(cluster_job_number)
+                    self.create_log(self.cluster_job_number)
+                    self.load_qacct_log()
+                    #print "done reloading"
+            else:    
+                self.create_log(self.cluster_job_number)
             
             
         

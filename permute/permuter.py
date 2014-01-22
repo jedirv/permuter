@@ -147,18 +147,21 @@ def check_status_of_run(cluster_runs, permutation_info, cspec):
     user_job_number_as_string = cluster_runs.get_job_number_string_for_permutation_info(permutation_info)
     qil = qsub_invoke_log.QsubInvokeLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'])
     cluster_job_number = qil.cluster_job_number
-    if (not(run_finished)):
-        print "{0}\t{1}\tstill running".format(cluster_job_number, qil.get_job_file_name())
-    elif (run_finished and not(missing_output_file)):
-        #done
-        print "{0}\t{1}\tcomplete".format(cluster_job_number, qil.get_job_file_name())
+    if (cluster_job_number == "NA"):
+        print "{0} - no evidence of having launched".format(user_job_number_as_string)
     else:
-        #fun finished but missing an output file, find out the error
-        qacctlog = qacct_log.QacctLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'])
-        qacctlog.ingest(cluster_job_number)
-        print "{0} FAILED -> {1}".format(cluster_job_number, qacctlog.get_failure_reason())
-        for missing_file in missing_output_files:
-            print "output file missing: {0}".format(missing_file)
+        if (not(run_finished)):
+            print "{0}\t{1}\tstill running".format(cluster_job_number, qil.get_job_file_name())
+        elif (run_finished and not(missing_output_file)):
+            #done
+            print "{0}\t{1}\tcomplete".format(cluster_job_number, qil.get_job_file_name())
+        else:
+            #fun finished but missing an output file, find out the error
+            qacctlog = qacct_log.QacctLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'])
+            qacctlog.ingest(cluster_job_number)
+            print "{0} FAILED -> {1}".format(cluster_job_number, qacctlog.get_failure_reason())
+            for missing_file in missing_output_files:
+                print "output file missing: {0}".format(missing_file)
     #print "DONE checking run status"
     #print "cluster_job_number is {0}".format(cluster_job_number)
     # first, check qstat to see if this

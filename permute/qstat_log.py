@@ -13,6 +13,8 @@ class QStatLog(PermutationDriverFile):
         self.type = "qstat_log"
         
     def is_cluster_job_still_running(self, cluster_job_number):
+        if (cluster_job_number == "NA"):
+            return False
         self.cluster_job_number = cluster_job_number
         starting_dir = os.getcwd()
         os.chdir(self.script_dir)
