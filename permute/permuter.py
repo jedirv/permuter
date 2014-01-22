@@ -65,11 +65,53 @@ def main():
         stop_runs(cluster_runs)
     elif (permute_command == "clean_scripts"):
         clean_scripts(cluster_runs)
+    elif (permute_command == "clean_results"):
+        clean_results(cluster_runs)
+    elif (permute_command == "clean_pooled_results"):
+        clean_pooled_results(cluster_runs)
+    elif (permute_command == "clean_all"):
+        stop_runs(cluster_runs)
+        clean_scripts(cluster_runs)
+        clean_results(cluster_runs)
+        clean_pooled_results(cluster_runs)
         
     else:
         pass
     logging.shutdown()    
     
+def clean_results(cluster_runs):
+    logging.info('CLEANING results')
+    results_dir = cluster_runs.cspec.job_results_dir
+    clean_out_dir(results_dir)
+    
+def clean_pooled_results(cluster_runs):
+    logging.info('CLEANING pooled results')
+    cspec = cluster_runs.cspec
+    pooled_results_dir = "{0}/{1}".format(cspec.scores_to, cspec.master_job_name)
+    clean_out_dir(pooled_results_dir)
+    
+def clean_out_dir(dirpath):
+    items = os.listdir(dirpath)
+    for item in items:
+        path = "{0}/{1}".format(dirpath, item)
+        if os.path.isdir(path):
+            try: 
+                print "pretending - to deleting dir {0}".format(path)
+                command = "rmdir -f {0}".format(path)
+                #os.system(command) 
+            except subprocess.CalledProcessError:
+                print "There was a problem calling rmdir -f on {0}".format(path)
+                print "Return code was {0}".format(subprocess.CalledProcessError.returncode)
+                    
+        else:
+            try: 
+                print "pretending - deleting file {0}".format(path)
+                command = "rm -f {0}".format(path)
+                #os.system(command) 
+            except subprocess.CalledProcessError:
+                print "There was a problem calling rm -f on {0}".format(path)
+                print "Return code was {0}".format(subprocess.CalledProcessError.returncode)                        
+        
 def collect(cluster_runs):
     #warn_of_incomplete_runs(cluster_runs)
     logging.info('COLLECTING results')
@@ -318,6 +360,9 @@ def validate_args(permute_command, cspec_path, flags):
             permute_command == "preview" or 
             permute_command == "stop" or 
             permute_command == "clean_scripts" or 
+            permute_command == "clean_results" or 
+            permute_command == "clean_pooled_results" or 
+            permute_command == "clean_all" or 
             permute_command == "test_launch")):
         usage()
         exit()
@@ -379,7 +424,27 @@ def create_source_file_map(cspec):
 
   
 def usage():
-    print "usage:  python permuter.py  gen|launch|auto|preview|test_launch|collect|stat|stop|clean_scripts <path of cluster_spec>  [-debug]"
+    print "usage:  python permuter.py  some_command <path of cluster_spec>  [-debug]"
+    print ""
+    print "        where some_command can be:"
+    print"               preview                # print to stdout what the first script generated will look like"     
+    print"               gen                    # generate cluster scripts"              
+    print"               test_launch            # launch the first script to see if it runs successfully"            
+    print"               launch                 # launch all the generated cluster scripts"                   
+    print"               auto                   # runs gen and then launch in sequence - only use if very confident" 
+    print""
+    print" once the runs are launched, the following commands are relevant:"                         
+    print"               stat                   # show the status of each permutation run"                  
+    print"               stop                   # call qdel on any runs that are unfinished to abort them"                    
+    print"               clean_scripts          # clean the launch scripts and associated .out, .err, and .qil files"                   
+    print"               clean_results          # clean only the contents of <permutation_results_dir>" 
+    print"               clean_pooled_results   # clean only the pooled results"           
+    print"               clean_all              # clean scripts, results, pooled results, and stop running jobs" 
+    print"               collect                # created pooled results from results"  
+    print""
+    print""
+    print"  -debug will enable DEBUG level logging which is 'INFO' level by default.  Log sent to ~/permuter/permuter.log"  
+
     
 if __name__ == '__main__':
     main()
