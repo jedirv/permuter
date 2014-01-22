@@ -5,7 +5,7 @@ permute:x=1 4
 permute:y=1,2,3
 
 scores_from:file=<results_dir>/run_test.csv,column_name=auc,row_number=1
-scores_to:runtest_out/collected_results
+scores_to:<output_root>/runtest_out/collected_results
 scores_y_axis:y
 scores_x_axis:x
 
@@ -19,15 +19,15 @@ scores_x_axis:x
 <replace>:x_dir=<root>/(letter)/<config[(letter)]>/(number)
 <replace>:algs_dir=/nfs/algs
 <replace>:tools_dir=<algs_dir>/tools
-<replace>:outfile_root=<pretty[(number)]>__TEST
+<replace>:output_root=/nfs/stak/students/i/irvine/python/cluster/test
 #
 #  results_dir is where the generated results will be
 #
-root_results_dir:runtest_out/results
+root_results_dir:<output_root>/runtest_out/results
 #
 #  script is where the generated scripts will be
 #
-script_dir:runtest_out/scripts
+script_dir:<output_root>/runtest_out/scripts
 #
 qsub_command:-q eecs,eecs1,eecs,share
 #qsub_command:-M someone@gmail.com
