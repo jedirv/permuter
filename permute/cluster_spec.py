@@ -6,7 +6,7 @@ def resolve_value(keyValMap, given_val):
     for key, val in keyValMap.iteritems():
         match_string = "<{0}>".format(key)
         result = result.replace(match_string, val)
-    logging.debug("  value resolved to : {0}".format(result))
+    #logging.debug("  value resolved to : {0}".format(result))
     return result
     
 class ClusterSpec(object):
@@ -171,7 +171,7 @@ class ClusterSpec(object):
                 permuters[permuteKey] = permute_list
             else:
                 pass
-
+        logging.debug("  permuters : {0}".format(permuters))
         return permuters
     
     def load_replaces(self, path):
@@ -193,6 +193,7 @@ class ClusterSpec(object):
                 key_val_map[key] = val
             else:
                 pass
+        logging.debug("  key_val_map {0}".format(key_val_map))
         return key_val_map        
     
 
@@ -209,6 +210,7 @@ class ClusterSpec(object):
                 qsub_commands.append(this_command)
             else:
                 pass
+        logging.debug("  qsub_commands {0}".format(qsub_commands))
         return qsub_commands
     
     def load_commands(self, path):
@@ -224,6 +226,7 @@ class ClusterSpec(object):
                 commands.append(this_command)
             else:
                 pass
+        logging.debug("  commands {0}".format(commands))
         return commands
         
      
@@ -241,6 +244,7 @@ class ClusterSpec(object):
                 concisePrintMap[key] = val
             else:
                 pass
+        logging.debug("  concisePrintMap {0}".format(concisePrintMap))
         return concisePrintMap
         
  

@@ -50,7 +50,7 @@ def generate_permutation_code(permutation_info, concisePrintMap, include_trials)
                 val = concisePrintMap[val]
             code = "{0}_{1}_{2}".format(code, key, val)
     code = code.lstrip('_')
-    logging.debug("code determined as : {0}".format(code))
+    logging.info("   perm code : {0}".format(code))
     return code        
 
     
@@ -64,7 +64,7 @@ def expand_permutations(permuters):
     for permuteKey in sorted_keys:
         permuteList = permuters[permuteKey]
         sortedPermuteList = sorted(permuteList)
-        logging.debug("  permute_key {0}, permute_list {1}".format(permuteKey, sortedPermuteList))
+        #logging.debug("  permute_key {0}, permute_list {1}".format(permuteKey, sortedPermuteList))
         if (len(dict_list) == 0):
             # first time through
             for permuteListValue in sortedPermuteList:
@@ -91,7 +91,7 @@ def expand_permutations(permuters):
                     expanded_dict_list.append(new_dict)
             dict_list = expanded_dict_list
         dict_list = sorted(dict_list)
-        logging.debug("  dict_list : {0}".format(dict_list))
+        logging.info("  perms expanded to : {0}".format(dict_list))
     return dict_list                 
 
           
@@ -147,7 +147,7 @@ def resolve_permutation(permutation_info, commands, keyValMap):
         commands = commands_for_this_permutation    
         logging.debug("  commands after a pass2 of resolve_permutation: {0}".format(commands))  
     #print "  commands after resolve_permutation: {0}".format(commands_for_this_permutation)
-    logging.debug("  commands after resolve_permutation: {0}".format(commands_for_this_permutation))
+    logging.info("  commands after resolve_permutation: {0}".format(commands_for_this_permutation))
     return commands_for_this_permutation
 
 def get_resolved_results_dir_for_permutation(permutation_info, cspec):
@@ -155,6 +155,7 @@ def get_resolved_results_dir_for_permutation(permutation_info, cspec):
     interim_results_dir = cspec.generate_results_dir_for_permutation(permutation_info['trials'], permute_code_sans_trial)
     list_of_size_1 = [interim_results_dir]
     resolved_results_dir =  resolve_permutation(permutation_info, list_of_size_1, cspec.key_val_map)[0]
+    logging.info("  resolved_results_dir: {0}".format(resolved_results_dir))
     return resolved_results_dir
     
     

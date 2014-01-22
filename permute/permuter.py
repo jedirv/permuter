@@ -26,42 +26,39 @@ def main():
     flags = ""
     if (len(sys.argv) == 4):
         flags = sys.argv[3]
+        
+     # set up logging 
+    home_dir_permuter = os.path.expanduser('~/permuter')
+    logging_level = logging.INFO
+    if (flags == '-debug'):
+        logging_level = logging.DEBUG
+    if (not(os.path.isdir(home_dir_permuter))):
+        os.makedirs(home_dir_permuter)
+    logging.basicConfig(filename='{0}/permuter.log'.format(home_dir_permuter), filemode='w', level=logging_level)
+    
     validate_args(permute_command, cspec_path, flags)
     if (not(cluster_spec.validate(cspec_path))):
         exit()
     cspec = cluster_spec.ClusterSpec(cspec_path)
     cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
     
-    # set up logging dir
-    home_dir_permuter = os.path.expanduser('~/permuter')
-    if (not(os.path.isdir(home_dir_permuter))):
-            os.makedirs(home_dir_permuter)
+   
             
     # why isn't logging working?
     if (permute_command == "gen"):
-        logging.basicConfig(filename='{0}/gen.log'.format(home_dir_permuter), filemode='w', level=logging.DEBUG)
         generate_scripts(cluster_runs)
     elif (permute_command == "launch"):
-        logging.basicConfig(filename='{0}/launch.log'.format(home_dir_permuter), filemode='w', level=logging.DEBUG)
         launch_scripts(cluster_runs)
     elif (permute_command == "auto"):
-        logging.basicConfig(filename='{0}/auto.log'.format(home_dir_permuter), filemode='w', level=logging.DEBUG)
         generate_scripts(cluster_runs)
         launch_scripts(cluster_runs)
     elif (permute_command == "preview"):
-        logging.basicConfig(filename='{0}/preview.log'.format(home_dir_permuter), filemode='w', level=logging.DEBUG)
         preview_scripts(cluster_runs)
     elif (permute_command == "test_launch"):
-        logging.basicConfig(filename='{0}/test_launch.log'.format(home_dir_permuter), filemode='w', level=logging.DEBUG)
         test_launch_single_script(cluster_runs)
     elif (permute_command == "collect"):
-        #log_filename = '{0}/collect.log'.format(home_dir_permuter)
-        #print "log_filename {0}".format(log_filename)
-        #logging.basicConfig(filename=log_filename, filemode='w', level=logging.DEBUG)
-        logging.info("hello world")
         collect(cluster_runs)
     elif (permute_command == "stat"):
-        logging.basicConfig(filename='{0}/stat.log'.format(home_dir_permuter), filemode='w', level=logging.DEBUG)
         check_status_of_runs(cluster_runs)
         
     else:
@@ -212,6 +209,7 @@ def create_pooled_results_files(cluster_runs):
         resultsFile = pooled_results_file.PooledResultsFile(source_file_map, filename_permutation_info, cluster_runs)
         resultsFile.persist()
         resultsFiles.append(resultsFile)
+    logging.info("...resultsFiles : {0}".format(resultsFiles))    
     return resultsFiles
 
 def delete_results(cspec):
@@ -249,7 +247,7 @@ def generate_scripts(cluster_runs):
        
 
 def preview_scripts(cluster_runs):
-    logging.info('PREVIEWING scripts')
+    logging.info("PREVIEWING scripts")
     cspec = cluster_runs.cspec
     permutation_info = cluster_runs.permutation_info_list_full[0]
     user_job_number_as_string = cluster_runs.get_job_number_string_for_permutation_info(permutation_info)
@@ -288,10 +286,10 @@ def validate_args(permute_command, cspec_path, flags):
             exit()
         f.close()
     except IOError:
-        print "An error occured trying to open {0}".format(cspec_path)
+        print "An error occurred trying to open {0}".format(cspec_path)
         exit()
-    if (flags != ""):
-        print "Invalid flag {0}. Flags not yet supported".format(flags)
+    if (flags != "-debug" and flags != ""):
+        print "Invalid flag {0}. -debug is only flag supported".format(flags)
         exit()
   
 def create_source_file_map(cspec):
@@ -335,7 +333,7 @@ def create_source_file_map(cspec):
 
   
 def usage():
-    print "usage:  python permuter.py  gen|launch|auto|preview|test_launch|collect|stat <path of cluster_spec> [-v]"
+    print "usage:  python permuter.py  gen|launch|auto|preview|test_launch|collect|stat <path of cluster_spec>  [-debug]"
     
 if __name__ == '__main__':
     main()

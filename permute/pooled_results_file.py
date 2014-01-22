@@ -250,6 +250,7 @@ def gather_file_permuters(cspec):
         del file_permuters[x_permuter]
     for y_permuter in y_permuters:
         del file_permuters[y_permuter]
+    logging.info("...file_permuters".format(file_permuters))
     return file_permuters
 
 def build_code_using_dictionary(perm_info, cspec):
