@@ -210,7 +210,7 @@ def check_status_of_run(cluster_runs, permutation_info, cspec):
     run_finished = cluster_runs_info.did_run_finish(cluster_runs, permutation_code)
     missing_output_file = False
     missing_output_files = cluster_runs_info.get_missing_output_files(permutation_info, cspec)
-    if len(missing_output_files != 0):
+    if (len(missing_output_files) != 0):
         missing_output_file = True 
             
 
