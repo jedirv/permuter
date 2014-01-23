@@ -4,7 +4,8 @@ Created on Dec 17, 2013
 @author: admin-jed
 '''
 import permutations
-         
+import os
+
 class ClusterRunsInfo(object):
     
     def __init__(self,cspec):
