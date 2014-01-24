@@ -230,7 +230,10 @@ def check_status_of_run(cluster_runs, permutation_info, cspec):
         print "{0} - no evidence of having launched".format(user_job_number_as_string)
     else:
         if (not(run_finished)):
-            print "{0}\t{1}\tstill running".format(cluster_job_number, qil.get_job_file_name())
+            if qil.is_first_error_permission_problem():
+                print "{0}\t{1}\tblocked on permissions".format(cluster_job_number, qil.get_job_file_name())
+            else:
+                print "{0}\t{1}\tstill running".format(cluster_job_number, qil.get_job_file_name())
         elif (run_finished and not(missing_output_file)):
             #done
             print "{0}\t{1}\tcomplete".format(cluster_job_number, qil.get_job_file_name())

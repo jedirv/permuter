@@ -14,7 +14,22 @@ class QsubInvokeLog(PermutationDriverFile):
         self.script_name = "{0}.sh".format(self.get_job_file_name())
         self.cluster_job_number = self.load_job_number()
         self.type = "qsub_invoke_log"
-        
+       
+    def is_first_error_permission_problem(self):
+        error_file = self.qsub_invoke_log_fullpath.replace('.qil','.err')
+        if not(os.path.exists(error_file)):
+            return False
+        f = open(error_file,'r')
+        lines = f.readlines()
+        f.close()
+        if (len(lines) == 0):
+            return False
+        first_line = lines[0]
+        if (first_line.count('Permission denied') > 0):
+            return True
+        return False
+       
+         
     def load_job_number(self):
         starting_dir = os.getcwd()
         os.chdir(self.script_dir)
