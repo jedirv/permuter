@@ -64,7 +64,12 @@ def main():
     elif (permute_command == "collect"):
         collect(cluster_runs)
     elif (permute_command == "stat"):
-        check_status_of_runs(cluster_runs)
+        check_status_of_runs(cluster_runs,"summary")
+    elif (permute_command == "stat_full"):
+        check_status_of_runs(cluster_runs,"full")
+    elif (permute_command == "stat_pending"):
+        check_status_of_runs(cluster_runs,"pending")
+    
     elif (permute_command == "stop"):
         stop_runs(cluster_runs)
     elif (permute_command == "clean_scripts"):
@@ -207,13 +212,48 @@ def stop_run(cluster_job_number):
         print "There was a problem calling qdel on job {0}".format(cluster_job_number)
         print "Return code was {0}".format(subprocess.CalledProcessError.returncode)
                     
-def check_status_of_runs(cluster_runs):
+def check_status_of_runs(cluster_runs, output_style):
     logging.info('CHECKING status of runs')
     cspec = cluster_runs.cspec
+    running_count = 0
+    permission_block_count = 0
+    failed_count = 0
+    complete_count = 0
+    total_count = 0
+    not_yet_launched_count = 0
+    unknown_count = 0
     for permutation_info in cluster_runs.permutation_info_list_full:
-        check_status_of_run(cluster_runs, permutation_info, cspec)
+        status = check_status_of_run(cluster_runs, permutation_info, cspec, output_style)
+        if (status=="not_yet_launched"):
+            not_yet_launched_count = not_yet_launched_count + 1
+        elif (status=="permission_block"):
+            permission_block_count = permission_block_count + 1
+        elif (status=="still_running"):
+            running_count = running_count + 1
+        elif (status=="complete"):
+            complete_count = complete_count + 1
+        elif (status=="failed"):
+            failed_count = failed_count + 1
+        else:
+            unknown_count = unknown_count + 1
+        total_count = total_count + 1
+    message = "{0}({1})\t".format(cspec.master_job_name, total_count)
+    if complete_count != 0:
+        message = "{0}complete: {1}\t".format(message, complete_count)
+    if not_yet_launched_count != 0:
+        message = "{0}not yet launched: {1}\t".format(message, not_yet_launched_count)
+    if running_count != 0:
+        message = "{0}running: {1}\t".format(message, running_count)
+    if permission_block_count != 0:
+        message = "{0}nfs permission issue: {1}\t".format(message, permission_block_count)
+    if failed_count != 0:
+        message = "{0}failed: {1}\t".format(message, failed_count)
+    if unknown_count != 0:
+        message = "{0}unknown fate: {1}\t".format(message, unknown_count)
+    #message = "{0}\n".format(message)
+    print message
         
-def check_status_of_run(cluster_runs, permutation_info, cspec):
+def check_status_of_run(cluster_runs, permutation_info, cspec, output_style):
     logging.debug('CHECKING status of run')
     permutation_code = permutations.generate_permutation_code(permutation_info, cspec.concise_print_map, True)
     run_finished = cluster_runs_info.did_run_finish(cluster_runs, permutation_code)
@@ -226,24 +266,35 @@ def check_status_of_run(cluster_runs, permutation_info, cspec):
     user_job_number_as_string = cluster_runs.get_job_number_string_for_permutation_info(permutation_info)
     qil = qsub_invoke_log.QsubInvokeLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'])
     cluster_job_number = qil.cluster_job_number
+    # summary , full, pending
     if (cluster_job_number == "NA"):
-        print "{0} - no evidence of having launched".format(user_job_number_as_string)
+        if (output_style == "full" or output_style == "pending"):
+            print "{0} - no evidence of having launched".format(user_job_number_as_string)
+        return "not_yet_launched"
     else:
         if (not(run_finished)):
             if qil.is_first_error_permission_problem():
-                print "{0}\t{1}\tblocked on permissions".format(cluster_job_number, qil.get_job_file_name())
+                if (output_style == "full" or output_style == "pending"):
+                    print "{0}\t{1}\tblocked on permissions".format(cluster_job_number, qil.get_job_file_name())
+                return "permission_block"
             else:
-                print "{0}\t{1}\tstill running".format(cluster_job_number, qil.get_job_file_name())
+                if (output_style == "full" or output_style == "pending"):
+                    print "{0}\t{1}\tstill running".format(cluster_job_number, qil.get_job_file_name())
+                return "still_running"
         elif (run_finished and not(missing_output_file)):
             #done
-            print "{0}\t{1}\tcomplete".format(cluster_job_number, qil.get_job_file_name())
+            if (output_style == "full"):
+                print "{0}\t{1}\tcomplete".format(cluster_job_number, qil.get_job_file_name())
+            return "complete"
         else:
             #fun finished but missing an output file, find out the error
             qacctlog = qacct_log.QacctLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'])
             qacctlog.ingest(cluster_job_number)
-            print "{0} FAILED -> {1}".format(cluster_job_number, qacctlog.get_failure_reason())
+            if (output_style == "full" or output_style == "pending"):
+                print "{0} FAILED -> {1}".format(cluster_job_number, qacctlog.get_failure_reason())
             for missing_file in missing_output_files:
                 print "output file missing: {0}".format(missing_file)
+            return "failed"
     #print "DONE checking run status"
     #print "cluster_job_number is {0}".format(cluster_job_number)
     # first, check qstat to see if this
@@ -379,6 +430,8 @@ def test_launch_single_script(cluster_runs):
 def validate_args(permute_command, cspec_path, flags):
     if (not(permute_command == "collect" or 
             permute_command == "stat" or 
+            permute_command == "stat_full" or 
+            permute_command == "stat_pending" or 
             permute_command == "gen" or 
             permute_command == "launch" or 
             permute_command == "auto" or 
@@ -472,7 +525,9 @@ def usage():
     print"               auto                   # runs gen and then launch in sequence - only use if very confident" 
     print""
     print" once the runs are launched, the following commands are relevant:"                         
-    print"               stat                   # show the status of each permutation run"                  
+    print"               stat                   # show the summary counts of status of runs"                   
+    print"               stat_full              # show the status of each permutation run"                   
+    print"               stat_pending           # show the status of each permutation run that is not finished"                  
     print"               stop                   # call qdel on any runs that are unfinished to abort them"                    
     print"               clean_scripts          # clean the launch scripts and associated .out, .err, and .qil files"                   
     print"               clean_results          # clean only the contents of <permutation_results_dir>" 
