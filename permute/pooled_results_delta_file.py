@@ -20,8 +20,12 @@ class PooledResultsDeltaFile(object):
         self.resultsFile = resultsFile
         self.dirname = resultsFile.target_dir
         self.filename_code = resultsFile.perm_code_for_filename
-        self.source_file_path = "{0}/{1}.csv".format(self.dirname, self.filename_code)
-        self.target_file_path = "{0}/deltas_{1}.csv".format(self.dirname, self.filename_code)
+        if (self.filename_code == ""):
+            self.source_file_path = "{0}/pooled_results.csv".format(self.dirname)
+            self.target_file_path = "{0}/pooled_results_deltas.csv".format(self.dirname)
+        else:
+            self.source_file_path = "{0}/pooled_results_{1}.csv".format(self.dirname, self.filename_code)
+            self.target_file_path = "{0}/pooled_results_{1}_deltas.csv".format(self.dirname, self.filename_code)
         
     def generate(self):
         f_source = open(self.source_file_path,'r')

@@ -15,7 +15,7 @@ def main():
     outpath = sys.argv[3]
     product = x * y
     for i in range(0,product):
-        time.sleep(30)
+        time.sleep(15)
         print "sleeping at i: {0}".format(i)
     dir = os.path.dirname(outpath)
     os.makedirs(dir);

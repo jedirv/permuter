@@ -49,6 +49,8 @@ def main():
     if (permute_command == "gen"):
         generate_scripts(cluster_runs)
     elif (permute_command == "launch"):
+        clean_results(cluster_runs)
+        clean_pooled_results(cluster_runs)
         launch_scripts(cluster_runs)
     elif (permute_command == "auto"):
         generate_scripts(cluster_runs)
@@ -56,6 +58,8 @@ def main():
     elif (permute_command == "preview"):
         preview_scripts(cluster_runs)
     elif (permute_command == "test_launch"):
+        clean_results(cluster_runs)
+        clean_pooled_results(cluster_runs)
         test_launch_single_script(cluster_runs)
     elif (permute_command == "collect"):
         collect(cluster_runs)
@@ -81,16 +85,20 @@ def main():
     
 def clean_results(cluster_runs):
     logging.info('CLEANING results')
+    print('CLEANING results')
     results_dir = cluster_runs.cspec.job_results_dir
     clean_out_dir(results_dir)
     
 def clean_pooled_results(cluster_runs):
     logging.info('CLEANING pooled results')
+    print('CLEANING pooled results')
     cspec = cluster_runs.cspec
     pooled_results_dir = "{0}/{1}".format(cspec.scores_to, cspec.master_job_name)
     clean_out_dir(pooled_results_dir)
     
 def clean_out_dir(dirpath):
+    if not(os.path.exists(dirpath)):
+        return
     items = os.listdir(dirpath)
     for item in items:
         path = "{0}/{1}".format(dirpath, item)
@@ -186,6 +194,7 @@ def stop_run_if_running(cluster_runs, permutation_info, cspec):
         if (not(run_finished)):
             #print "{0}\t{1}\tstill running".format(cluster_job_number, qil.get_job_file_name())
             stop_run(cluster_job_number)
+            qil.delete()
         else:
             print "{0} detected as finished {1}".format(cluster_job_number, user_job_number_as_string)
     
@@ -260,9 +269,13 @@ def create_pooled_timings_files(cluster_runs):
     print "permuters_for_filename {0}".format(permuters_for_filename)
     filename_permutations = permutations.expand_permutations(permuters_for_filename)
     print "filename_permutations {0}".format(filename_permutations)
-    for filename_permutation_info in filename_permutations:
-        timingsFile = pooled_timings_file.PooledTimingsFile(filename_permutation_info, cluster_runs)
+    if (len(filename_permutations) == 0):
+        timingsFile = pooled_timings_file.PooledTimingsFile({}, cluster_runs)
         timingsFile.persist()
+    else: 
+        for filename_permutation_info in filename_permutations:
+            timingsFile = pooled_timings_file.PooledTimingsFile(filename_permutation_info, cluster_runs)
+            timingsFile.persist()
 
 
   
@@ -270,9 +283,13 @@ def create_ranked_results_files(cluster_runs):
     logging.info('CREATING ranked results file')
     permuters_for_filename = pooled_results_file.gather_file_permuters(cluster_runs.cspec)
     filename_permutations = permutations.expand_permutations(permuters_for_filename)
-    for filename_permutation_info in filename_permutations:
-        rankFile = ranked_results_file.RankedResultsFile(filename_permutation_info, cluster_runs)
+    if (len(filename_permutations) == 0):
+        rankFile = ranked_results_file.RankedResultsFile({}, cluster_runs)
         rankFile.persist()
+    else:
+        for filename_permutation_info in filename_permutations:
+            rankFile = ranked_results_file.RankedResultsFile(filename_permutation_info, cluster_runs)
+            rankFile.persist()
         
   
 def create_pooled_results_files(cluster_runs):
@@ -284,10 +301,15 @@ def create_pooled_results_files(cluster_runs):
     filename_permutations = permutations.expand_permutations(permuters_for_filename)
     logging.debug("...filename permutations : {0}".format(filename_permutations))
     resultsFiles = []
-    for filename_permutation_info in filename_permutations:
-        resultsFile = pooled_results_file.PooledResultsFile(source_file_map, filename_permutation_info, cluster_runs)
+    if (len(filename_permutations) == 0):
+        resultsFile = pooled_results_file.PooledResultsFile(source_file_map, {}, cluster_runs)
         resultsFile.persist()
         resultsFiles.append(resultsFile)
+    else:
+        for filename_permutation_info in filename_permutations:
+            resultsFile = pooled_results_file.PooledResultsFile(source_file_map, filename_permutation_info, cluster_runs)
+            resultsFile.persist()
+            resultsFiles.append(resultsFile)
     logging.info("...resultsFiles : {0}".format(resultsFiles))    
     return resultsFiles
 
@@ -383,6 +405,27 @@ def validate_args(permute_command, cspec_path, flags):
         print "Invalid flag {0}. -debug is only flag supported".format(flags)
         exit()
   
+def get_full_perm_code(permutation_info,scores_permutations_info, cspec):
+    master_permutation_info = {}
+    for key, val in permutation_info.items():
+        master_permutation_info[key] = val
+    if (len(scores_permutations_info) != 0):
+        for key, val in scores_permutations_info.items():
+            master_permutation_info[key] = val
+    full_perm_code = permutations.generate_permutation_code(master_permutation_info, cspec.concise_print_map, permutations.INCLUDE_TRIALS)
+    return full_perm_code
+                
+def get_fully_resolved_from_filepath(from_file_path_with_results_dir_resolved, permutation_info, cspec, scores_permutations_info):
+    # first resolve the regular_permutations info in the scores_from_filepath
+    list_of_one = [ from_file_path_with_results_dir_resolved ]
+    revised_list_of_one = permutations.resolve_permutation(permutation_info, list_of_one, cspec.key_val_map)
+    partially_resolved_from_filepath = revised_list_of_one[0]
+    # now resolve the scores_permutation info in the scores_from_filepath
+    list_of_one = [ partially_resolved_from_filepath ]
+    revised_list_of_one = permutations.resolve_permutation(scores_permutations_info, list_of_one, cspec.key_val_map)
+    fully_resolved_from_filepath = revised_list_of_one[0]
+    return fully_resolved_from_filepath
+    
 def create_source_file_map(cspec):
     logging.info('CREATING source file map')   
     source_file_map = {}
@@ -396,29 +439,21 @@ def create_source_file_map(cspec):
     permutation_list = permutations.expand_permutations(permuters_with_trials)
     for permutation_info in permutation_list:
         permutation_code = permutations.generate_permutation_code(permutation_info, cspec.concise_print_map, permutations.IGNORE_TRIALS)
+        #print "permutation_code {0}".format(permutation_code)
         permutation_results_dir = cspec.generate_results_dir_for_permutation(permutation_info['trials'], permutation_code) 
         from_file_path_with_results_dir_resolved = cspec.scores_from_filepath.replace('<permutation_results_dir>',permutation_results_dir)
+        #print "from_file_path_with_results_dir_resolved {0}".format(from_file_path_with_results_dir_resolved)
         scores_permutations_list = permutations.expand_permutations(cspec.scores_permuters)
-        for scores_permutations_info in scores_permutations_list:
-            # first resolve the regular_permutations info in the scores_from_filepath
-            list_of_one = [ from_file_path_with_results_dir_resolved ]
-            revised_list_of_one = permutations.resolve_permutation(permutation_info, list_of_one, cspec.key_val_map)
-            partially_resolved_from_filepath = revised_list_of_one[0]
-            # now resolve the scores_permutation info in the scores_from_filepath
-            list_of_one = [ partially_resolved_from_filepath ]
-            revised_list_of_one = permutations.resolve_permutation(scores_permutations_info, list_of_one, cspec.key_val_map)
-            fully_resolved_from_filepath = revised_list_of_one[0]
-            #print "RESOLVED_LIST_OF_ONE: {0}".format(fully_resolved_from_filepath)
-            # create the full perm code (includes the scores_permutations)
-            master_permutation_info = {}
-            for key, val in permutation_info.items():
-                master_permutation_info[key] = val
-            for key, val in scores_permutations_info.items():
-                master_permutation_info[key] = val
-                
-            full_perm_code = permutations.generate_permutation_code(master_permutation_info, cspec.concise_print_map, permutations.INCLUDE_TRIALS)
+        if (len(scores_permutations_list) == 0):
+            fully_resolved_from_filepath = get_fully_resolved_from_filepath(from_file_path_with_results_dir_resolved, permutation_info, cspec, {})
+            full_perm_code = get_full_perm_code(permutation_info,{}, cspec)
             source_file_map[full_perm_code] = fully_resolved_from_filepath
-            #print "source_file_map[{0}] = {1}".format(full_perm_code, fully_resolved_from_filepath)
+        else:
+            for scores_permutations_info in scores_permutations_list:
+                fully_resolved_from_filepath = get_fully_resolved_from_filepath(from_file_path_with_results_dir_resolved, permutation_info, cspec, scores_permutations_info)
+                full_perm_code = get_full_perm_code(permutation_info,scores_permutations_info, cspec)
+                source_file_map[full_perm_code] = fully_resolved_from_filepath
+                #print "source_file_map[{0}] = {1}".format(full_perm_code, fully_resolved_from_filepath)
     return source_file_map
 
 

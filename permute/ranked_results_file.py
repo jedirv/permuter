@@ -22,9 +22,14 @@ class RankedResultsFile(object):
         self.cspec = cluster_runs.cspec
         self.target_dir = pooled_results_file.generate_target_dirname(self.cspec)
         self.perm_code_for_filename  = pooled_results_file.build_code_using_dictionary(filename_permutation_info, self.cspec)
-        self.target_path = "{0}/{1}_score_list.txt".format(self.target_dir, self.perm_code_for_filename)
-        self.scores_source_path = "{0}/{1}.csv".format(self.target_dir, self.perm_code_for_filename)
-        self.timings_source_path = "{0}/{1}_timings.csv".format(self.target_dir, self.perm_code_for_filename)
+        if (self.perm_code_for_filename == ""):
+            self.target_path = "{0}/pooled_results_ranked.txt".format(self.target_dir)
+            self.scores_source_path = "{0}/pooled_results.csv".format(self.target_dir)
+            self.timings_source_path = "{0}/pooled_results_timings.csv".format(self.target_dir)
+        else:
+            self.target_path = "{0}/pooled_results_{1}_ranked.txt".format(self.target_dir, self.perm_code_for_filename)
+            self.scores_source_path = "{0}/pooled_results_{1}.csv".format(self.target_dir, self.perm_code_for_filename)
+            self.timings_source_path = "{0}/pooled_results_{1}_timings.csv".format(self.target_dir, self.perm_code_for_filename)
         
        
     def persist(self):

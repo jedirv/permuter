@@ -35,7 +35,11 @@ class QsubInvokeLog(PermutationDriverFile):
             result = "NA"
         return result
         
-
+    def delete(self):
+        print ("ok , trying to delete {0} ".format(self.qsub_invoke_log_fullpath))
+        if (os.path.exists(self.qsub_invoke_log_fullpath)):
+            print ("removing {0}".format(self.qsub_invoke_log_fullpath))
+            os.remove(self.qsub_invoke_log_fullpath)
  
     
         

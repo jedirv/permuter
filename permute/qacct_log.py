@@ -30,7 +30,11 @@ class QacctLog(PermutationDriverFile):
         
       
     def run_failed(self):
-        return self.error_reading or (self.failed != '0'  and self.failed != "?")
+        result = self.error_reading or (self.failed != '0'  and self.failed != "?")
+        #print "{0} run failed: {1}".format(self.script_path_root, result)
+        #print "self.error_reading {0}".format(self.error_reading)
+        #print "self.failed {0}".format(self.failed)
+        return result
     
     def get_failure_reason(self):
         if (self.error_reading):

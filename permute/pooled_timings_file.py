@@ -15,7 +15,10 @@ class PooledTimingsFile(object):
         self.cspec = cluster_runs.cspec
         self.target_dir = pooled_results_file.generate_target_dirname(self.cspec)
         self.perm_code_for_filename  = pooled_results_file.build_code_using_dictionary(filename_permutation_info, self.cspec)
-        self.target_timings_path = "{0}/{1}_timings.csv".format(self.target_dir, self.perm_code_for_filename)
+        if (self.perm_code_for_filename == ""):
+            self.target_timings_path = "{0}/pooled_results_timings.csv".format(self.target_dir)
+        else:
+            self.target_timings_path = "{0}/pooled_results_{1}_timings.csv".format(self.target_dir, self.perm_code_for_filename)
         self.filename_permutation_info = filename_permutation_info
        
     def persist(self):

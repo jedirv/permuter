@@ -30,6 +30,7 @@ class PermutationDriverFile(object):
         self.user_job_number = user_job_number
         self.script_dir = cspec.script_dir
         self.qsub_invoke_log = "{0}.qil".format(self.get_job_file_name())
+        self.qsub_invoke_log_fullpath = "{0}/{1}".format(self.script_dir,self.qsub_invoke_log)
         self.configure()
         
     # override this

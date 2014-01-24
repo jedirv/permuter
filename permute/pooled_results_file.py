@@ -23,7 +23,11 @@ class PooledResultsFile(object):
         self.cspec = cluster_runs.cspec
         self.target_dir = generate_target_dirname(self.cspec)
         self.perm_code_for_filename  = build_code_using_dictionary(filename_permutation_info, self.cspec)
-        self.target_path = "{0}/{1}.csv".format(self.target_dir, self.perm_code_for_filename)
+        print "self.perm_code_for_filename : {0}".format(self.perm_code_for_filename)
+        if (self.perm_code_for_filename == ""):
+            self.target_path = "{0}/pooled_results.csv".format(self.target_dir)
+        else:
+            self.target_path = "{0}/pooled_results_{1}.csv".format(self.target_dir, self.perm_code_for_filename)
         self.source_file_map = source_file_map
         self.filename_permutation_info = filename_permutation_info
        
@@ -65,6 +69,7 @@ class PooledResultsFile(object):
                 trial_values = []
                 for trial in trials_list:
                     result_file_perm_code = gen_result_perm_code_from_pieces(y_permutation, x_permutation, self.filename_permutation_info, cspec, trial)
+                    #print "self.source_file_map {0}".format(self.source_file_map)
                     source_file_path = self.source_file_map[result_file_perm_code]
                     #print "SOURCE_FILE_PATH : {0}".format(source_file_path)
                     value = get_result_from_file(source_file_path, cspec.scores_from_colname, cspec.scores_from_rownum)
@@ -197,8 +202,9 @@ def generate_target_dirname(cspec):
     
 def gen_result_perm_code_from_pieces(y_axis_permutation, x_axis_permutation, filename_perm_dict, cspec, trial):
     full_perm_dict = {}
-    for key, val in filename_perm_dict.items():
-        full_perm_dict[key] = val
+    if (len(filename_perm_dict) != 0):
+        for key, val in filename_perm_dict.items():
+            full_perm_dict[key] = val
     # create a full perm_dict by adding the x and y vals back in
     for key, val in y_axis_permutation.items():
         full_perm_dict[key] = val
@@ -255,6 +261,8 @@ def gather_file_permuters(cspec):
 
 def build_code_using_dictionary(perm_info, cspec):
     result = ''
+    if (len(perm_info) == 0):
+        return ""
     # build a map using the coded keys
     # and a list of the keys
     coded_key_info = {}
