@@ -1,3 +1,22 @@
+
+permuter.py v0.3
+================
+
+New Features
+------------
+* python permuter.py stat <cspec_path>                  # now just shows summary counts of complete, running, failed, etc
+* python permuter.py stat_full <cspec_path>             # lists all runs and their status followed by summary
+* python permuter.py stat_pending <cspec_path>          # lists all runs that are not complete followed by summary
+
+* python permuter.py stat_all <cspec_path>              # same as stat, but for all specs in the dir of this spec
+* python permuter.py stat_full_all <cspec_path>         # same as stat_full, but for all specs in the dir of this spec
+* python permuter.py stat_pending_all <cspec_path>      # same as stat_pending, but for all specs in the dir of this spec
+
+Bugs fixed
+----------
+* none
+
+
 permuter.py v0.2
 ================
 
