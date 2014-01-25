@@ -63,13 +63,20 @@ def main():
         test_launch_single_script(cluster_runs)
     elif (permute_command == "collect"):
         collect(cluster_runs)
+        
     elif (permute_command == "stat"):
         check_status_of_runs(cluster_runs,"summary")
     elif (permute_command == "stat_full"):
         check_status_of_runs(cluster_runs,"full")
     elif (permute_command == "stat_pending"):
         check_status_of_runs(cluster_runs,"pending")
-    
+    elif (permute_command == "stat_all"):
+        run_command_on_all_specs(cspec_path,"stat")
+    elif (permute_command == "stat_full_all"):
+        run_command_on_all_specs(cspec_path,"stat_full")
+    elif (permute_command == "stat_pending_all"):
+        run_command_on_all_specs(cspec_path,"stat_pending")
+        
     elif (permute_command == "stop"):
         stop_runs(cluster_runs)
     elif (permute_command == "clean_scripts"):
@@ -212,6 +219,24 @@ def stop_run(cluster_job_number):
         print "There was a problem calling qdel on job {0}".format(cluster_job_number)
         print "Return code was {0}".format(subprocess.CalledProcessError.returncode)
                     
+def run_command_on_all_specs(cspec_path, permuter_command):
+    spec_dir = os.path.dirname(cspec_path)
+    file_or_dirnames = os.listdir(spec_dir)
+    cspec_paths = []
+    for entry in file_or_dirnames:
+        full_path = "{0}/{1}".format(spec_dir,entry)
+        if (os.path.isfile(full_path) and not(full_path.endswith("~"))):
+            f = open(full_path, 'r')
+            header = f.readline()
+            f.close()
+            if (header.startswith("#cspec")):
+                cspec_paths.append(full_path)
+    for path in cspec_paths:
+        command = "python permuter.py {0} {1}".format(permuter_command, path)
+        print "-------------------------------------------------------------------"
+        #print command
+        os.system(command) 
+    
 def check_status_of_runs(cluster_runs, output_style):
     logging.info('CHECKING status of runs')
     cspec = cluster_runs.cspec
@@ -432,6 +457,9 @@ def validate_args(permute_command, cspec_path, flags):
             permute_command == "stat" or 
             permute_command == "stat_full" or 
             permute_command == "stat_pending" or 
+            permute_command == "stat_all" or 
+            permute_command == "stat_full_all" or 
+            permute_command == "stat_pending_all" or 
             permute_command == "gen" or 
             permute_command == "launch" or 
             permute_command == "auto" or 
@@ -527,7 +555,10 @@ def usage():
     print" once the runs are launched, the following commands are relevant:"                         
     print"               stat                   # show the summary counts of status of runs"                   
     print"               stat_full              # show the status of each permutation run"                   
-    print"               stat_pending           # show the status of each permutation run that is not finished"                  
+    print"               stat_pending           # show the status of each permutation run that is not finished"                    
+    print"               stat_all               # show the summary status of all specs."                                     
+    print"               stat_full_all          # show the status of each permutation run for all specs."                                     
+    print"               stat_pending_all       # show the status of each permutation run that is not finished for all specs"                  
     print"               stop                   # call qdel on any runs that are unfinished to abort them"                    
     print"               clean_scripts          # clean the launch scripts and associated .out, .err, and .qil files"                   
     print"               clean_results          # clean only the contents of <permutation_results_dir>" 
