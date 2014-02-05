@@ -164,6 +164,7 @@ class ClusterSpec(object):
                     permute_list = zero_pad_to_widest(permute_list)
                 elif (permute_list_string.find(",") != -1):
                     permute_list = permute_list_string.split(",")
+                    permute_list = convert_escaped_commas(permute_list) # supports "6_comma_8_comma_10" -->  "6,8,10"
                     permute_list = zero_pad_to_widest(permute_list)
                 else:
                     # must be a singleton cvalue
@@ -247,7 +248,13 @@ class ClusterSpec(object):
         logging.debug("  concisePrintMap {0}".format(concisePrintMap))
         return concisePrintMap
         
- 
+def convert_escaped_commas(list):
+    newList = []
+    for val in list:
+        newVal = val.replace("_comma_",",")
+        newList.append(newVal)
+    return newList
+     
 def zero_pad_to_widest(permute_values):
     result = permute_values
     # if any of the entries are not numbers, just return the list

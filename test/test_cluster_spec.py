@@ -7,6 +7,13 @@ class TestClusterSpec(unittest.TestCase):
         path = "./test.cspec"
         self.cspec = cluster_spec.ClusterSpec(path)
 
+    def test_convert_escaped_commas(self):
+        foo = [ '1_comma_2_comma_3', '4', '5_comma_6']
+        bar = cluster_spec.convert_escaped_commas(foo)
+        self.assertTrue(bar[0] == '1,2,3')
+        self.assertTrue(bar[1] == '4')
+        self.assertTrue(bar[2] == '5,6')
+        
     def test_zero_pad_to_widest(self):
         all_integers = ['0','10','345']
         padded_integers = cluster_spec.zero_pad_to_widest(all_integers)
