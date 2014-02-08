@@ -311,19 +311,19 @@ def validate(path):
     if not(result_replace):
         print "problem found in replace statements"
         
-    result_script_dir = validate_script_dir(path)
+    result_script_dir = validate_statement_present(path,"script_dir:","some_dir")
     if not(result_script_dir):
         print "problem found in script_dir statement"
   
-    result_root_results_dir = validate_root_results_dir(path)
+    result_root_results_dir = validate_statement_present(path,"root_results_dir:","some_dir")
     if not(result_root_results_dir):
         print "problem found in root_results_dir statement"
         
-    result_master_job_name = validate_master_job_name(path)
+    result_master_job_name = validate_statement_present(path,"master_job_name:","some_name")
     if not(result_master_job_name):
         print "problem found in master_job_name statement"
         
-    result_trials = validate_trials(path)
+    result_trials = validate_statement_present(path,"trials:","some_integer")
     if not(result_trials):
         print "problem found in trials statement"
     
@@ -334,75 +334,38 @@ def validate(path):
     return result_permute and result_replace and result_script_dir and result_root_results_dir and result_master_job_name and result_trials and result_scores_info
 
    
-def validate_root_results_dir(path):
+def validate_statement_present(path,statement, val):
     f = open(path, 'r')
     lines = f.readlines()
     f.close()
+    return validate_statement_present_in_lines(lines, statement, val)
+
+
+def validate_statement_present_in_lines(lines, statement, val):
     result = True
-    root_results_dir = "unknown"
+    value = "unknown"
+    statement_command = "unknown"
     for line in lines:
         line = line.rstrip()
-        if (line.startswith("root_results_dir:")):
+        if (line.startswith(statement)):
             # should be one =
-            root_results_dir_command, root_results_dir = line.split(":")
-    if (root_results_dir == "unknown"):
+            statement_command, value = line.split(":")
+    if (statement_command == "unknown"):
         result = False
-        print "cluster_spec missing root_results_dir declaration (root_results_dir:some_dir) {0}".format(path)    
+        print "cluster_spec missing statement {0}{1}".format(statement, val)
+    if (value == "unknown" or value == "" or value == None):
+        result = False
+        print "cluster_spec missing value for statement {0}{1}".format(statement, val)
     return result
     
-def validate_script_dir(path):
-    f = open(path, 'r')
-    lines = f.readlines()
-    f.close()
-    result = True
-    script_dir = "unknown"
-    for line in lines:
-        line = line.rstrip()
-        if (line.startswith("script_dir:")):
-            # should be one =
-            script_dir_command, script_dir = line.split(":")
-    if (script_dir == "unknown"):
-        result = False
-        print "cluster_spec missing script_dir declaration (script_dir:some_dir) {0}".format(path)      
-    return result
-
-def validate_master_job_name(path):
-    f = open(path, 'r')
-    lines = f.readlines()
-    f.close()
-    result = True
-    master_job_name = "unknown"
-    for line in lines:
-        line = line.rstrip()
-        if (line.startswith("master_job_name:")):
-            # should be one =
-            master_job_name_command, master_job_name = line.split(":")
-    if (master_job_name == "unknown"):
-        result = False
-        print "cluster_spec missing master_job_name declaration (master_job_name:some_name) {0}".format(path)      
-    return result
-
-
-def validate_trials(path):
-    f = open(path, 'r')
-    lines = f.readlines()
-    f.close()
-    result = True
-    trials = "unknown"
-    for line in lines:
-        line = line.rstrip()
-        if (line.startswith("trials:")):
-            # should be one =
-            trials_command, trials = line.split(":")
-    if (trials == "unknown"):
-        result = False
-        print "cluster_spec missing trials declaration (trials:some_integer) {0}".format(path)      
-    return result
 
 def validate_replace_entries(path):
     f = open(path, 'r')
     lines = f.readlines()
     f.close()
+    return validate_replace_entries_in_lines(lines)
+    
+def validate_replace_entries_in_lines(lines):
     result = True
     for line in lines:
         line = line.rstrip()
@@ -432,10 +395,14 @@ def validate_replace_entries(path):
                         pass
     return result
     
+
 def validate_permute_entries(path):
     f = open(path, 'r')
     lines = f.readlines()
     f.close()
+    return validate_permute_entries_in_lines(lines)
+
+def validate_permute_entries_in_lines(lines):
     result = True
     for line in lines:
         line = line.rstrip()

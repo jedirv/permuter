@@ -43,9 +43,6 @@ def main():
     cspec = cluster_spec.ClusterSpec(cspec_path)
     cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
     
-   
-            
-    # why isn't logging working?
     if (permute_command == "gen"):
         generate_scripts(cluster_runs)
     elif (permute_command == "launch"):

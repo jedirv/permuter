@@ -72,33 +72,62 @@ class TestClusterSpec(unittest.TestCase):
         #print ""
         #print "one up is _{0}_".format(self.cspec.one_up_basis)
         self.assertTrue(self.cspec.root_results_dir == './sample_results')
-    
-    def test_validate_master_job_name(self):
-        self.assertFalse(cluster_spec.validate_master_job_name("malformed_cspecs/missing_basics.cspec"))
-            
+   
     def test_validate_root_results_dir(self):
-        self.assertFalse(cluster_spec.validate_root_results_dir("malformed_cspecs/missing_basics.cspec"))
+        lines = []
+        lines.append("root_results_dir")
+        self.assertFalse(cluster_spec.validate_statement_present_in_lines(lines,"root_results_dir:","some_dir"))
+        lines.append("root_results_dir:")
+        self.assertFalse(cluster_spec.validate_statement_present_in_lines(lines,"root_results_dir:","some_dir"))
+        lines.append("root_results_dir:/foo/bar")
+        self.assertTrue(cluster_spec.validate_statement_present_in_lines(lines,"root_results_dir:","some_dir"))
+        
                 
     def test_validate_permutes(self):
-        self.assertFalse(cluster_spec.validate_permute_entries("malformed_cspecs/permute_colon_count.cspec"))
-        self.assertFalse(cluster_spec.validate_permute_entries("malformed_cspecs/permute_start_integer.cspec"))
-        self.assertFalse(cluster_spec.validate_permute_entries("malformed_cspecs/permute_end_integer.cspec"))
-        self.assertFalse(cluster_spec.validate_permute_entries("malformed_cspecs/permute_integer_order.cspec"))
+        lines = []
+        lines.append("permute:number=1:3") # wrong colon count
+        self.assertFalse(cluster_spec.validate_permute_entries_in_lines(lines))
         
-        self.assertTrue(cluster_spec.validate_permute_entries("well_formed_cspecs/permute_integer_range.cspec"))
-        self.assertTrue(cluster_spec.validate_permute_entries("well_formed_cspecs/permute_singleton_range.cspec"))
-        self.assertTrue(cluster_spec.validate_permute_entries("well_formed_cspecs/permute_comma_list_range.cspec"))
+        lines = []
+        lines.append("permute:number=a 3") # first integer bad in range
+        self.assertFalse(cluster_spec.validate_permute_entries_in_lines(lines))
+        
+        lines = []
+        lines.append("permute:number=1 a") # second integer bad in range
+        self.assertFalse(cluster_spec.validate_permute_entries_in_lines(lines))
+        
+        lines = []
+        lines.append("permute:number=3 2") # integer range out of order
+        self.assertFalse(cluster_spec.validate_permute_entries_in_lines(lines))
+        
+        lines = []
+        lines.append("permute:number=1 10") # integer range
+        self.assertTrue(cluster_spec.validate_permute_entries_in_lines(lines))
+        
+        lines = []
+        lines.append("permute:foo=2") # singleton integer 
+        self.assertTrue(cluster_spec.validate_permute_entries_in_lines(lines))
+        
+        lines = []
+        lines.append("permute:foo=a,33,zxc") # comma list 
+        self.assertTrue(cluster_spec.validate_permute_entries_in_lines(lines))
         
     def test_validate_replaces(self):
-        self.assertFalse(cluster_spec.validate_replace_entries("malformed_cspecs/replace_empty_key.cspec"))
-        self.assertFalse(cluster_spec.validate_replace_entries("malformed_cspecs/replace_empty_val.cspec"))
-        self.assertFalse(cluster_spec.validate_replace_entries("malformed_cspecs/replace_colon_count.cspec"))
+        lines = []
+        lines.append("<replace>:=/nfs/foo/bar") # key missing
+        self.assertFalse(cluster_spec.validate_replace_entries_in_lines(lines))
         
-        self.assertTrue(cluster_spec.validate_replace_entries("well_formed_cspecs/replace_basic.cspec"))
+        lines = []
+        lines.append("<replace>:foo=") # val missing
+        self.assertFalse(cluster_spec.validate_replace_entries_in_lines(lines))
         
-    def test_validate_trials(self):
-        self.assertFalse(cluster_spec.validate_trials("malformed_cspecs/missing_basics.cspec"))
-        self.assertTrue(cluster_spec.validate_trials("well_formed_cspecs/basics.cspec"))
+        lines = []
+        lines.append("<replace>:root:/nfs/foo/bar") # colon count wrong
+        self.assertFalse(cluster_spec.validate_replace_entries_in_lines(lines))
+        
+        lines = []
+        lines.append("<replace>:root=/nfs/foo/bar") # correct
+        self.assertTrue(cluster_spec.validate_replace_entries_in_lines(lines))
         
     def test_load_permutes(self):
         self.assertTrue(self.cspec.permuters['number'][0] == '1')
