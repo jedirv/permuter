@@ -14,31 +14,33 @@ class ClusterSpec(object):
     Wraps the cluster specification file *.cspec
     '''
     
-    def __init__(self, path):
+    def __init__(self, path, lines):
         '''
         Constructor
         '''
         self.path = path
+        self.lines = lines
         #print "opening cspec path: {0}".format(self.path)
         # verify spec path exists
         try:
-            f = open(path, 'r')
+            if (len(lines) == 0):
+                print "cspec file empty:  {0}Exiting.".format(path)
+            
             # verify first line has cspec flag
-            header = f.readline()
-            #print "header : {0} length {1} ".format(header, len(header))
+            header = lines[0]
+            print "header : {0} length {1} ".format(header, len(header))
             if (header != "#cspec\n"):
                 print "cspec file must have this header:  '#cspec', {0} does not. Exiting.".format(path)
-                f.close()
                 exit()
-            f.close()
             
-            self.master_job_name = self.load_special_value(self.path, 'master_job_name:')
-            self.trials = self.load_special_value(self.path, 'trials:')
-            self.permuters = self.load_permuters(self.path, 'permute:')
-            self.concise_print_map = self.load_concise_print_map(self.path)
             
-            self.key_val_map = self.load_replaces(self.path)
-            self.root_results_dir = self.load_dir(self.path, "root_results_dir:")
+            self.master_job_name = self.load_special_value(self.lines, 'master_job_name:')
+            self.trials = self.load_special_value(self.lines, 'trials:')
+            self.permuters = self.load_permuters(self.lines, 'permute:')
+            self.concise_print_map = self.load_concise_print_map(self.lines)
+            
+            self.key_val_map = self.load_replaces(self.lines)
+            self.root_results_dir = self.load_dir(self.lines, "root_results_dir:")
             self.job_results_dir = "{0}/{1}".format(self.root_results_dir, self.master_job_name)
             # put the results_dir into the kvm so that permutation calculation wil find it
             self.key_val_map['root_results_dir'] = self.root_results_dir
@@ -46,20 +48,20 @@ class ClusterSpec(object):
             # and the master_job_name
             self.key_val_map['master_job_name'] = self.master_job_name
             
-            self.qsub_commands = self.load_qsub_commands(self.path)
-            self.commands = self.load_commands(self.path)
+            self.qsub_commands = self.load_qsub_commands(self.lines)
+            self.commands = self.load_commands(self.lines)
             
-            self.script_dir = self.load_dir(self.path, "script_dir")
-            self.one_up_basis = self.load_special_value(self.path, 'one_up_basis:')
+            self.script_dir = self.load_dir(self.lines, "script_dir")
+            self.one_up_basis = self.load_special_value(self.lines, 'one_up_basis:')
             
-            self.scores_permuters = self.load_permuters(self.path, 'scores_permute:')
+            self.scores_permuters = self.load_permuters(self.lines, 'scores_permute:')
             self.scores_from_filepath = ""
             self.scores_from_colname = ""
             self.scores_from_rownum = ""
-            self.load_scores_from(self.path)
-            self.scores_to = self.load_special_value(self.path,'scores_to:')
-            self.scores_x_axis = self.load_list(self.path, 'scores_x_axis:')
-            self.scores_y_axis = self.load_list(self.path, 'scores_y_axis:')
+            self.load_scores_from(self.lines)
+            self.scores_to = self.load_special_value(self.lines,'scores_to:')
+            self.scores_x_axis = self.load_list(self.lines, 'scores_x_axis:')
+            self.scores_y_axis = self.load_list(self.lines, 'scores_y_axis:')
             #print "done loading cspec"
         except IOError:
             print "An error occurred trying to open cspec file {0}".format(path)
@@ -88,10 +90,7 @@ class ClusterSpec(object):
         else:
             return permuter_name
         
-    def load_scores_from(self, path):
-        f = open(path, 'r')
-        lines = f.readlines()
-        f.close()
+    def load_scores_from(self, lines):
         for line in lines:
             line = line.rstrip()
             if (line.startswith('scores_from:')):
@@ -102,10 +101,7 @@ class ClusterSpec(object):
                 rownum_flag, self.scores_from_rownum = row_info.split('=')
         
     
-    def load_dir(self, path, dir_flag):
-        f = open(path, 'r')
-        lines = f.readlines()
-        f.close()
+    def load_dir(self, lines, dir_flag):
         for line in lines:
             line = line.rstrip()
             if (line.startswith(dir_flag)):
@@ -114,10 +110,7 @@ class ClusterSpec(object):
                 return dir
         return ""
     
-    def load_special_value(self, path, flag):
-        f = open(path, 'r')
-        lines = f.readlines()
-        f.close()
+    def load_special_value(self, lines, flag):
         for line in lines:
             line = line.rstrip()
             if (line.startswith(flag)):
@@ -129,10 +122,7 @@ class ClusterSpec(object):
                     return target
         return ""
 
-    def load_list(self, path, flag):
-        f = open(path, 'r')
-        lines = f.readlines()
-        f.close()
+    def load_list(self, lines, flag):
         for line in lines:
             line = line.rstrip()
             if (line.startswith(flag)):
@@ -146,10 +136,7 @@ class ClusterSpec(object):
                     resolved_list.append(resolved_item)
                 return resolved_list
         return ""    
-    def load_permuters(self, path, flag):
-        f = open(path, 'r')
-        lines = f.readlines()
-        f.close()
+    def load_permuters(self, lines, flag):
         permuters = {}
         for line in lines:
             line = line.rstrip()
@@ -175,10 +162,7 @@ class ClusterSpec(object):
         logging.debug("  permuters : {0}".format(permuters))
         return permuters
     
-    def load_replaces(self, path):
-        f = open(path, 'r')
-        lines = f.readlines()
-        f.close()
+    def load_replaces(self, lines):
         key_val_map = {}
         # set default tag as empty string
         key_val_map['tag'] = ""
@@ -198,10 +182,7 @@ class ClusterSpec(object):
         return key_val_map        
     
 
-    def load_qsub_commands(self, path):
-        f = open(path, 'r')
-        lines = f.readlines()
-        f.close()
+    def load_qsub_commands(self, lines):
         qsub_commands = []
         for line in lines:
             line = line.rstrip()
@@ -214,10 +195,7 @@ class ClusterSpec(object):
         logging.debug("  qsub_commands {0}".format(qsub_commands))
         return qsub_commands
     
-    def load_commands(self, path):
-        f = open(path, 'r')
-        lines = f.readlines()
-        f.close()
+    def load_commands(self, lines):
         commands = []
         for line in lines:
             line = line.rstrip()
@@ -231,10 +209,7 @@ class ClusterSpec(object):
         return commands
         
      
-    def load_concise_print_map(self, path):
-        f = open(path, 'r')
-        lines = f.readlines()
-        f.close()
+    def load_concise_print_map(self, lines):
         concisePrintMap = {}
         for line in lines:
             line = line.rstrip()

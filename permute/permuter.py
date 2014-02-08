@@ -40,7 +40,12 @@ def main():
     validate_args(permute_command, cspec_path, flags)
     if (not(cluster_spec.validate(cspec_path))):
         exit()
-    cspec = cluster_spec.ClusterSpec(cspec_path)
+        
+    f = open(cspec_path, 'r')
+    cspec_lines = f.readlines()
+    f.close()
+    cspec = cluster_spec.ClusterSpec(cspec_path, cspec_lines)
+    
     cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
     
     if (permute_command == "gen"):

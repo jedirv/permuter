@@ -4,8 +4,9 @@ from permute import cluster_spec
 class TestClusterSpec(unittest.TestCase):
 
     def setUp(self):
+        
         path = "./test.cspec"
-        self.cspec = cluster_spec.ClusterSpec(path)
+        #self.cspec = cluster_spec.ClusterSpec(path)
 
     def test_convert_escaped_commas(self):
         foo = [ '1_comma_2_comma_3', '4', '5_comma_6']
@@ -32,54 +33,133 @@ class TestClusterSpec(unittest.TestCase):
         padded_partial_numbers = cluster_spec.zero_pad_to_widest(partial_numbers)
         self.assertTrue(padded_partial_numbers == ['a','bbb','33','4'])
         
-    def test_get_concise_name(self):
-        #print self.cspec.concise_print_map
-        self.assertTrue(self.cspec.get_concise_name('number') == 'number')
-        self.assertTrue(self.cspec.get_concise_name('letter') == 'l')
-        self.assertTrue(self.cspec.get_concise_name('singleton_val') == 's')
-        self.assertTrue(self.cspec.get_concise_name('resolution') == 'res')
-        
-    def test_scores_info(self):
-        self.assertTrue(self.cspec.scores_permuters['resolution'][0] == 'userDay')
-        self.assertTrue(self.cspec.scores_permuters['resolution'][1] == 'userMonth')
-        
-        self.assertTrue(self.cspec.scores_from_filepath=='<permutation_results_dir>/(resolution).csv')
-        self.assertTrue(self.cspec.scores_from_colname=='auc')
-        self.assertTrue(self.cspec.scores_from_rownum=='1')
-        print 'self.cspec.scores_to : {0}'.format(self.cspec.scores_to)
-        self.assertTrue(self.cspec.scores_to=='./collected_results')
-        
-        self.assertTrue(self.cspec.scores_x_axis==['number', 'animal'])
-        self.assertTrue(self.cspec.scores_y_axis==['letter'])
-
-    def test_script_dir(self):
-        #print self.cspec.script_dir
-        self.assertTrue(self.cspec.script_dir=='./scripts_unittest')
-        
-    def test_trials(self):
-        self.assertTrue(self.cspec.trials=='2')
-    
-    def test_master_job_name(self):
-        #print self.cspec.script_dir
-        self.assertTrue(self.cspec.master_job_name=='unittest')
-            
-    def test_one_up_basis(self):
-        #print ""
-        #print "one up is _{0}_".format(self.cspec.one_up_basis)
-        self.assertTrue(self.cspec.one_up_basis == '100')
-        
-    def test_root_results_dir(self):
-        #print ""
-        #print "one up is _{0}_".format(self.cspec.one_up_basis)
-        self.assertTrue(self.cspec.root_results_dir == './sample_results')
-   
-    def test_validate_root_results_dir(self):
+    def test_load_cspec(self):
         lines = []
-        lines.append("root_results_dir")
+        lines.append("#cspec\n")
+        lines.append("master_job_name:unittest\n")
+        lines.append("trials:2\n")
+        lines.append("tag=_myTag\n")
+        lines.append("permute:number=1 3\n")
+        lines.append("permute:letter=AAA,BBB\n")
+        lines.append("permute:singleton_val=300\n")
+        lines.append("permute:animal=dog,cat\n")
+        lines.append("concise_print:animal,an\n")
+        lines.append("concise_print:letter,l\n")
+        lines.append("concise_print:singleton_val,s\n")
+        lines.append("concise_print:resolution,res\n")
+        lines.append("concise_print:AAA,aa\n")
+        lines.append("concise_print:BBB,bb\n")
+
+        lines.append("scores_permute:resolution=userDay,userMonth\n")
+        lines.append("scores_from:file=<permutation_results_dir>/(resolution).csv,column_name=auc,row_number=1\n")
+        lines.append("scores_to:./collected_results\n")
+        lines.append("scores_y_axis:letter\n")
+        lines.append("scores_x_axis:number,animal\n")
+        
+        lines.append("<replace>:config[AAA]=aaa\n")
+        lines.append("<replace>:config[BBB]=bbb\n")
+
+        lines.append("<replace>:pretty[1]=one\n")
+        lines.append("<replace>:pretty[2]=two\n")
+        lines.append("<replace>:pretty[3]=three\n")
+
+        lines.append("<replace>:root=/nfs/foo/bar\n")
+        lines.append("<replace>:x_dir=<root>/(letter)/<config[(letter)]>/(number)\n")
+        lines.append("<replace>:algs_dir=/nfs/algs\n")
+        lines.append("<replace>:tools_dir=<algs_dir>/tools\n")
+        lines.append("<replace>:outfile_root=<pretty[(number)]>__TEST\n")
+
+        lines.append("root_results_dir:./sample_results\n")
+        lines.append("script_dir:./scripts_<master_job_name>\n")
+
+        lines.append("qsub_command:-q eecs,eecs1,eecs,share\n")
+        lines.append("qsub_command:-M someone@gmail.com\n")
+        lines.append("qsub_command:-m beas\n")
+        lines.append("one_up_basis:100\n")
+
+        lines.append("command:echo (letter) (number) (singleton_val) > <permutation_results_dir>/(letter)_(number)_<pretty[(number)]>.txt\n")
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines)
+        #print self.cspec.concise_print_map
+        # concise_name
+        self.assertTrue(cspec.get_concise_name('number') == 'number')
+        self.assertTrue(cspec.get_concise_name('letter') == 'l')
+        self.assertTrue(cspec.get_concise_name('singleton_val') == 's')
+        self.assertTrue(cspec.get_concise_name('resolution') == 'res')
+        
+        #scores_info
+        self.assertTrue(cspec.scores_permuters['resolution'][0] == 'userDay')
+        self.assertTrue(cspec.scores_permuters['resolution'][1] == 'userMonth')
+        
+        self.assertTrue(cspec.scores_from_filepath=='<permutation_results_dir>/(resolution).csv')
+        self.assertTrue(cspec.scores_from_colname=='auc')
+        self.assertTrue(cspec.scores_from_rownum=='1')
+        #print 'self.cspec.scores_to : {0}'.format(self.cspec.scores_to)
+        self.assertTrue(cspec.scores_to=='./collected_results')
+        
+        self.assertTrue(cspec.scores_x_axis==['number', 'animal'])
+        self.assertTrue(cspec.scores_y_axis==['letter'])
+
+        #script_dir
+        self.assertTrue(cspec.script_dir=='./scripts_unittest')
+        
+        #trials:
+        self.assertTrue(cspec.trials=='2')
+    
+        #master_job_name:
+        self.assertTrue(cspec.master_job_name=='unittest')
+            
+        #one_up_basis:
+        self.assertTrue(cspec.one_up_basis == '100')
+        
+        #root_results_dir:
+        self.assertTrue(cspec.root_results_dir == './sample_results')
+
+
+        # permuters:
+        self.assertTrue(cspec.permuters['number'][0] == '1')
+        self.assertTrue(cspec.permuters['number'][1] == '2')
+        self.assertTrue(cspec.permuters['number'][2] == '3')
+        self.assertTrue(cspec.permuters['letter'][0] == 'AAA')
+        self.assertTrue(cspec.permuters['letter'][1] == 'BBB')
+        
+        # generate_results_dir_for_permutation:
+        self.assertTrue(cspec.generate_results_dir_for_permutation('3','xyz') == './sample_results/unittest/trial3/xyz')
+        
+        #concise_print_map:
+        self.assertTrue(cspec.concise_print_map['letter'] == 'l')
+        self.assertTrue(cspec.concise_print_map['singleton_val'] == 's')
+
+        #key_val_map:
+        kvm = cspec.key_val_map
+        self.assertTrue(kvm['config[AAA]']=='aaa')
+        self.assertTrue(kvm['config[BBB]']=='bbb')
+        self.assertTrue(kvm['pretty[1]']=='one')
+        self.assertTrue(kvm['pretty[2]']=='two')
+        self.assertTrue(kvm['pretty[3]']=='three')
+        self.assertTrue(kvm['master_job_name']=='unittest')
+        self.assertTrue(kvm['root']=='/nfs/foo/bar')
+        self.assertTrue(kvm['x_dir']=='/nfs/foo/bar/(letter)/<config[(letter)]>/(number)')
+        self.assertTrue(kvm['algs_dir']=='/nfs/algs')
+        self.assertTrue(kvm['tools_dir']=='/nfs/algs/tools')
+        self.assertTrue(kvm['outfile_root']=='<pretty[(number)]>__TEST')
+            
+        #commands:
+        commands_as_string = "{0}".format(cspec.commands)
+        self.assertTrue(commands_as_string == "['echo (letter) (number) (singleton_val) > <permutation_results_dir>/(letter)_(number)_<pretty[(number)]>.txt']")
+           
+        #qsub_commands:
+        qsub_commands_as_string = "{0}".format(cspec.qsub_commands)
+        self.assertTrue(qsub_commands_as_string == "['-q eecs,eecs1,eecs,share', '-M someone@gmail.com', '-m beas']")
+        
+        
+        
+    def test_validate_statement_present_in_lines(self):
+        lines = []
+        lines.append("root_results_dir\n")
         self.assertFalse(cluster_spec.validate_statement_present_in_lines(lines,"root_results_dir:","some_dir"))
-        lines.append("root_results_dir:")
+        lines.append("root_results_dir:\n")
         self.assertFalse(cluster_spec.validate_statement_present_in_lines(lines,"root_results_dir:","some_dir"))
-        lines.append("root_results_dir:/foo/bar")
+        lines.append("root_results_dir:/foo/bar\n")
         self.assertTrue(cluster_spec.validate_statement_present_in_lines(lines,"root_results_dir:","some_dir"))
         
                 
@@ -129,41 +209,6 @@ class TestClusterSpec(unittest.TestCase):
         lines.append("<replace>:root=/nfs/foo/bar") # correct
         self.assertTrue(cluster_spec.validate_replace_entries_in_lines(lines))
         
-    def test_load_permutes(self):
-        self.assertTrue(self.cspec.permuters['number'][0] == '1')
-        self.assertTrue(self.cspec.permuters['number'][1] == '2')
-        self.assertTrue(self.cspec.permuters['number'][2] == '3')
-        self.assertTrue(self.cspec.permuters['letter'][0] == 'AAA')
-        self.assertTrue(self.cspec.permuters['letter'][1] == 'BBB')
-        
-    def test_generate_results_dir_for_permutation(self):
-        self.assertTrue(self.cspec.generate_results_dir_for_permutation('3','xyz') == './sample_results/unittest/trial3/xyz')
-        
-    def test_concise_print_map(self):
-        self.assertTrue(self.cspec.concise_print_map['letter'] == 'l')
-        self.assertTrue(self.cspec.concise_print_map['singleton_val'] == 's')
-
-    def test_key_val_map(self):
-        kvm = self.cspec.key_val_map
-        self.assertTrue(kvm['config[AAA]']=='aaa')
-        self.assertTrue(kvm['config[BBB]']=='bbb')
-        self.assertTrue(kvm['pretty[1]']=='one')
-        self.assertTrue(kvm['pretty[2]']=='two')
-        self.assertTrue(kvm['pretty[3]']=='three')
-        self.assertTrue(kvm['master_job_name']=='unittest')
-        self.assertTrue(kvm['root']=='/nfs/foo/bar')
-        self.assertTrue(kvm['x_dir']=='/nfs/foo/bar/(letter)/<config[(letter)]>/(number)')
-        self.assertTrue(kvm['algs_dir']=='/nfs/algs')
-        self.assertTrue(kvm['tools_dir']=='/nfs/algs/tools')
-        self.assertTrue(kvm['outfile_root']=='<pretty[(number)]>__TEST')
-            
-    def test_commands(self):
-        commands_as_string = "{0}".format(self.cspec.commands)
-        self.assertTrue(commands_as_string == "['echo (letter) (number) (singleton_val) > <permutation_results_dir>/(letter)_(number)_<pretty[(number)]>.txt']")
-           
-    def test__qsub_commands(self):
-        qsub_commands_as_string = "{0}".format(self.cspec.qsub_commands)
-        self.assertTrue(qsub_commands_as_string == "['-q eecs,eecs1,eecs,share', '-M someone@gmail.com', '-m beas']")
   
     def test_resolve_value(self):
         kv = {}

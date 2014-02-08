@@ -10,13 +10,37 @@ from permute import cluster_runs_info
 
 class TestPermuter(unittest.TestCase):
 
-    def setUp(self):
-        path = "./test.cspec"
-        self.cspec = cluster_spec.ClusterSpec(path)
-        self.cluster_runs = cluster_runs_info.ClusterRunsInfo(self.cspec)
+    #def setUp(self):
+        #path = "./test.cspec"
+        #self.cspec = cluster_spec.ClusterSpec(path)
+        #self.cluster_runs = cluster_runs_info.ClusterRunsInfo(self.cspec)
 
     def test_create_source_file_map(self):
-        source_file_map = permuter.create_source_file_map(self.cspec)
+        lines = []
+        lines.append("#cspec\n")
+        lines.append("master_job_name:unittest\n")
+        lines.append("trials:2\n")
+        lines.append("permute:number=1 3\n")
+        lines.append("permute:letter=AAA,BBB\n")
+        lines.append("permute:singleton_val=300\n")
+        lines.append("permute:animal=dog,cat\n")
+        lines.append("concise_print:animal,an\n")
+        lines.append("concise_print:letter,l\n")
+        lines.append("concise_print:singleton_val,s\n")
+        lines.append("concise_print:resolution,res\n")
+        lines.append("concise_print:AAA,aa\n")
+        lines.append("concise_print:BBB,bb\n")
+
+        lines.append("scores_permute:resolution=userDay,userMonth\n")
+        lines.append("scores_from:file=<permutation_results_dir>/(resolution).csv,column_name=auc,row_number=1\n")
+        lines.append("scores_to:./collected_results\n")
+        lines.append("scores_y_axis:letter\n")
+        lines.append("scores_x_axis:number,animal\n")
+        
+        lines.append("root_results_dir:./sample_results\n")
+        
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines)
+        source_file_map = permuter.create_source_file_map(cspec)
         #print source_file_map
         #self.assertTrue(len(source_file_map.keys()) == 24)
         self.assertTrue(len(source_file_map.keys()) == 48)
@@ -75,11 +99,36 @@ class TestPermuter(unittest.TestCase):
         self.assertTrue(source_file_map['an_cat_l_bb_number_3_res_userMonth_s_300_trials_2']== './sample_results/unittest/trial2/an_cat_l_bb_number_3_s_300/userMonth.csv')
         
     def test_create_pooled_results_files(self):
+        lines = []
+        lines.append("#cspec\n")
+        lines.append("master_job_name:unittest\n")
+        lines.append("trials:2\n")
+        lines.append("permute:number=1 3\n")
+        lines.append("permute:letter=AAA,BBB\n")
+        lines.append("permute:singleton_val=300\n")
+        lines.append("permute:animal=dog,cat\n")
+        lines.append("concise_print:animal,an\n")
+        lines.append("concise_print:letter,l\n")
+        lines.append("concise_print:singleton_val,s\n")
+        lines.append("concise_print:resolution,res\n")
+        lines.append("concise_print:AAA,aa\n")
+        lines.append("concise_print:BBB,bb\n")
+
+        lines.append("scores_permute:resolution=userDay,userMonth\n")
+        lines.append("scores_from:file=<permutation_results_dir>/(resolution).csv,column_name=auc,row_number=1\n")
+        lines.append("scores_to:./collected_results\n")
+        lines.append("scores_y_axis:letter\n")
+        lines.append("scores_x_axis:number,animal\n")
+        lines.append("root_results_dir:./sample_results\n")
+
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines)
+        
+        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
         # delete everything in the results folder
         folder = './collected_results'
         self.clean_dir(folder)
         # generate 
-        permuter.create_pooled_results_files(self.cluster_runs)
+        permuter.create_pooled_results_files(cluster_runs)
         f1 = open('./collected_results/unittest/res_userDay_s_300.csv','r')
         lines1 = f1.readlines()
         print lines1

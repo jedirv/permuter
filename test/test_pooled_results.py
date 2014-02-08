@@ -11,35 +11,107 @@ from permute import cluster_spec
 
 class TestPooledResultsFile(unittest.TestCase):
 
-    def setUp(self):
-        path = "./test.cspec"
-        self.cspec = cluster_spec.ClusterSpec(path)
+    #def setUp(self):
+        
 
     def test_gather_file_permuters(self):
-        perm_dict = pooled_results_file.gather_file_permuters(self.cspec)
+        lines = []
+        lines.append("#cspec\n")
+        lines.append("permute:number=1 3\n")
+        lines.append("permute:letter=AAA,BBB\n")
+        lines.append("permute:singleton_val=300\n")
+        lines.append("permute:animal=dog,cat\n")
+
+        lines.append("scores_permute:resolution=userDay,userMonth\n")
+        lines.append("scores_from:file=<permutation_results_dir>/(resolution).csv,column_name=auc,row_number=1\n")
+        lines.append("scores_to:./collected_results\n")
+        lines.append("scores_y_axis:letter\n")
+        lines.append("scores_x_axis:number,animal\n")
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines)
+        perm_dict = pooled_results_file.gather_file_permuters(cspec)
         keys = perm_dict.keys()
         self.assertTrue(len(keys) == 2)
         self.assertTrue(perm_dict.has_key('singleton_val'))
         self.assertTrue(perm_dict.has_key('resolution'))
 
     def test_gen_result_perm_code_from_pieces(self):
+        lines = []
+        lines.append("#cspec\n")
+
+        lines.append("trials:2\n")
+        lines.append("permute:number=1 3\n")
+        lines.append("permute:letter=AAA,BBB\n")
+        lines.append("permute:singleton_val=300\n")
+        lines.append("permute:animal=dog,cat\n")
+        lines.append("concise_print:animal,an\n")
+        lines.append("concise_print:letter,l\n")
+        lines.append("concise_print:singleton_val,s\n")
+        lines.append("concise_print:resolution,res\n")
+        lines.append("concise_print:AAA,aa\n")
+        lines.append("concise_print:BBB,bb\n")
+
+        lines.append("scores_permute:resolution=userDay,userMonth\n")
+        
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines)
         y_permutation = {'letter': 'AAA' }
         x_permutation = {'number': '3', 'animal':'dog'}
         filename_perm_dict = {'singleton_val':'300', 'resolution':'userDay' }
-        result = pooled_results_file.gen_result_perm_code_from_pieces(y_permutation, x_permutation, filename_perm_dict, self.cspec, '2')
-        #print "RESULT : {0}".format(result)
+        result = pooled_results_file.gen_result_perm_code_from_pieces(y_permutation, x_permutation, filename_perm_dict, cspec, '2')
+        #print " FIRST RESULT : {0}".format(result)
         self.assertTrue(result == 'an_dog_l_aa_number_3_res_userDay_s_300_trials_2')
         
     def test_gen_cluster_job_perm_code_from_pieces(self):
+        lines = []
+        lines.append("#cspec\n")
+        lines.append("master_job_name:unittest\n")
+        lines.append("trials:2\n")
+        lines.append("permute:number=1 3\n")
+        lines.append("permute:letter=AAA,BBB\n")
+        lines.append("permute:singleton_val=300\n")
+        lines.append("permute:animal=dog,cat\n")
+        lines.append("concise_print:animal,an\n")
+        lines.append("concise_print:letter,l\n")
+        lines.append("concise_print:singleton_val,s\n")
+        lines.append("concise_print:resolution,res\n")
+        lines.append("concise_print:AAA,aa\n")
+        lines.append("concise_print:BBB,bb\n")
+
+        lines.append("scores_permute:resolution=userDay,userMonth\n")
+        lines.append("scores_from:file=<permutation_results_dir>/(resolution).csv,column_name=auc,row_number=1\n")
+        lines.append("scores_to:./collected_results\n")
+        lines.append("scores_y_axis:letter\n")
+        lines.append("scores_x_axis:number,animal\n")
+        
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines)
         y_permutation = {'letter': 'AAA' }
         x_permutation = {'number': '3', 'animal':'dog'}
         filename_perm_dict = {'singleton_val':'300', 'resolution':'userDay' }
-        result = pooled_timings_file.gen_cluster_job_perm_code_from_pieces(y_permutation, x_permutation, filename_perm_dict, self.cspec, '2')
+        result = pooled_timings_file.gen_cluster_job_perm_code_from_pieces(y_permutation, x_permutation, filename_perm_dict, cspec, '2')
         print "RESULT : {0}".format(result)
         self.assertTrue(result == 'an_dog_l_aa_number_3_s_300_trials_2')
          
     def test_generate_target_dirname(self):
-        dirname = pooled_results_file.generate_target_dirname(self.cspec)
+        lines = []
+        lines.append("#cspec\n")
+        lines.append("master_job_name:unittest\n")
+        lines.append("permute:number=1 3\n")
+        lines.append("permute:letter=AAA,BBB\n")
+        lines.append("permute:singleton_val=300\n")
+        lines.append("permute:animal=dog,cat\n")
+        
+        lines.append("concise_print:animal,an\n")
+        lines.append("concise_print:letter,l\n")
+        lines.append("concise_print:singleton_val,s\n")
+        lines.append("concise_print:resolution,res\n")
+        lines.append("concise_print:AAA,aa\n")
+        lines.append("concise_print:BBB,bb\n")
+        lines.append("scores_permute:resolution=userDay,userMonth\n")
+        lines.append("scores_from:file=<permutation_results_dir>/(resolution).csv,column_name=auc,row_number=1\n")
+        lines.append("scores_to:./collected_results\n")
+        lines.append("scores_y_axis:letter\n")
+        lines.append("scores_x_axis:number,animal\n")
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines)
+        dirname = pooled_results_file.generate_target_dirname(cspec)
         #print "DIR IS : {0}".format(dirname)
         self.assertTrue(dirname == './collected_results/unittest')
         
@@ -97,8 +169,18 @@ class TestPooledResultsFile(unittest.TestCase):
         self.assertTrue(result == 'xxx')
         
     def test_build_code_using_dictionary(self):
+        lines = []
+        lines.append("#cspec\n")
+
+        lines.append("concise_print:letter,l\n")
+        lines.append("concise_print:singleton_val,s\n")
+        lines.append("concise_print:resolution,res\n")
+        lines.append("concise_print:AAA,aa\n")
+        lines.append("concise_print:BBB,bb\n")
+
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines)
         perm_dict = {'singleton_val':'300', 'res':'userDay' }
-        code = pooled_results_file.build_code_using_dictionary(perm_dict, self.cspec)
+        code = pooled_results_file.build_code_using_dictionary(perm_dict, cspec)
         self.assertTrue(code == 'res_userDay_s_300')
         
     def test_get_result_from_file(self):
