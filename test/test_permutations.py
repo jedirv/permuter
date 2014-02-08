@@ -3,10 +3,6 @@ from permute import cluster_spec
 from permute import permutations
 
 class TestPermuter(unittest.TestCase):
-
-    def setUp(self):
-        path = "./test.cspec"
-        #self.cspec = cluster_spec.ClusterSpec(path)
         
     def test_expand_permutations(self):
         lines = []

@@ -3,11 +3,6 @@ from permute import cluster_spec
 
 class TestClusterSpec(unittest.TestCase):
 
-    def setUp(self):
-        
-        path = "./test.cspec"
-        #self.cspec = cluster_spec.ClusterSpec(path)
-
     def test_convert_escaped_commas(self):
         foo = [ '1_comma_2_comma_3', '4', '5_comma_6']
         bar = cluster_spec.convert_escaped_commas(foo)

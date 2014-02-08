@@ -11,9 +11,6 @@ from permute import cluster_spec
 
 class TestPooledResultsFile(unittest.TestCase):
 
-    #def setUp(self):
-        
-
     def test_gather_file_permuters(self):
         lines = []
         lines.append("#cspec\n")

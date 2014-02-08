@@ -5,11 +5,6 @@ from permute import cluster_runs_info
 
 class TestSystem(unittest.TestCase):
 
-    def setUp(self):
-        path = "./gentest.cspec"
-        #self.cspec = cluster_spec.ClusterSpec(path)
-        #self.cluster_runs = cluster_runs_info.ClusterRunsInfo(self.cspec)
-        
     def test_generate(self):
         lines = []
         lines.append("#cspec\n")

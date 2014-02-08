@@ -10,11 +10,6 @@ from permute import cluster_runs_info
 
 class TestPermuter(unittest.TestCase):
 
-    #def setUp(self):
-        #path = "./test.cspec"
-        #self.cspec = cluster_spec.ClusterSpec(path)
-        #self.cluster_runs = cluster_runs_info.ClusterRunsInfo(self.cspec)
-
     def test_create_source_file_map(self):
         lines = []
         lines.append("#cspec\n")
