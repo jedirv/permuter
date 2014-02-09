@@ -73,8 +73,8 @@ def get_formatted_user_job_number(user_job_number, width):
     return str(user_job_number).zfill(width)
 
 
-def did_run_finish(cluster_runs, permutation_code):
-    results_dir = cluster_runs.get_results_dir_for_permutation_code(permutation_code)
+def did_run_finish(cluster_runs, run_permutation_code):
+    results_dir = cluster_runs.get_results_dir_for_permutation_code(run_permutation_code)
     done_marker_file_path = "{0}/permutation_done_marker.txt".format(results_dir)
     #print "done_marker_file_path {0}".format(done_marker_file_path)
     run_finished = False
