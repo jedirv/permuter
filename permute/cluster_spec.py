@@ -36,7 +36,7 @@ class ClusterSpec(object):
             
             self.master_job_name = self.load_special_value(self.lines, 'master_job_name:')
             self.trials = self.load_special_value(self.lines, 'trials:')
-            self.permuters = self.load_permuters(self.lines, 'permute:')
+            self.permuters = self.load_permuters(self.lines, 'permute:', '(permute):')
             self.concise_print_map = self.load_concise_print_map(self.lines)
             
             self.key_val_map = self.load_replaces(self.lines)
@@ -54,7 +54,7 @@ class ClusterSpec(object):
             self.script_dir = self.load_dir(self.lines, "script_dir")
             self.one_up_basis = self.load_special_value(self.lines, 'one_up_basis:')
             
-            self.scores_permuters = self.load_permuters(self.lines, 'scores_permute:')
+            self.scores_permuters = self.load_permuters(self.lines, 'scores_permute:','(scores_permute):')
             self.scores_from_filepath = ""
             self.scores_from_colname = ""
             self.scores_from_rownum = ""
@@ -136,11 +136,11 @@ class ClusterSpec(object):
                     resolved_list.append(resolved_item)
                 return resolved_list
         return ""    
-    def load_permuters(self, lines, flag):
+    def load_permuters(self, lines, flag1, flag2):
         permuters = {}
         for line in lines:
             line = line.rstrip()
-            if (line.startswith(flag)):
+            if (line.startswith(flag1) or line.startswith(flag2)):
                 logging.debug("  processing permute line - {0}".format(line))
                 permute_command, permutation_info = line.split(':')
                 permuteKey, permute_list_string = permutation_info.split('=')
