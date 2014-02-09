@@ -26,7 +26,7 @@ def get_list_of_output_files(permutation_info, cspec):
         for key, val in cspec.key_val_map.items():
             kvm_with_results_dir_resolved[key] = val
         kvm_with_results_dir_resolved['permutation_results_dir'] = get_resolved_results_dir_for_permutation(permutation_info, cspec)      
-        resolved_list_of_one = resolve_permutation(complete_permutation_info, unresolved_output_files, kvm_with_results_dir_resolved)
+        resolved_list_of_one = resolve_list_for_permutation(complete_permutation_info, unresolved_output_files, kvm_with_results_dir_resolved)
         #print resolved_list_of_one
         output_file_paths.append(resolved_list_of_one[0])
     return output_file_paths
@@ -95,8 +95,8 @@ def expand_permutations(permuters):
     return dict_list                 
 
           
-def resolve_permutation(permutation_info, commands, keyValMap):
-    # first make a copy of the keyValMap so taht we can resolve permutations with in its values
+def resolve_list_for_permutation(permutation_info, commands, keyValMap):
+    # first make a copy of the keyValMap so that we can resolve permutations with in its values
     keyValMap_permuation_specific = {}
     for key, val in keyValMap.iteritems():
         keyValMap_permuation_specific[key] = val
@@ -153,8 +153,8 @@ def resolve_permutation(permutation_info, commands, keyValMap):
 def get_resolved_results_dir_for_permutation(permutation_info, cspec):
     permute_code_sans_trial = generate_permutation_code(permutation_info, cspec.concise_print_map, False)
     interim_results_dir = cspec.generate_results_dir_for_permutation(permutation_info['trials'], permute_code_sans_trial)
-    list_of_size_1 = [interim_results_dir]
-    resolved_results_dir =  resolve_permutation(permutation_info, list_of_size_1, cspec.key_val_map)[0]
+    dir_list = [interim_results_dir]
+    resolved_results_dir =  resolve_list_for_permutation(permutation_info, dir_list, cspec.key_val_map)[0]
     logging.info("  resolved_results_dir: {0}".format(resolved_results_dir))
     return resolved_results_dir
     

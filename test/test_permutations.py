@@ -50,7 +50,7 @@ class TestPermuter(unittest.TestCase):
         kv = {}
         kv['pretty[AAA]'] = 'aaa'
         kv['pretty[BBB]'] = 'bbb'
-        resolved_commands = permutations.resolve_permutation(permutation_info, commands, kv)
+        resolved_commands = permutations.resolve_list_for_permutation(permutation_info, commands, kv)
         self.assertTrue(len(resolved_commands) == 1)
         self.assertTrue(resolved_commands[0] == 'ls -la /nfs/1/AAA/aaa')
 

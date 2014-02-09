@@ -35,7 +35,7 @@ class TestPermuter(unittest.TestCase):
         lines.append("root_results_dir:./sample_results\n")
         
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines)
-        source_file_map = permuter.create_source_file_map(cspec)
+        source_file_map = cluster_runs_info.create_source_file_map(cspec)
         #print source_file_map
         #self.assertTrue(len(source_file_map.keys()) == 24)
         self.assertTrue(len(source_file_map.keys()) == 48)

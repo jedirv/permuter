@@ -9,7 +9,7 @@ class ClusterScript(PermutationDriverFile):
     '''
         
     def configure(self):
-        self.commands_for_this_permutation = permutations.resolve_permutation(self.permutation_info, self.cspec.commands, self.key_val_map)
+        self.commands_for_this_permutation = permutations.resolve_list_for_permutation(self.permutation_info, self.cspec.commands, self.key_val_map)
         self.qsub_commands = self.cspec.qsub_commands
         self.script_path_root = self.get_script_path_root()
         self.stdout_capture_filepath = "{0}_invoke.txt".format(self.script_path_root)
@@ -29,7 +29,7 @@ class ClusterScript(PermutationDriverFile):
         if (tag != ""):
             f.write("#$ -N {0}-j{1}_{2}_{3}_{4}{5}\n".format(self.cspec.master_job_name, self.user_job_number, self.trial, self.permute_code, self.trial, tag))
         else:
-            f.write("#$ -N {0}-j{1}_{2}_{3}_{4}\n".format(self.cspec.master_job_name, self.user_job_number, self.trial, self.permute_code, self.trial))
+            f.write("#$ -N {0}-j{1}_{2}_{3}_{4}\n".format(self.cspec.master_job_name, self.user_job_number, self.trial, self.permute_code_sans_trial, self.trial))
             
         f.write("#\n")
         
