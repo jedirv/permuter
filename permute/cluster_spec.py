@@ -213,7 +213,7 @@ class ClusterSpec(object):
         concisePrintMap = {}
         for line in lines:
             line = line.rstrip()
-            if (line.startswith("concise_print:")):
+            if (line.startswith("concise_print:") or line.startswith("encode:")):
                 logging.debug("  processing concise_print line - {0}".format(line))
                 command, conciseKeyVal = line.split(":")
                 key, val = conciseKeyVal.split(",")
@@ -572,6 +572,21 @@ def is_valid_permuter(name, lines):
     print 'invalid permuter detected: {0}'.format(name)
     return False
             
+def generate_new_spec(path):
+    if (path == "" or path == None):
+        print ("new_spec command missing pathname argument")
+        return
+    parent_dir = os.path.pardir(path)
+    if not(os.path.exists()):
+        os.makedirs(parent_dir)
+    lines = []
+    lines.append("#cspec")
+    
+    f = open(path, 'w')
+    for line in lines:
+        line_out = "{0}\n".format(line)
+        f.write(line_out)
+    f.close()
             
             
             

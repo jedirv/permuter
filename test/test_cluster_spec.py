@@ -39,7 +39,7 @@ class TestClusterSpec(unittest.TestCase):
         lines.append("permute:singleton_val=300\n")
         lines.append("permute:animal=dog,cat\n")
         lines.append("concise_print:animal,an\n")
-        lines.append("concise_print:letter,l\n")
+        lines.append("encode:letter,l\n") # alternate form
         lines.append("concise_print:singleton_val,s\n")
         lines.append("concise_print:resolution,res\n")
         lines.append("concise_print:AAA,aa\n")

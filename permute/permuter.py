@@ -24,6 +24,10 @@ def main():
         exit()
     permute_command = sys.argv[1]
     cspec_path = sys.argv[2]
+    if (permute_command == "new_spec"):
+        cluster_spec.generate_new_spec(cspec_path)
+        exit()
+        
     flags = ""
     if (len(sys.argv) == 4):
         flags = sys.argv[3]
@@ -374,6 +378,9 @@ def generate_scripts(cluster_runs):
     cspec = cluster_runs.cspec
     #for trial in range(1, int(cspec.trials) + 1):
     for run_permutation_code in cluster_runs.run_perm_codes_list:
+        results_dir = cluster_runs.get_results_dir_for_run_permutation_code(run_permutation_code)
+        if (not(os.path.isdir(results_dir))):
+            os.makedirs(results_dir)
         user_job_number_as_string = cluster_runs.get_job_number_string_for_run_permutation_code(run_permutation_code)
         permutation_info = cluster_runs.run_permutation_info_for_run_permutation_code_map[run_permutation_code]
         cscript = cluster_script.ClusterScript(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'])
@@ -461,6 +468,7 @@ def validate_args(permute_command, cspec_path, flags):
             permute_command == "clean_results" or 
             permute_command == "clean_pooled_results" or 
             permute_command == "clean_all" or 
+            permute_command == "new_spec" or 
             permute_command == "test_launch")):
         usage()
         exit()
@@ -484,7 +492,10 @@ def validate_args(permute_command, cspec_path, flags):
 def usage():
     print "usage:  python permuter.py  some_command <path of cluster_spec>  [-debug]"
     print ""
-    print "   where some_command can be..."               
+    print "   where some_command can be..."
+    print"        ...for generating a template cspec file" 
+    print"               new_spec               # generate a template cspec file the user can fill out"  
+    print""            
     print"        ...for actions to launch permutations"               
     print"               preview                # print to stdout what the first script generated will look like"     
     print"               gen                    # generate cluster scripts"              
