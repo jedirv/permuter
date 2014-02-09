@@ -34,7 +34,7 @@ class TestClusterSpec(unittest.TestCase):
         lines.append("master_job_name:unittest\n")
         lines.append("trials:2\n")
         lines.append("tag=_myTag\n")
-        lines.append("permute:number=1 3\n")
+        lines.append("(permute):number=1 3\n") # new form
         lines.append("permute:letter=AAA,BBB\n")
         lines.append("permute:singleton_val=300\n")
         lines.append("permute:animal=dog,cat\n")
