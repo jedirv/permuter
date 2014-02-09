@@ -32,7 +32,7 @@ def main():
     if (len(sys.argv) == 4):
         flags = sys.argv[3]
         
-     # set up logging 
+    # set up logging 
     home_dir_permuter = os.path.expanduser('~/permuter')
     logging_level = logging.INFO
     if (flags == '-debug'):
