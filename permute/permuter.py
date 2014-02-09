@@ -55,12 +55,18 @@ def main():
     if (permute_command == "gen"):
         generate_scripts(cluster_runs)
     elif (permute_command == "launch"):
-        clean_results(cluster_runs)
-        clean_pooled_results(cluster_runs)
-        launch_scripts(cluster_runs)
+        if (detect_still_running_runs(cluster_runs)):
+            print "Permutation jobs still running.  Use 'stop' to stop them before 'launch' to avoid replicated jobs"
+        else:
+            clean_results(cluster_runs)
+            clean_pooled_results(cluster_runs)
+            launch_scripts(cluster_runs)
     elif (permute_command == "auto"):
-        generate_scripts(cluster_runs)
-        launch_scripts(cluster_runs)
+        if (detect_still_running_runs(cluster_runs)):
+            print "Permutation jobs still running.  Use 'stop' to stop them before 'auto' to avoid replicated jobs"
+        else:
+            generate_scripts(cluster_runs)
+            launch_scripts(cluster_runs)
     elif (permute_command == "preview"):
         preview_scripts(cluster_runs)
     elif (permute_command == "test_launch"):
@@ -109,7 +115,32 @@ def collect(cluster_runs):
     create_pooled_timings_files(cluster_runs)
     create_ranked_results_files(cluster_runs)
     
+def detect_still_running_runs(cluster_runs):
+    logging.info('SCANNING for incomplete runs')
+    cspec = cluster_runs.cspec
+    still_running_count = 0
+    
+    for run_permutation_code in cluster_runs.run_perm_codes_list:
+        permutation_info = cluster_runs.run_permutation_info_for_run_permutation_code_map[run_permutation_code]
+        user_job_number_as_string = cluster_runs.get_job_number_string_for_run_permutation_code(run_permutation_code)
+        trial = permutation_info['trials']
+        qil = qsub_invoke_log.QsubInvokeLog(user_job_number_as_string, permutation_info, cspec, trial)
+        cluster_job_number = qil.cluster_job_number
+        # first, check qstat to see if this job is still running
+        if (cluster_job_number == "NA"):
+            pass
+        else:
+            statloq = qstat_log.QStatLog(user_job_number_as_string, permutation_info, cspec,trial)
+            if (statloq.is_cluster_job_still_running(cluster_job_number)):
+                still_running_count = still_running_count + 1
+                print "{0} still running".format(cluster_job_number)
+            
+    if (still_running_count != 0):
+        return True
+    return False
 
+            
+    
 def warn_of_incomplete_runs(cluster_runs):
     logging.info('CHECKING for incomplete runs')
     cspec = cluster_runs.cspec
