@@ -3,7 +3,6 @@ Created on Nov 22, 2013
 
 @author: admin-jed
 '''
-import os
 import qsub_invoke_log
 import qacct_log
 import permutations
@@ -15,13 +14,14 @@ class PooledResultsFile(object):
     '''
 
 
-    def __init__(self,source_file_map, filename_permutation_info, cluster_runs):
+    def __init__(self,source_file_map, filename_permutation_info, cluster_runs, cluster_system):
         '''
         Constructor
         '''
+        self.cluster_system = cluster_system
         self.cluster_runs = cluster_runs
         self.cspec = cluster_runs.cspec
-        self.target_dir = generate_target_dirname(self.cspec)
+        self.target_dir = generate_target_dirname(self.cspec, self.cluster_system)
         self.perm_code_for_filename  = build_code_using_dictionary(filename_permutation_info, self.cspec)
         print "self.perm_code_for_filename : {0}".format(self.perm_code_for_filename)
         if (self.perm_code_for_filename == ""):
@@ -34,7 +34,7 @@ class PooledResultsFile(object):
     def persist(self):
         cspec = self.cspec
         # generate the column names
-        f = open(self.target_path, 'w')
+        f = self.cluster_system.open_file(self.target_path, 'w')
         print "persisting {0}".format(self.target_path)
         
         # scores_y_axis:letter
@@ -72,7 +72,7 @@ class PooledResultsFile(object):
                     #print "self.source_file_map {0}".format(self.source_file_map)
                     source_file_path = self.source_file_map[result_file_perm_code]
                     #print "SOURCE_FILE_PATH : {0}".format(source_file_path)
-                    value = get_result_from_file(source_file_path, cspec.scores_from_colname, cspec.scores_from_rownum)
+                    value = get_result_from_file(source_file_path, cspec.scores_from_colname, cspec.scores_from_rownum, self.cluster_system)
                     trial_values.append(value)
                 median_value = get_median(trial_values, False)
                 line = "{0}{1},".format(line, median_value)
@@ -194,10 +194,10 @@ def get_median(string_series, as_integer):
         result_string = '{0}x'.format(result_string)
     return result_string
         
-def generate_target_dirname(cspec):
+def generate_target_dirname(cspec, cluster_system):
     dir = "{0}/{1}".format(cspec.scores_to, cspec.master_job_name)
-    if (not(os.path.isdir(dir))):
-        os.makedirs(dir)
+    if (not(cluster_system.isdir(dir))):
+        cluster_system.make_dirs(dir)
     return dir
     
 def gen_result_perm_code_from_pieces(y_axis_permutation, x_axis_permutation, filename_perm_dict, cspec, trial):
@@ -214,12 +214,12 @@ def gen_result_perm_code_from_pieces(y_axis_permutation, x_axis_permutation, fil
     result = build_code_using_dictionary(full_perm_dict, cspec)
     return result
     
-def get_result_from_file(source_file_path, colname, rownum):
+def get_result_from_file(source_file_path, colname, rownum, cluster_system):
     try:
-        if (not(os.path.exists(source_file_path))):
+        if (not(cluster_system.exists(source_file_path))):
             print 'MISSING {0}'.format(source_file_path)
             return 'missing'
-        f = open(source_file_path, 'r')
+        f = cluster_system.open_file(source_file_path, 'r')
         # determine columne number of colname
         lines = f.readlines()
         header = lines[0]

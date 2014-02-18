@@ -4,8 +4,10 @@ Created on Dec 12, 2013
 @author: admin-jed
 '''
 import unittest, os
+import mock_cluster_system
 from permute import cluster_spec
 from permute import permuter
+from permute import permutation_driver
 from permute import cluster_runs_info
 
 class TestPermuter(unittest.TestCase):
@@ -94,6 +96,70 @@ class TestPermuter(unittest.TestCase):
         self.assertTrue(source_file_map['an_cat_l_bb_number_3_res_userMonth_s_300_trials_2']== './sample_results/unittest/trial2/an_cat_l_bb_number_3_s_300/userMonth.csv')
         
     def test_create_pooled_results_files(self):
+        userday_answers_trial1 = {}
+        userday_answers_trial2 = {}
+        userday_answers_trial1['an_cat_l_aa_number_1_s_300'] = '2111.0' # this 
+        userday_answers_trial2['an_cat_l_aa_number_1_s_300'] = '4111.0' # and this will average to 3111 since don't have enough to do true median
+        userday_answers_trial1['an_cat_l_aa_number_2_s_300'] = '2121.0'
+        userday_answers_trial2['an_cat_l_aa_number_2_s_300'] = '4121.0'
+        userday_answers_trial1['an_cat_l_aa_number_3_s_300'] = '2131.0'
+        userday_answers_trial2['an_cat_l_aa_number_3_s_300'] = '4131.0'
+        userday_answers_trial1['an_dog_l_aa_number_1_s_300'] = '3111.0'
+        userday_answers_trial2['an_dog_l_aa_number_1_s_300'] = '5111.0'
+        userday_answers_trial1['an_dog_l_aa_number_2_s_300'] = '3121.0'
+        userday_answers_trial2['an_dog_l_aa_number_2_s_300'] = '5121.0'
+        userday_answers_trial1['an_dog_l_aa_number_3_s_300'] = '3131.0'
+        userday_answers_trial2['an_dog_l_aa_number_3_s_300'] = '5131.0'
+        
+        userday_answers_trial1['an_cat_l_bb_number_1_s_300'] = '2211.0'
+        userday_answers_trial2['an_cat_l_bb_number_1_s_300'] = '4211.0'
+        userday_answers_trial1['an_cat_l_bb_number_2_s_300'] = '2221.0'
+        userday_answers_trial2['an_cat_l_bb_number_2_s_300'] = '4221.0'
+        userday_answers_trial1['an_cat_l_bb_number_3_s_300'] = '2231.0'
+        userday_answers_trial2['an_cat_l_bb_number_3_s_300'] = '4231.0'
+        userday_answers_trial1['an_dog_l_bb_number_1_s_300'] = '3211.0'
+        userday_answers_trial2['an_dog_l_bb_number_1_s_300'] = '5211.0'
+        userday_answers_trial1['an_dog_l_bb_number_2_s_300'] = '3221.0'
+        userday_answers_trial2['an_dog_l_bb_number_2_s_300'] = '5221.0'
+        userday_answers_trial1['an_dog_l_bb_number_3_s_300'] = '3231.0'
+        userday_answers_trial2['an_dog_l_bb_number_3_s_300'] = '5231.0'
+        
+        trials_list_userday = [ userday_answers_trial1, userday_answers_trial2]
+        
+        usermonth_answers_trial1 = {}
+        usermonth_answers_trial2 = {}
+        usermonth_answers_trial1['an_cat_l_aa_number_1_s_300'] = '4111.0' # this 
+        usermonth_answers_trial2['an_cat_l_aa_number_1_s_300'] = '6111.0' # and this will average to 3111 since don't have enough to do true median
+        usermonth_answers_trial1['an_cat_l_aa_number_2_s_300'] = '4121.0'
+        usermonth_answers_trial2['an_cat_l_aa_number_2_s_300'] = '6121.0'
+        usermonth_answers_trial1['an_cat_l_aa_number_3_s_300'] = '4131.0'
+        usermonth_answers_trial2['an_cat_l_aa_number_3_s_300'] = '6131.0'
+        usermonth_answers_trial1['an_dog_l_aa_number_1_s_300'] = '5111.0'
+        usermonth_answers_trial2['an_dog_l_aa_number_1_s_300'] = '7111.0'
+        usermonth_answers_trial1['an_dog_l_aa_number_2_s_300'] = '5121.0'
+        usermonth_answers_trial2['an_dog_l_aa_number_2_s_300'] = '7121.0'
+        usermonth_answers_trial1['an_dog_l_aa_number_3_s_300'] = '5131.0'
+        usermonth_answers_trial2['an_dog_l_aa_number_3_s_300'] = '7131.0'
+        
+        usermonth_answers_trial1['an_cat_l_bb_number_1_s_300'] = '4211.0'
+        usermonth_answers_trial2['an_cat_l_bb_number_1_s_300'] = '6211.0'
+        usermonth_answers_trial1['an_cat_l_bb_number_2_s_300'] = '4221.0'
+        usermonth_answers_trial2['an_cat_l_bb_number_2_s_300'] = '6221.0'
+        usermonth_answers_trial1['an_cat_l_bb_number_3_s_300'] = '4231.0'
+        usermonth_answers_trial2['an_cat_l_bb_number_3_s_300'] = '6231.0'
+        usermonth_answers_trial1['an_dog_l_bb_number_1_s_300'] = '5211.0'
+        usermonth_answers_trial2['an_dog_l_bb_number_1_s_300'] = '7211.0'
+        usermonth_answers_trial1['an_dog_l_bb_number_2_s_300'] = '5221.0'
+        usermonth_answers_trial2['an_dog_l_bb_number_2_s_300'] = '7221.0'
+        usermonth_answers_trial1['an_dog_l_bb_number_3_s_300'] = '5231.0'
+        usermonth_answers_trial2['an_dog_l_bb_number_3_s_300'] = '7231.0'
+        
+        trials_list_usermonth = [ usermonth_answers_trial1, usermonth_answers_trial2]
+        answerkey = {}
+        answerkey['userDay'] = trials_list_userday
+        answerkey['userMonth'] = trials_list_usermonth
+        mc_system = mock_cluster_system.MockClusterSystem()
+        mc_system.set_unittest_answers(answerkey)
         lines = []
         lines.append("#cspec\n")
         lines.append("master_job_name:unittest\n")
@@ -115,16 +181,16 @@ class TestPermuter(unittest.TestCase):
         lines.append("scores_y_axis:letter\n")
         lines.append("scores_x_axis:number,animal\n")
         lines.append("root_results_dir:./sample_results\n")
-
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines)
-        
-        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
-        # delete everything in the results folder
-        folder = './collected_results'
-        self.clean_dir(folder)
+        lines.append("script_dir:./runtest_out/scripts\n")
+        lines.append("one_up_basis:0")
+        lines.append("command:")
+        #folder = './collected_results'
         # generate 
-        permuter.create_pooled_results_files(cluster_runs)
-        f1 = open('./collected_results/unittest/res_userDay_s_300.csv','r')
+        perm_driver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec", mc_system)
+        perm_driver.run_command("gen")
+        perm_driver.run_command("launch")
+        permutation_driver.create_pooled_results_files(perm_driver.cluster_runs,mc_system)
+        f1 = mc_system.open_file('./collected_results/unittest/pooled_results_res_userDay_s_300.csv','r')
         lines1 = f1.readlines()
         print lines1
         self.assertTrue(lines1[0] == 'letter,an_cat_number_1,an_cat_number_2,an_cat_number_3,an_dog_number_1,an_dog_number_2,an_dog_number_3\n')
@@ -132,30 +198,22 @@ class TestPermuter(unittest.TestCase):
         self.assertTrue(lines1[2] == 'l_bb,3211.0,3221.0,3231.0,4211.0,4221.0,4231.0\n')
         f1.close()
         
-        f2 = open('./collected_results/unittest/res_userMonth_s_300.csv','r')
+        f2 = mc_system.open_file('./collected_results/unittest/pooled_results_res_userMonth_s_300.csv','r')
         lines2 = f2.readlines()
         self.assertTrue(lines2[0] == 'letter,an_cat_number_1,an_cat_number_2,an_cat_number_3,an_dog_number_1,an_dog_number_2,an_dog_number_3\n')
         self.assertTrue(lines2[1] == 'l_aa,5111.0,5121.0,5131.0,6111.0,6121.0,6131.0\n')
         self.assertTrue(lines2[2] == 'l_bb,5211.0,5221.0,5231.0,6211.0,6221.0,6231.0\n')
         f2.close()
-        # clean the folder again
-        #self.clean_dir(folder)
        
-    def clean_dir(self, folder):
-        for the_file in os.listdir(folder):
-            file_path = os.path.join(folder, the_file)
-            try:
-                if os.path.isfile(file_path):
-                    os.unlink(file_path)
-            except Exception, e:
-                print e
+   # def clean_dir(self, folder):
+   #     for the_file in os.listdir(folder):
+   #         file_path = os.path.join(folder, the_file)
+   #         try:
+   #             if os.path.isfile(file_path):
+   #                 os.unlink(file_path)
+   #         except Exception, e:
+   #             print e
                 
-#    def test_create_dir_under_tilde(self):
-#        dir = os.path.expanduser('~/permuter')
-#        if (not(os.path.isdir(dir))):
-#            os.makedirs(dir)
-#        file_created = os.path.isdir(dir)
-#        self.asserTrue(file_created)
 if __name__ == '__main__':
     unittest.main()
     

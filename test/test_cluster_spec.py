@@ -1,5 +1,6 @@
 import unittest
 from permute import cluster_spec
+import mock_cluster_system
 
 class TestClusterSpec(unittest.TestCase):
 
@@ -151,58 +152,58 @@ class TestClusterSpec(unittest.TestCase):
     def test_validate_statement_present_in_lines(self):
         lines = []
         lines.append("root_results_dir\n")
-        self.assertFalse(cluster_spec.validate_statement_present_in_lines(lines,"root_results_dir:","some_dir"))
+        self.assertFalse(cluster_spec.validate_statement_present(lines,"root_results_dir:","some_dir"))
         lines.append("root_results_dir:\n")
-        self.assertFalse(cluster_spec.validate_statement_present_in_lines(lines,"root_results_dir:","some_dir"))
+        self.assertFalse(cluster_spec.validate_statement_present(lines,"root_results_dir:","some_dir"))
         lines.append("root_results_dir:/foo/bar\n")
-        self.assertTrue(cluster_spec.validate_statement_present_in_lines(lines,"root_results_dir:","some_dir"))
+        self.assertTrue(cluster_spec.validate_statement_present(lines,"root_results_dir:","some_dir"))
         
                 
     def test_validate_permutes(self):
         lines = []
         lines.append("permute:number=1:3") # wrong colon count
-        self.assertFalse(cluster_spec.validate_permute_entries_in_lines(lines))
+        self.assertFalse(cluster_spec.validate_permute_entries(lines))
         
         lines = []
         lines.append("permute:number=a 3") # first integer bad in range
-        self.assertFalse(cluster_spec.validate_permute_entries_in_lines(lines))
+        self.assertFalse(cluster_spec.validate_permute_entries(lines))
         
         lines = []
         lines.append("permute:number=1 a") # second integer bad in range
-        self.assertFalse(cluster_spec.validate_permute_entries_in_lines(lines))
+        self.assertFalse(cluster_spec.validate_permute_entries(lines))
         
         lines = []
         lines.append("permute:number=3 2") # integer range out of order
-        self.assertFalse(cluster_spec.validate_permute_entries_in_lines(lines))
+        self.assertFalse(cluster_spec.validate_permute_entries(lines))
         
         lines = []
         lines.append("permute:number=1 10") # integer range
-        self.assertTrue(cluster_spec.validate_permute_entries_in_lines(lines))
+        self.assertTrue(cluster_spec.validate_permute_entries(lines))
         
         lines = []
         lines.append("permute:foo=2") # singleton integer 
-        self.assertTrue(cluster_spec.validate_permute_entries_in_lines(lines))
+        self.assertTrue(cluster_spec.validate_permute_entries(lines))
         
         lines = []
         lines.append("permute:foo=a,33,zxc") # comma list 
-        self.assertTrue(cluster_spec.validate_permute_entries_in_lines(lines))
+        self.assertTrue(cluster_spec.validate_permute_entries(lines))
         
     def test_validate_replaces(self):
         lines = []
         lines.append("<replace>:=/nfs/foo/bar") # key missing
-        self.assertFalse(cluster_spec.validate_replace_entries_in_lines(lines))
+        self.assertFalse(cluster_spec.validate_replace_entries(lines))
         
         lines = []
         lines.append("<replace>:foo=") # val missing
-        self.assertFalse(cluster_spec.validate_replace_entries_in_lines(lines))
+        self.assertFalse(cluster_spec.validate_replace_entries(lines))
         
         lines = []
         lines.append("<replace>:root:/nfs/foo/bar") # colon count wrong
-        self.assertFalse(cluster_spec.validate_replace_entries_in_lines(lines))
+        self.assertFalse(cluster_spec.validate_replace_entries(lines))
         
         lines = []
         lines.append("<replace>:root=/nfs/foo/bar") # correct
-        self.assertTrue(cluster_spec.validate_replace_entries_in_lines(lines))
+        self.assertTrue(cluster_spec.validate_replace_entries(lines))
         
   
     def test_resolve_value(self):
@@ -264,14 +265,15 @@ class TestClusterSpec(unittest.TestCase):
         self.assertTrue(cluster_spec.validate_axis_list(lines,'scores_x_axis'))
         
     def test_validate_scores_to(self):
+        mc_system = mock_cluster_system.MockClusterSystem()
         lines = []
         lines.append('scores_to:./junk\n')
         lines.append('scores_to:./junk2\n')
-        self.assertFalse(cluster_spec.validate_scores_to(lines))
-        
+        self.assertFalse(cluster_spec.validate_scores_to(lines, mc_system))
+        mc_system.mkdir('./junk')
         lines = []
         lines.append('scores_to:./junk\n')
-        self.assertTrue(cluster_spec.validate_scores_to(lines))
+        self.assertTrue(cluster_spec.validate_scores_to(lines, mc_system))
         
     def test_validate_scores_from(self):
         #scores_from:file=<permutation_results_dir>/(resolution).csv,column_name=auc,row_number=1
@@ -323,11 +325,11 @@ class TestClusterSpec(unittest.TestCase):
         self.assertFalse(cluster_spec.single_entry_present(lines,'prefixC'))
 
 
-    def test_validate_scores_gathering_info_from_lines(self):
+    def test_validate_scores_gathering_info(self):
         # none present is ok
         lines = []
         lines.append("foo\n")
-        self.assertTrue(cluster_spec.validate_scores_gathering_info_from_lines(lines))
+        self.assertTrue(cluster_spec.validate_scores_gathering_info(lines))
         
         #if any present, then 4 need to be present
         
@@ -336,28 +338,28 @@ class TestClusterSpec(unittest.TestCase):
         lines.append('scores_to:./collected_results')
         lines.append('scores_y_axis:letter')
         lines.append('scores_x_axis:number,animal')
-        self.assertFalse(cluster_spec.validate_scores_gathering_info_from_lines(lines))
+        self.assertFalse(cluster_spec.validate_scores_gathering_info(lines))
         
         #missing to
         lines = []
         lines.append('scores_from:file=<permutation_results_dir>/foo.csv,column_name=auc,row_number=1')
         lines.append('scores_y_axis:letter')
         lines.append('scores_x_axis:number,animal')
-        self.assertFalse(cluster_spec.validate_scores_gathering_info_from_lines(lines))
+        self.assertFalse(cluster_spec.validate_scores_gathering_info(lines))
         
         #missing x axis
         lines = []
         lines.append('scores_from:file=<permutation_results_dir>/foo.csv,column_name=auc,row_number=1')
         lines.append('scores_to:./collected_results')
         lines.append('scores_y_axis:letter')
-        self.assertFalse(cluster_spec.validate_scores_gathering_info_from_lines(lines))
+        self.assertFalse(cluster_spec.validate_scores_gathering_info(lines))
         
         #missing y axis
         lines = []
         lines.append('scores_from:file=<permutation_results_dir>/foo.csv,column_name=auc,row_number=1')
         lines.append('scores_to:./collected_results')
         lines.append('scores_x_axis:number,animal')
-        self.assertFalse(cluster_spec.validate_scores_gathering_info_from_lines(lines))
+        self.assertFalse(cluster_spec.validate_scores_gathering_info(lines))
         
 
         

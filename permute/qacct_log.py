@@ -1,4 +1,3 @@
-import os
 from permutation_driver_file import PermutationDriverFile
 import logging
 #from monitor import monitor_exception
@@ -50,7 +49,7 @@ class QacctLog(PermutationDriverFile):
         else:
             #print "opening {0}".format(self.qstat_log)
             command = "qacct -j {0} > {1}".format(cluster_job_number, self.qacct_log)
-            os.system(command) 
+            self.cluster_system.execute_command(command) 
         
     def ingest(self, cluster_job_number):
         if (cluster_job_number == "NA"):
@@ -58,11 +57,11 @@ class QacctLog(PermutationDriverFile):
             logging.error(error)
             print error
         else:
-            starting_dir = os.getcwd()
-            os.chdir(self.script_dir)
+            starting_dir = self.cluster_system.getcwd()
+            self.cluster_system.chdir(self.script_dir)
             self.cluster_job_number = cluster_job_number
 
-            if (os.path.isfile(self.qacct_log) and has_content(self.qacct_log)):
+            if (self.cluster_system.isfile(self.qacct_log) and has_content(self.qacct_log, self.cluster_system)):
                 #print "file exists"
                 self.load_qacct_log()
                 if (self.error_reading):
@@ -77,14 +76,15 @@ class QacctLog(PermutationDriverFile):
             
         
         
-        os.chdir(starting_dir)
+        self.cluster_system.chdir(starting_dir)
         #os.unlink(self.qstat_log)
         #print "closed {0}".format(self.qstat_log)
     
     def load_qacct_log(self):
         self.error_reading = False
-        f = open(self.qacct_log, 'r')
+        f = self.cluster_system.open_file(self.qacct_log,'r')
         lines = f.readlines()
+        f.close()
         for line in lines:
             line = ' '.join(line.split())
             parts = line.split(' ')
@@ -129,10 +129,9 @@ class QacctLog(PermutationDriverFile):
         #    print "{0} maxvmem : {1}".format(self.cluster_job_number,self.maxvmem)   
         #    print "{0} start_time : {1}".format(self.cluster_job_number,self.start_time)   
         #    print "{0} end_time : {1}".format(self.cluster_job_number,self.end_time)   
-        f.close()
 
-def has_content(path):
-    f = open(path, 'r') 
+def has_content(path, cluster_system):
+    f = cluster_system.open_file(path,'r')
     lines = f.readlines()
     f.close()
     if (len(lines) > 10):

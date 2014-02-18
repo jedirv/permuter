@@ -7,13 +7,14 @@ class PooledTimingsFile(object):
     '''
     classdocs
     '''
-    def __init__(self,filename_permutation_info, cluster_runs):
+    def __init__(self,filename_permutation_info, cluster_runs, cluster_system):
         '''
         Constructor
         '''
+        self.cluster_system = cluster_system
         self.cluster_runs = cluster_runs
         self.cspec = cluster_runs.cspec
-        self.target_dir = pooled_results_file.generate_target_dirname(self.cspec)
+        self.target_dir = pooled_results_file.generate_target_dirname(self.cspec, self.cluster_system)
         self.perm_code_for_filename  = pooled_results_file.build_code_using_dictionary(filename_permutation_info, self.cspec)
         if (self.perm_code_for_filename == ""):
             self.target_timings_path = "{0}/pooled_results_timings.csv".format(self.target_dir)
@@ -24,7 +25,7 @@ class PooledTimingsFile(object):
     def persist(self):
         cspec = self.cspec
         # generate the column names
-        ft = open(self.target_timings_path, 'w')
+        ft = self.cluster_system.open_file(self.target_timings_path, 'w')
         print "persisting {0}".format(self.target_timings_path)
         
         # scores_y_axis:letter

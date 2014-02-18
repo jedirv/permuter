@@ -1,4 +1,4 @@
-import os
+
 import logging
 
 def resolve_value(keyValMap, given_val):
@@ -20,8 +20,6 @@ class ClusterSpec(object):
         '''
         self.path = path
         self.lines = lines
-        #print "opening cspec path: {0}".format(self.path)
-        # verify spec path exists
         try:
             if (len(lines) == 0):
                 print "cspec file empty:  {0}Exiting.".format(path)
@@ -277,46 +275,39 @@ def is_string_a_float(val):
     except ValueError:
         return False
                
-def validate(path):
-    result_permute = validate_permute_entries(path)
+def validate(lines):
+    result_permute = validate_permute_entries(lines)
     if not(result_permute):
         print "problem found in permute statements"
         
-    result_replace = validate_replace_entries(path)
+    result_replace = validate_replace_entries(lines)
     if not(result_replace):
         print "problem found in replace statements"
         
-    result_script_dir = validate_statement_present(path,"script_dir:","some_dir")
+    result_script_dir = validate_statement_present(lines,"script_dir:","some_dir")
     if not(result_script_dir):
         print "problem found in script_dir statement"
   
-    result_root_results_dir = validate_statement_present(path,"root_results_dir:","some_dir")
+    result_root_results_dir = validate_statement_present(lines,"root_results_dir:","some_dir")
     if not(result_root_results_dir):
         print "problem found in root_results_dir statement"
         
-    result_master_job_name = validate_statement_present(path,"master_job_name:","some_name")
+    result_master_job_name = validate_statement_present(lines,"master_job_name:","some_name")
     if not(result_master_job_name):
         print "problem found in master_job_name statement"
         
-    result_trials = validate_statement_present(path,"trials:","some_integer")
+    result_trials = validate_statement_present(lines,"trials:","some_integer")
     if not(result_trials):
         print "problem found in trials statement"
     
-    result_scores_info = validate_scores_gathering_info(path)
+    result_scores_info = validate_scores_gathering_info(lines)
     if not(result_scores_info):
         print "problem found in scores gathering info entries"
         
     return result_permute and result_replace and result_script_dir and result_root_results_dir and result_master_job_name and result_trials and result_scores_info
 
-   
-def validate_statement_present(path,statement, val):
-    f = open(path, 'r')
-    lines = f.readlines()
-    f.close()
-    return validate_statement_present_in_lines(lines, statement, val)
 
-
-def validate_statement_present_in_lines(lines, statement, val):
+def validate_statement_present(lines, statement, val):
     result = True
     value = "unknown"
     statement_command = "unknown"
@@ -334,13 +325,7 @@ def validate_statement_present_in_lines(lines, statement, val):
     return result
     
 
-def validate_replace_entries(path):
-    f = open(path, 'r')
-    lines = f.readlines()
-    f.close()
-    return validate_replace_entries_in_lines(lines)
-    
-def validate_replace_entries_in_lines(lines):
+def validate_replace_entries(lines):
     result = True
     for line in lines:
         line = line.rstrip()
@@ -371,13 +356,7 @@ def validate_replace_entries_in_lines(lines):
     return result
     
 
-def validate_permute_entries(path):
-    f = open(path, 'r')
-    lines = f.readlines()
-    f.close()
-    return validate_permute_entries_in_lines(lines)
-
-def validate_permute_entries_in_lines(lines):
+def validate_permute_entries(lines):
     result = True
     for line in lines:
         line = line.rstrip()
@@ -428,13 +407,7 @@ def lines_contains_prefix(lines, prefix):
             return True
     return False
 
-def validate_scores_gathering_info(path):
-    f = open(path, 'r')
-    lines = f.readlines()
-    f.close()
-    return validate_scores_gathering_info_from_lines(lines)
-    
-def validate_scores_gathering_info_from_lines(lines):
+def validate_scores_gathering_info(lines):
     x_axis_info_present = lines_contains_prefix(lines, 'scores_x_axis')
     y_axis_info_present = lines_contains_prefix(lines, 'scores_y_axis')
     permute_info_present = lines_contains_prefix(lines, 'scores_permute')
@@ -528,7 +501,7 @@ def validate_scores_from(lines):
                 return False
     return True
         
-def validate_scores_to(lines):
+def validate_scores_to(lines,cluster_system):
     if (not(single_entry_present(lines, 'scores_to:'))):
         print 'more than one entry for scores_to:  Should be one entry'
         return False
@@ -536,11 +509,11 @@ def validate_scores_to(lines):
         line = line.rstrip()
         if (line.startswith('scores_to:')):
             flag, dir = line.split(':')
-            if (os.path.exists(dir)):
+            if (cluster_system.exists(dir)):
                 return True
             else:
-                os.makedirs(dir)
-                if (os.path.exists(dir)):
+                cluster_system.make_dirs(dir)
+                if (cluster_system.exists(dir)):
                     return True
                 else:
                     print 'Could not create directory specified in scores_to:'
@@ -572,17 +545,17 @@ def is_valid_permuter(name, lines):
     print 'invalid permuter detected: {0}'.format(name)
     return False
             
-def generate_new_spec(path):
+def generate_new_spec(path, cluster_system):
     if (path == "" or path == None):
         print ("new_spec command missing pathname argument")
         return
-    parent_dir = os.path.pardir(path)
-    if not(os.path.exists()):
-        os.makedirs(parent_dir)
+    parent_dir = cluster_system.get_par_dir(path)
+    if not(cluster_system.exists()):
+        cluster_system.make_dirs(parent_dir)
     lines = []
     lines.append("#cspec")
     
-    f = open(path, 'w')
+    f = cluster_system.open_file(path, 'w')
     for line in lines:
         line_out = "{0}\n".format(line)
         f.write(line_out)

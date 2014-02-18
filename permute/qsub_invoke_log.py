@@ -1,4 +1,3 @@
-import os
 from permutation_driver_file import PermutationDriverFile
 #from monitor import monitor_exception
 
@@ -17,9 +16,9 @@ class QsubInvokeLog(PermutationDriverFile):
        
     def is_first_error_permission_problem(self):
         error_file = self.qsub_invoke_log_fullpath.replace('.qil','.err')
-        if not(os.path.exists(error_file)):
+        if not(self.cluster_system.exists(error_file)):
             return False
-        f = open(error_file,'r')
+        f = self.cluster_system.open_file(error_file,'r')
         lines = f.readlines()
         f.close()
         if (len(lines) == 0):
@@ -31,17 +30,17 @@ class QsubInvokeLog(PermutationDriverFile):
        
          
     def load_job_number(self):
-        starting_dir = os.getcwd()
-        os.chdir(self.script_dir)
+        starting_dir = self.cluster_system.getcwd()
+        self.cluster_system.chdir(self.script_dir)
         #print "opening {0}".format(self.qsub_invoke_log)
         #print self.script_dir
-        if (os.path.exists(self.qsub_invoke_log)):
-            f = open(self.qsub_invoke_log, 'r')
+        if (self.cluster_system.exists(self.qsub_invoke_log)):
+            f = self.cluster_system.open_file(self.qsub_invoke_log, 'r')
             line = f.readline()
             f.close()
             #print "closed {0}".format(self.qsub_invoke_log)
             parts = line.split(' ')
-            os.chdir(starting_dir)
+            self.cluster_system.chdir(starting_dir)
             if (len(parts) != 7):
                 #raise monitor_exception.MonitorException("qsub invoke log has incorrect number of fields {0}. Should look like 'Your job 4174438 (jobname) has been submitted'")
                 raise Exception("qsub invoke log has incorrect number of fields {0}. Should look like 'Your job 4174438 (jobname) has been submitted'")
@@ -51,10 +50,9 @@ class QsubInvokeLog(PermutationDriverFile):
         return result
         
     def delete(self):
-        print ("ok , trying to delete {0} ".format(self.qsub_invoke_log_fullpath))
-        if (os.path.exists(self.qsub_invoke_log_fullpath)):
-            print ("removing {0}".format(self.qsub_invoke_log_fullpath))
-            os.remove(self.qsub_invoke_log_fullpath)
+        #print ("ok , trying to delete {0} ".format(self.qsub_invoke_log_fullpath))
+        if (self.cluster_system.exists(self.qsub_invoke_log_fullpath)):
+            self.cluster_system.delete_file("deleting qsub_invoke_log",self.qsub_invoke_log_fullpath)
  
     
         
