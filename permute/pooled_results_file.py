@@ -195,10 +195,10 @@ def get_median(string_series, as_integer):
     return result_string
         
 def generate_target_dirname(cspec, cluster_system):
-    dir = "{0}/{1}".format(cspec.scores_to, cspec.master_job_name)
-    if (not(cluster_system.isdir(dir))):
-        cluster_system.make_dirs(dir)
-    return dir
+    dirname = "{0}/{1}".format(cspec.scores_to, cspec.master_job_name)
+    if (not(cluster_system.isdir(dirname))):
+        cluster_system.make_dirs(dirname)
+    return dirname
     
 def gen_result_perm_code_from_pieces(y_axis_permutation, x_axis_permutation, filename_perm_dict, cspec, trial):
     full_perm_dict = {}

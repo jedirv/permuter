@@ -8,6 +8,7 @@ from permute import pooled_results_file
 from permute import pooled_results_delta_file
 from permute import pooled_timings_file
 from permute import cluster_spec
+import mock_cluster_system
 
 class TestPooledResultsFile(unittest.TestCase):
 
@@ -108,7 +109,8 @@ class TestPooledResultsFile(unittest.TestCase):
         lines.append("scores_y_axis:letter\n")
         lines.append("scores_x_axis:number,animal\n")
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines)
-        dirname = pooled_results_file.generate_target_dirname(cspec)
+        mc_system = mock_cluster_system.MockClusterSystem()
+        dirname = pooled_results_file.generate_target_dirname(cspec,mc_system)
         #print "DIR IS : {0}".format(dirname)
         self.assertTrue(dirname == './collected_results/unittest')
         
@@ -181,29 +183,35 @@ class TestPooledResultsFile(unittest.TestCase):
         self.assertTrue(code == 'res_userDay_s_300')
         
     def test_get_result_from_file(self):
+        mc_system = mock_cluster_system.MockClusterSystem()
+        f = mc_system.open_file('./sample_result_file.txt','w')
+        f.write('recall,precision,anomaly,rank,auc,ap\n')
+        f.write('0,0,143001,1564,0.87682755275285,0.000748909371611072\n')
+        f.write('0.00882175431075814,0,116061,1897,0,0\n')
+        f.close()
         try:
-            result = pooled_results_file.get_result_from_file('./sample_result_file.txt', 'auc', 1)
+            result = pooled_results_file.get_result_from_file('./sample_result_file.txt', 'auc', 1, mc_system)
             self.assertTrue(result == '0.877')
         except Exception as detail:
             self.fail(detail)
 
         #try the last field in the line
         try:
-            result = pooled_results_file.get_result_from_file('./sample_result_file.txt', 'ap', 1)
+            result = pooled_results_file.get_result_from_file('./sample_result_file.txt', 'ap', 1, mc_system)
             self.assertTrue(result == '0.001')
         except Exception as detail:
             self.fail(detail)
 
         # try a nonexistent column
         try:
-            result = pooled_results_file.get_result_from_file('./sample_result_file.txt', 'foo', 1)
+            result = pooled_results_file.get_result_from_file('./sample_result_file.txt', 'foo', 1, mc_system)
             self.fail("should have complained about non-existent column")
         except Exception as detail:
             self.assertTrue(True)
             
         # try a nonexistent line
         try:
-            result = pooled_results_file.get_result_from_file('./sample_result_file.txt', 'auc', 10)
+            result = pooled_results_file.get_result_from_file('./sample_result_file.txt', 'auc', 10, mc_system)
             self.fail("should have complained about non-existent column")
         except Exception as detail:
             self.assertTrue(True)

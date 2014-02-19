@@ -1,7 +1,9 @@
 import unittest, os
 from permute import cluster_spec
 from permute import permuter
+from permute import permutation_driver
 from permute import cluster_runs_info
+import mock_cluster_system
 
 class TestSystem(unittest.TestCase):
 
@@ -53,41 +55,72 @@ class TestSystem(unittest.TestCase):
 
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
-        permuter.generate_scripts(cluster_runs)
+        mc_system = mock_cluster_system.MockClusterSystem()
+        #permdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec",mc_system)
+        permutation_driver.generate_scripts(cluster_runs, mc_system)
         
-        self.assertTrue(os.path.isfile('./scripts_unittest/j100_1_l_aa_number_1_s_300.sh'))
-        self.assertTrue(os.path.isfile('./scripts_unittest/j101_2_l_aa_number_1_s_300.sh'))
-        self.assertTrue(os.path.isfile('./scripts_unittest/j102_1_l_aa_number_2_s_300.sh'))
-        self.assertTrue(os.path.isfile('./scripts_unittest/j103_2_l_aa_number_2_s_300.sh'))
-        self.assertTrue(os.path.isfile('./scripts_unittest/j104_1_l_aa_number_3_s_300.sh'))
-        self.assertTrue(os.path.isfile('./scripts_unittest/j105_2_l_aa_number_3_s_300.sh'))
+        self.assertTrue(mc_system.isfile('./scripts_unittest/j100_1_an_cat_l_aa_number_1_s_300.sh'))
+        self.assertTrue(mc_system.isfile('./scripts_unittest/j101_2_an_cat_l_aa_number_1_s_300.sh'))
+        self.assertTrue(mc_system.isfile('./scripts_unittest/j102_1_an_cat_l_aa_number_2_s_300.sh'))
+        self.assertTrue(mc_system.isfile('./scripts_unittest/j103_2_an_cat_l_aa_number_2_s_300.sh'))
+        self.assertTrue(mc_system.isfile('./scripts_unittest/j104_1_an_cat_l_aa_number_3_s_300.sh'))
+        self.assertTrue(mc_system.isfile('./scripts_unittest/j105_2_an_cat_l_aa_number_3_s_300.sh'))
         
-        self.assertTrue(os.path.isfile('./scripts_unittest/j106_1_l_bb_number_1_s_300.sh'))
-        self.assertTrue(os.path.isfile('./scripts_unittest/j107_2_l_bb_number_1_s_300.sh'))
-        self.assertTrue(os.path.isfile('./scripts_unittest/j108_1_l_bb_number_2_s_300.sh'))
-        self.assertTrue(os.path.isfile('./scripts_unittest/j109_2_l_bb_number_2_s_300.sh'))
-        self.assertTrue(os.path.isfile('./scripts_unittest/j110_1_l_bb_number_3_s_300.sh'))
-        self.assertTrue(os.path.isfile('./scripts_unittest/j111_2_l_bb_number_3_s_300.sh'))
+        self.assertTrue(mc_system.isfile('./scripts_unittest/j106_1_an_cat_l_bb_number_1_s_300.sh'))
+        self.assertTrue(mc_system.isfile('./scripts_unittest/j107_2_an_cat_l_bb_number_1_s_300.sh'))
+        self.assertTrue(mc_system.isfile('./scripts_unittest/j108_1_an_cat_l_bb_number_2_s_300.sh'))
+        self.assertTrue(mc_system.isfile('./scripts_unittest/j109_2_an_cat_l_bb_number_2_s_300.sh'))
+        self.assertTrue(mc_system.isfile('./scripts_unittest/j110_1_an_cat_l_bb_number_3_s_300.sh'))
+        self.assertTrue(mc_system.isfile('./scripts_unittest/j111_2_an_cat_l_bb_number_3_s_300.sh'))
         
-        self.assertTrue(self.is_echo_line_match('./scripts_unittest/j100_1_l_aa_number_1_s_300.sh','echo AAA 1 300 > ./generated_results/unittest/trial1/l_aa_number_1_s_300/AAA_1_one.txt'))
-        self.assertTrue(self.is_echo_line_match('./scripts_unittest/j101_2_l_aa_number_1_s_300.sh','echo AAA 1 300 > ./generated_results/unittest/trial2/l_aa_number_1_s_300/AAA_1_one.txt'))
-        self.assertTrue(self.is_echo_line_match('./scripts_unittest/j102_1_l_aa_number_2_s_300.sh','echo AAA 2 300 > ./generated_results/unittest/trial1/l_aa_number_2_s_300/AAA_2_two.txt'))
-        self.assertTrue(self.is_echo_line_match('./scripts_unittest/j103_2_l_aa_number_2_s_300.sh','echo AAA 2 300 > ./generated_results/unittest/trial2/l_aa_number_2_s_300/AAA_2_two.txt'))
-        self.assertTrue(self.is_echo_line_match('./scripts_unittest/j104_1_l_aa_number_3_s_300.sh','echo AAA 3 300 > ./generated_results/unittest/trial1/l_aa_number_3_s_300/AAA_3_three.txt'))
-        self.assertTrue(self.is_echo_line_match('./scripts_unittest/j105_2_l_aa_number_3_s_300.sh','echo AAA 3 300 > ./generated_results/unittest/trial2/l_aa_number_3_s_300/AAA_3_three.txt'))
+        self.assertTrue(mc_system.isfile('./scripts_unittest/j112_1_an_dog_l_aa_number_1_s_300.sh'))
+        self.assertTrue(mc_system.isfile('./scripts_unittest/j113_2_an_dog_l_aa_number_1_s_300.sh'))
+        self.assertTrue(mc_system.isfile('./scripts_unittest/j114_1_an_dog_l_aa_number_2_s_300.sh'))
+        self.assertTrue(mc_system.isfile('./scripts_unittest/j115_2_an_dog_l_aa_number_2_s_300.sh'))
+        self.assertTrue(mc_system.isfile('./scripts_unittest/j116_1_an_dog_l_aa_number_3_s_300.sh'))
+        self.assertTrue(mc_system.isfile('./scripts_unittest/j117_2_an_dog_l_aa_number_3_s_300.sh'))
         
-        self.assertTrue(self.is_echo_line_match('./scripts_unittest/j106_1_l_bb_number_1_s_300.sh','echo BBB 1 300 > ./generated_results/unittest/trial1/l_bb_number_1_s_300/BBB_1_one.txt'))
-        self.assertTrue(self.is_echo_line_match('./scripts_unittest/j107_2_l_bb_number_1_s_300.sh','echo BBB 1 300 > ./generated_results/unittest/trial2/l_bb_number_1_s_300/BBB_1_one.txt'))
-        self.assertTrue(self.is_echo_line_match('./scripts_unittest/j108_1_l_bb_number_2_s_300.sh','echo BBB 2 300 > ./generated_results/unittest/trial1/l_bb_number_2_s_300/BBB_2_two.txt'))
-        self.assertTrue(self.is_echo_line_match('./scripts_unittest/j109_2_l_bb_number_2_s_300.sh','echo BBB 2 300 > ./generated_results/unittest/trial2/l_bb_number_2_s_300/BBB_2_two.txt'))
-        self.assertTrue(self.is_echo_line_match('./scripts_unittest/j110_1_l_bb_number_3_s_300.sh','echo BBB 3 300 > ./generated_results/unittest/trial1/l_bb_number_3_s_300/BBB_3_three.txt'))
-        self.assertTrue(self.is_echo_line_match('./scripts_unittest/j111_2_l_bb_number_3_s_300.sh','echo BBB 3 300 > ./generated_results/unittest/trial2/l_bb_number_3_s_300/BBB_3_three.txt'))
+        self.assertTrue(mc_system.isfile('./scripts_unittest/j118_1_an_dog_l_bb_number_1_s_300.sh'))
+        self.assertTrue(mc_system.isfile('./scripts_unittest/j119_2_an_dog_l_bb_number_1_s_300.sh'))
+        self.assertTrue(mc_system.isfile('./scripts_unittest/j120_1_an_dog_l_bb_number_2_s_300.sh'))
+        self.assertTrue(mc_system.isfile('./scripts_unittest/j121_2_an_dog_l_bb_number_2_s_300.sh'))
+        self.assertTrue(mc_system.isfile('./scripts_unittest/j122_1_an_dog_l_bb_number_3_s_300.sh'))
+        self.assertTrue(mc_system.isfile('./scripts_unittest/j123_2_an_dog_l_bb_number_3_s_300.sh'))
+        
+        self.assertTrue(self.is_echo_line_match(mc_system, './scripts_unittest/j100_1_an_cat_l_aa_number_1_s_300.sh','echo AAA 1 300 > ./sample_results/unittest/trial1/an_cat_l_aa_number_1_s_300/AAA_1_one.txt'))
+        self.assertTrue(self.is_echo_line_match(mc_system, './scripts_unittest/j101_2_an_cat_l_aa_number_1_s_300.sh','echo AAA 1 300 > ./sample_results/unittest/trial2/an_cat_l_aa_number_1_s_300/AAA_1_one.txt'))
+        self.assertTrue(self.is_echo_line_match(mc_system, './scripts_unittest/j102_1_an_cat_l_aa_number_2_s_300.sh','echo AAA 2 300 > ./sample_results/unittest/trial1/an_cat_l_aa_number_2_s_300/AAA_2_two.txt'))
+        self.assertTrue(self.is_echo_line_match(mc_system, './scripts_unittest/j103_2_an_cat_l_aa_number_2_s_300.sh','echo AAA 2 300 > ./sample_results/unittest/trial2/an_cat_l_aa_number_2_s_300/AAA_2_two.txt'))
+        self.assertTrue(self.is_echo_line_match(mc_system, './scripts_unittest/j104_1_an_cat_l_aa_number_3_s_300.sh','echo AAA 3 300 > ./sample_results/unittest/trial1/an_cat_l_aa_number_3_s_300/AAA_3_three.txt'))
+        self.assertTrue(self.is_echo_line_match(mc_system, './scripts_unittest/j105_2_an_cat_l_aa_number_3_s_300.sh','echo AAA 3 300 > ./sample_results/unittest/trial2/an_cat_l_aa_number_3_s_300/AAA_3_three.txt'))
+        
+        self.assertTrue(self.is_echo_line_match(mc_system, './scripts_unittest/j106_1_an_cat_l_bb_number_1_s_300.sh','echo BBB 1 300 > ./sample_results/unittest/trial1/an_cat_l_bb_number_1_s_300/BBB_1_one.txt'))
+        self.assertTrue(self.is_echo_line_match(mc_system, './scripts_unittest/j107_2_an_cat_l_bb_number_1_s_300.sh','echo BBB 1 300 > ./sample_results/unittest/trial2/an_cat_l_bb_number_1_s_300/BBB_1_one.txt'))
+        self.assertTrue(self.is_echo_line_match(mc_system, './scripts_unittest/j108_1_an_cat_l_bb_number_2_s_300.sh','echo BBB 2 300 > ./sample_results/unittest/trial1/an_cat_l_bb_number_2_s_300/BBB_2_two.txt'))
+        self.assertTrue(self.is_echo_line_match(mc_system, './scripts_unittest/j109_2_an_cat_l_bb_number_2_s_300.sh','echo BBB 2 300 > ./sample_results/unittest/trial2/an_cat_l_bb_number_2_s_300/BBB_2_two.txt'))
+        self.assertTrue(self.is_echo_line_match(mc_system, './scripts_unittest/j110_1_an_cat_l_bb_number_3_s_300.sh','echo BBB 3 300 > ./sample_results/unittest/trial1/an_cat_l_bb_number_3_s_300/BBB_3_three.txt'))
+        self.assertTrue(self.is_echo_line_match(mc_system, './scripts_unittest/j111_2_an_cat_l_bb_number_3_s_300.sh','echo BBB 3 300 > ./sample_results/unittest/trial2/an_cat_l_bb_number_3_s_300/BBB_3_three.txt'))
         
         
-    def is_echo_line_match(self, path, expected_content):
+        self.assertTrue(self.is_echo_line_match(mc_system, './scripts_unittest/j112_1_an_dog_l_aa_number_1_s_300.sh','echo AAA 1 300 > ./sample_results/unittest/trial1/an_dog_l_aa_number_1_s_300/AAA_1_one.txt'))
+        self.assertTrue(self.is_echo_line_match(mc_system, './scripts_unittest/j113_2_an_dog_l_aa_number_1_s_300.sh','echo AAA 1 300 > ./sample_results/unittest/trial2/an_dog_l_aa_number_1_s_300/AAA_1_one.txt'))
+        self.assertTrue(self.is_echo_line_match(mc_system, './scripts_unittest/j114_1_an_dog_l_aa_number_2_s_300.sh','echo AAA 2 300 > ./sample_results/unittest/trial1/an_dog_l_aa_number_2_s_300/AAA_2_two.txt'))
+        self.assertTrue(self.is_echo_line_match(mc_system, './scripts_unittest/j115_2_an_dog_l_aa_number_2_s_300.sh','echo AAA 2 300 > ./sample_results/unittest/trial2/an_dog_l_aa_number_2_s_300/AAA_2_two.txt'))
+        self.assertTrue(self.is_echo_line_match(mc_system, './scripts_unittest/j116_1_an_dog_l_aa_number_3_s_300.sh','echo AAA 3 300 > ./sample_results/unittest/trial1/an_dog_l_aa_number_3_s_300/AAA_3_three.txt'))
+        self.assertTrue(self.is_echo_line_match(mc_system, './scripts_unittest/j117_2_an_dog_l_aa_number_3_s_300.sh','echo AAA 3 300 > ./sample_results/unittest/trial2/an_dog_l_aa_number_3_s_300/AAA_3_three.txt'))
+        
+        self.assertTrue(self.is_echo_line_match(mc_system, './scripts_unittest/j118_1_an_dog_l_bb_number_1_s_300.sh','echo BBB 1 300 > ./sample_results/unittest/trial1/an_dog_l_bb_number_1_s_300/BBB_1_one.txt'))
+        self.assertTrue(self.is_echo_line_match(mc_system, './scripts_unittest/j119_2_an_dog_l_bb_number_1_s_300.sh','echo BBB 1 300 > ./sample_results/unittest/trial2/an_dog_l_bb_number_1_s_300/BBB_1_one.txt'))
+        self.assertTrue(self.is_echo_line_match(mc_system, './scripts_unittest/j120_1_an_dog_l_bb_number_2_s_300.sh','echo BBB 2 300 > ./sample_results/unittest/trial1/an_dog_l_bb_number_2_s_300/BBB_2_two.txt'))
+        self.assertTrue(self.is_echo_line_match(mc_system, './scripts_unittest/j121_2_an_dog_l_bb_number_2_s_300.sh','echo BBB 2 300 > ./sample_results/unittest/trial2/an_dog_l_bb_number_2_s_300/BBB_2_two.txt'))
+        self.assertTrue(self.is_echo_line_match(mc_system, './scripts_unittest/j122_1_an_dog_l_bb_number_3_s_300.sh','echo BBB 3 300 > ./sample_results/unittest/trial1/an_dog_l_bb_number_3_s_300/BBB_3_three.txt'))
+        self.assertTrue(self.is_echo_line_match(mc_system, './scripts_unittest/j123_2_an_dog_l_bb_number_3_s_300.sh','echo BBB 3 300 > ./sample_results/unittest/trial2/an_dog_l_bb_number_3_s_300/BBB_3_three.txt'))
+        
+        
+    def is_echo_line_match(self, mc_system, path, expected_content):
         print expected_content
         result = False
-        f = open(path, 'r')
+        f = mc_system.open_file(path, 'r')
         lines = f.readlines()
         for line in lines:
             line = line.rstrip('\n')
