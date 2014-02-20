@@ -23,7 +23,7 @@ class PooledResultsFile(object):
         self.cspec = cluster_runs.cspec
         self.target_dir = generate_target_dirname(self.cspec, self.cluster_system)
         self.perm_code_for_filename  = build_code_using_dictionary(filename_permutation_info, self.cspec)
-        print "self.perm_code_for_filename : {0}".format(self.perm_code_for_filename)
+        #print "self.perm_code_for_filename : {0}".format(self.perm_code_for_filename)
         if (self.perm_code_for_filename == ""):
             self.target_path = "{0}/pooled_results.csv".format(self.target_dir)
         else:

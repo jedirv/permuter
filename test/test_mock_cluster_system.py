@@ -5,7 +5,7 @@ Created on Feb 13, 2014
 '''
 import unittest
 import mock_cluster_system
-
+from permute import cluster_spec
 class Test(unittest.TestCase):
 
 
@@ -13,6 +13,12 @@ class Test(unittest.TestCase):
    
     def test_is_cluster_job_still_running(self):
         mc_system = mock_cluster_system.MockClusterSystem()
+        mc_system.set_unittest_answers({})
+        # set bogus cspec to satisfy method signature
+        bogus_cspec_lines = []
+        bogus_cspec_lines.append("#cspec\n")
+        cspec = cluster_spec.ClusterSpec("/foo.cspec",bogus_cspec_lines,mc_system)
+        mc_system.set_cluster_spec(cspec)
         self.assertTrue(mc_system.is_cluster_job_still_running("1", "na", "na") == False)
         self.assertTrue(mc_system.is_cluster_job_still_running("2", "na", "na") == False)
         mc_system.execute_command("qsub foo.sh")
@@ -29,6 +35,12 @@ class Test(unittest.TestCase):
         
     def test_execute_command(self):
         mc_system = mock_cluster_system.MockClusterSystem()
+        mc_system.set_unittest_answers({})
+        # set bogus cspec to satisfy method signature
+        bogus_cspec_lines = []
+        bogus_cspec_lines.append("#cspec\n")
+        cspec = cluster_spec.ClusterSpec("/foo.cspec",bogus_cspec_lines,mc_system)
+        mc_system.set_cluster_spec(cspec)
         mc_system.execute_command("foo")
         mc_system.execute_command("bar")
         self.assertTrue(mc_system.commands[0] == "foo")

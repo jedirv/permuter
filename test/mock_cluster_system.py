@@ -20,17 +20,23 @@ class MockClusterSystem(object):
         self.running_jobs = {}
         self.next_job_number = 1
         self.qacct_files = {}
+        self.stdout = []
+
+    def set_cluster_spec(self,cspec):
+        self.cspec = cspec
         
-    
+    def println(self,s):
+        self.stdout.append(s)
+        
     def is_cluster_job_still_running(self, cluster_job_number, script_dir, qstat_log):
         if cluster_job_number in self.running_jobs:
             return True
         return False
         
-    def execute_command(self,command, cspec):
+    def execute_command(self,command):
         self.commands.append(command)
         if command.startswith("qsub"): #assume this is always the unit test context
-            self.process_unittest_script(command, cspec)
+            self.process_unittest_script(command, self.cspec)
             parts = command.split(" ")
             job_script = parts[1]
             next_job_number_string = "{0}".format(self.next_job_number)

@@ -14,21 +14,22 @@ class ClusterSpec(object):
     Wraps the cluster specification file *.cspec
     '''
     
-    def __init__(self, path, lines):
+    def __init__(self, path, lines, cluster_system):
         '''
         Constructor
         '''
+        self.cluster_system = cluster_system
         self.path = path
         self.lines = lines
         try:
             if (len(lines) == 0):
-                print "cspec file empty:  {0}Exiting.".format(path)
+                self.cluster_system.println("cspec file empty:  {0}Exiting.".format(path))
             
             # verify first line has cspec flag
             header = lines[0]
-            print "header : {0} length {1} ".format(header, len(header))
+            self.cluster_system.println("header : {0} length {1} ".format(header, len(header)))
             if (header != "#cspec\n"):
-                print "cspec file must have this header:  '#cspec', {0} does not. Exiting.".format(path)
+                self.cluster_system.println("cspec file must have this header:  '#cspec', {0} does not. Exiting.".format(path))
                 exit()
             
             
@@ -62,7 +63,7 @@ class ClusterSpec(object):
             self.scores_y_axis = self.load_list(self.lines, 'scores_y_axis:')
             #print "done loading cspec"
         except IOError:
-            print "An error occurred trying to open cspec file {0}".format(path)
+            self.cluster_system.println("An error occurred trying to open cspec file {0}".format(path))
             exit()
 
     def get_permuters_trials_included(self):
@@ -275,39 +276,39 @@ def is_string_a_float(val):
     except ValueError:
         return False
                
-def validate(lines):
+def validate(lines, cluster_system):
     result_permute = validate_permute_entries(lines)
     if not(result_permute):
-        print "problem found in permute statements"
+        cluster_system.println("problem found in permute statements")
         
     result_replace = validate_replace_entries(lines)
     if not(result_replace):
-        print "problem found in replace statements"
+        cluster_system.println("problem found in replace statements")
         
-    result_script_dir = validate_statement_present(lines,"script_dir:","some_dir")
+    result_script_dir = validate_statement_present(lines,"script_dir:","some_dir", cluster_system)
     if not(result_script_dir):
-        print "problem found in script_dir statement"
+        cluster_system.println("problem found in script_dir statement")
   
-    result_root_results_dir = validate_statement_present(lines,"root_results_dir:","some_dir")
+    result_root_results_dir = validate_statement_present(lines,"root_results_dir:","some_dir", cluster_system)
     if not(result_root_results_dir):
-        print "problem found in root_results_dir statement"
+        cluster_system.println("problem found in root_results_dir statement")
         
-    result_master_job_name = validate_statement_present(lines,"master_job_name:","some_name")
+    result_master_job_name = validate_statement_present(lines,"master_job_name:","some_name", cluster_system)
     if not(result_master_job_name):
-        print "problem found in master_job_name statement"
+        cluster_system.println("problem found in master_job_name statement")
         
-    result_trials = validate_statement_present(lines,"trials:","some_integer")
+    result_trials = validate_statement_present(lines,"trials:","some_integer", cluster_system)
     if not(result_trials):
-        print "problem found in trials statement"
+        cluster_system.println("problem found in trials statement")
     
     result_scores_info = validate_scores_gathering_info(lines)
     if not(result_scores_info):
-        print "problem found in scores gathering info entries"
+        cluster_system.println("problem found in scores gathering info entries")
         
     return result_permute and result_replace and result_script_dir and result_root_results_dir and result_master_job_name and result_trials and result_scores_info
 
 
-def validate_statement_present(lines, statement, val):
+def validate_statement_present(lines, statement, val, cluster_system):
     result = True
     value = "unknown"
     statement_command = "unknown"
@@ -318,10 +319,10 @@ def validate_statement_present(lines, statement, val):
             statement_command, value = line.split(":")
     if (statement_command == "unknown"):
         result = False
-        print "cluster_spec missing statement {0}{1}".format(statement, val)
+        cluster_system.println("cluster_spec missing statement {0}{1}".format(statement, val))
     if (value == "unknown" or value == "" or value == None):
         result = False
-        print "cluster_spec missing value for statement {0}{1}".format(statement, val)
+        cluster_system.println("cluster_spec missing value for statement {0}{1}".format(statement, val))
     return result
     
 
@@ -332,7 +333,7 @@ def validate_replace_entries(lines):
         if (line.startswith("<replace>:")):
             colon_count = line.count(':')
             if (colon_count != 1):
-                # should be one :
+                # should be one : 
                 print "<replace>:key=value - line malformed - {0}".format(line)
                 result = False
             else:
@@ -547,7 +548,7 @@ def is_valid_permuter(name, lines):
             
 def generate_new_spec(path, cluster_system):
     if (path == "" or path == None):
-        print ("new_spec command missing pathname argument")
+        cluster_system.println ("new_spec command missing pathname argument")
         return
     parent_dir = cluster_system.get_par_dir(path)
     if not(cluster_system.exists()):

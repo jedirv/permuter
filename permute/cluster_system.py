@@ -28,7 +28,9 @@ class ClusterSystem(object):
         os.chdir(starting_dir)
         return result
         
-    
+    def println(self,s):
+        print s 
+        
     def get_time_delay(self):
         return 1.5
     

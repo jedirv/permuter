@@ -25,7 +25,9 @@ class TestPooledResultsFile(unittest.TestCase):
         lines.append("scores_to:./collected_results\n")
         lines.append("scores_y_axis:letter\n")
         lines.append("scores_x_axis:number,animal\n")
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines)
+        
+        mc_system = mock_cluster_system.MockClusterSystem()
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, mc_system)
         perm_dict = pooled_results_file.gather_file_permuters(cspec)
         keys = perm_dict.keys()
         self.assertTrue(len(keys) == 2)
@@ -50,7 +52,8 @@ class TestPooledResultsFile(unittest.TestCase):
 
         lines.append("scores_permute:resolution=userDay,userMonth\n")
         
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines)
+        mc_system = mock_cluster_system.MockClusterSystem()
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, mc_system)
         y_permutation = {'letter': 'AAA' }
         x_permutation = {'number': '3', 'animal':'dog'}
         filename_perm_dict = {'singleton_val':'300', 'resolution':'userDay' }
@@ -80,7 +83,8 @@ class TestPooledResultsFile(unittest.TestCase):
         lines.append("scores_y_axis:letter\n")
         lines.append("scores_x_axis:number,animal\n")
         
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines)
+        mc_system = mock_cluster_system.MockClusterSystem()
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, mc_system)
         y_permutation = {'letter': 'AAA' }
         x_permutation = {'number': '3', 'animal':'dog'}
         filename_perm_dict = {'singleton_val':'300', 'resolution':'userDay' }
@@ -108,8 +112,8 @@ class TestPooledResultsFile(unittest.TestCase):
         lines.append("scores_to:./collected_results\n")
         lines.append("scores_y_axis:letter\n")
         lines.append("scores_x_axis:number,animal\n")
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines)
         mc_system = mock_cluster_system.MockClusterSystem()
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, mc_system)
         dirname = pooled_results_file.generate_target_dirname(cspec,mc_system)
         #print "DIR IS : {0}".format(dirname)
         self.assertTrue(dirname == './collected_results/unittest')
@@ -177,7 +181,8 @@ class TestPooledResultsFile(unittest.TestCase):
         lines.append("concise_print:AAA,aa\n")
         lines.append("concise_print:BBB,bb\n")
 
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines)
+        mc_system = mock_cluster_system.MockClusterSystem()
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, mc_system)
         perm_dict = {'singleton_val':'300', 'res':'userDay' }
         code = pooled_results_file.build_code_using_dictionary(perm_dict, cspec)
         self.assertTrue(code == 'res_userDay_s_300')

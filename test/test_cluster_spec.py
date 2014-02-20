@@ -74,7 +74,8 @@ class TestClusterSpec(unittest.TestCase):
         lines.append("one_up_basis:100\n")
 
         lines.append("command:echo (letter) (number) (singleton_val) > <permutation_results_dir>/(letter)_(number)_<pretty[(number)]>.txt\n")
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines)
+        mc_system = mock_cluster_system.MockClusterSystem()
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines,mc_system)
         #print self.cspec.concise_print_map
         # concise_name
         self.assertTrue(cspec.get_concise_name('number') == 'number')
@@ -151,12 +152,13 @@ class TestClusterSpec(unittest.TestCase):
         
     def test_validate_statement_present_in_lines(self):
         lines = []
+        mc_system = mock_cluster_system.MockClusterSystem()
         lines.append("root_results_dir\n")
-        self.assertFalse(cluster_spec.validate_statement_present(lines,"root_results_dir:","some_dir"))
+        self.assertFalse(cluster_spec.validate_statement_present(lines,"root_results_dir:","some_dir",mc_system))
         lines.append("root_results_dir:\n")
-        self.assertFalse(cluster_spec.validate_statement_present(lines,"root_results_dir:","some_dir"))
+        self.assertFalse(cluster_spec.validate_statement_present(lines,"root_results_dir:","some_dir",mc_system))
         lines.append("root_results_dir:/foo/bar\n")
-        self.assertTrue(cluster_spec.validate_statement_present(lines,"root_results_dir:","some_dir"))
+        self.assertTrue(cluster_spec.validate_statement_present(lines,"root_results_dir:","some_dir",mc_system))
         
                 
     def test_validate_permutes(self):

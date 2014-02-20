@@ -38,10 +38,10 @@ def main():
     cspec_lines = f.readlines()
     f.close()
     
-    if (not(cluster_spec.validate(cspec_lines))):
-        exit()
-    
     cluster_system = cluster_system.ClusterSystem()
+    if (not(cluster_spec.validate(cspec_lines, cluster_system))):
+        exit()
+        
     permutation_driver = permutation_driver.PermutationDriver(cspec_lines, cspec_path, cluster_system)
     permutation_driver.run_command(permute_command)
 

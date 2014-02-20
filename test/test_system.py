@@ -6,8 +6,7 @@ from permute import cluster_runs_info
 import mock_cluster_system
 
 class TestSystem(unittest.TestCase):
-
-    def test_generate(self):
+    def setUp(self):
         lines = []
         lines.append("#cspec\n")
         lines.append("master_job_name:unittest\n")
@@ -52,10 +51,19 @@ class TestSystem(unittest.TestCase):
         lines.append("one_up_basis:100\n")
 
         lines.append("command:echo (letter) (number) (singleton_val) > <permutation_results_dir>/(letter)_(number)_<pretty[(number)]>.txt\n")
-
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines)
-        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
+        self.lines = lines
+        
+    def test_preview(self):
         mc_system = mock_cluster_system.MockClusterSystem()
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, mc_system)
+        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
+        #permdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec",mc_system)
+        permutation_driver.preview_scripts(cluster_runs, mc_system)
+        
+    def test_generate(self):
+        mc_system = mock_cluster_system.MockClusterSystem()
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, mc_system)
+        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
         #permdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec",mc_system)
         permutation_driver.generate_scripts(cluster_runs, mc_system)
         

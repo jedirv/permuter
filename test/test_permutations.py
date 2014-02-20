@@ -1,17 +1,19 @@
 import unittest
 from permute import cluster_spec
 from permute import permutations
+import mock_cluster_system
 
 class TestPermuter(unittest.TestCase):
         
     def test_expand_permutations(self):
+        mc_system = mock_cluster_system.MockClusterSystem()
         lines = []
         lines.append("#cspec\n")
         lines.append("permute:number=1 3\n")
         lines.append("permute:letter=AAA,BBB\n")
         lines.append("permute:singleton_val=300\n")
         lines.append("permute:animal=dog,cat\n")
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, mc_system)
         
         permuters = cspec.permuters
         dict_list = permutations.expand_permutations(permuters)

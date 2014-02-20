@@ -45,7 +45,7 @@ class QacctLog(PermutationDriverFile):
         
     def create_log(self, cluster_job_number):
         if (cluster_job_number == "NA"):
-            print "skipping qacct, job not started yet"
+            self.cluster_system.println("skipping qacct, job not started yet")
         else:
             #print "opening {0}".format(self.qstat_log)
             command = "qacct -j {0} > {1}".format(cluster_job_number, self.qacct_log)
@@ -55,7 +55,7 @@ class QacctLog(PermutationDriverFile):
         if (cluster_job_number == "NA"):
             error = "qacct_log cannot ingest job number 'NA'"
             logging.error(error)
-            print error
+            self.cluster_system.println(error)
         else:
             starting_dir = self.cluster_system.getcwd()
             self.cluster_system.chdir(self.script_dir)

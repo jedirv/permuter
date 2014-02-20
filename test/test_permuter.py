@@ -35,8 +35,8 @@ class TestPermuter(unittest.TestCase):
         lines.append("scores_x_axis:number,animal\n")
         
         lines.append("root_results_dir:./sample_results\n")
-        
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines)
+        mc_system = mock_cluster_system.MockClusterSystem()
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, mc_system)
         source_file_map = cluster_runs_info.create_source_file_map(cspec)
         #print source_file_map
         #self.assertTrue(len(source_file_map.keys()) == 24)
@@ -184,6 +184,8 @@ class TestPermuter(unittest.TestCase):
         lines.append("script_dir:./runtest_out/scripts\n")
         lines.append("one_up_basis:0")
         lines.append("command:")
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec",lines,mc_system)
+        mc_system.set_cluster_spec(cspec)
         #folder = './collected_results'
         # generate 
         perm_driver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec", mc_system)

@@ -17,7 +17,7 @@ class ClusterScript(PermutationDriverFile):
         self.script_name = "{0}.sh".format(self.get_job_file_name())
         
     def generate(self):
-        print "  generating script file: {0}".format(self.pathname)
+        self.cluster_system.println("  generating script file: {0}".format(self.pathname))
         f = self.cluster_system.open_file(self.pathname, 'w')
         f.write("#!/bin/csh\n")
         f.write("#\n")
@@ -50,28 +50,28 @@ class ClusterScript(PermutationDriverFile):
         f = self.cluster_system.open_file(self.pathname, 'r')
         lines = f.readlines()
         for line in lines:
-            print(line)
+            self.cluster_system.println(line)
         f.close()
-        os.remove(self.pathname)
+        self.cluster_system.delete_file("remove temp junk.sh", self.pathname)
         
     def launch(self):
         try: 
             cluster_system = self.cluster_system
             starting_dir = cluster_system.getcwd()
             cluster_system.chdir(self.script_dir)
-            print "calling qsub {0}".format(self.pathname)
+            self.cluster_system.println("calling qsub {0}".format(self.pathname))
             #args = "{0}.sh > {0}__invoke.txt".format(self.get_job_file_name())
             #args = "{0} > {1}".format(self.pathname, self.stdout_capture_filepath)
             #print "args : {0}".format(args)  
             command = "qsub {0} > {1}".format(self.script_name, self.qsub_invoke_log)
-            cluster_system.execute_command(command, self.cspec) 
+            cluster_system.execute_command(command) 
             #subprocess.check_call(["qsub", self.pathname, ">" , self.stdout_capture_filepath])
             #subprocess.check_call(["qsub", args])
             cluster_system.chdir(starting_dir)
             
         except subprocess.CalledProcessError:
-            print "There was a problem invoking the script: {0}".format(self.pathname)
-            print "Return code was {0}".format(subprocess.CalledProcessError.returncode)
+            self.cluster_system.println("There was a problem invoking the script: {0}".format(self.pathname))
+            self.cluster_system.println("Return code was {0}".format(subprocess.CalledProcessError.returncode))
         
         
         
