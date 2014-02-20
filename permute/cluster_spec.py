@@ -23,11 +23,11 @@ class ClusterSpec(object):
         self.lines = lines
         try:
             if (len(lines) == 0):
-                self.cluster_system.println("cspec file empty:  {0}Exiting.".format(path))
+                print("cspec file empty:  {0}Exiting.".format(path))
             
             # verify first line has cspec flag
             header = lines[0]
-            self.cluster_system.println("header : {0} length {1} ".format(header, len(header)))
+            #print("header : {0} length {1} ".format(header, len(header)))
             if (header != "#cspec\n"):
                 self.cluster_system.println("cspec file must have this header:  '#cspec', {0} does not. Exiting.".format(path))
                 exit()

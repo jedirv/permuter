@@ -59,6 +59,22 @@ class TestSystem(unittest.TestCase):
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
         #permdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec",mc_system)
         permutation_driver.preview_scripts(cluster_runs, mc_system)
+        self.assertTrue(mc_system.stdout[0] == "#!/bin/csh\n")
+        self.assertTrue(mc_system.stdout[1] == "#\n")
+        self.assertTrue(mc_system.stdout[2] == "#$ -q eecs,eecs1,eecs,share\n")
+        self.assertTrue(mc_system.stdout[3] == "#$ -M someone@gmail.com\n")
+        self.assertTrue(mc_system.stdout[4] == "#$ -m beas\n")
+        self.assertTrue(mc_system.stdout[5] == "#$ -N unittest-j100_1_an_cat_l_aa_number_1_s_300_1\n")
+        self.assertTrue(mc_system.stdout[6] == "#\n")
+        self.assertTrue(mc_system.stdout[7] == "# send stdout and stderror to this file\n")
+        self.assertTrue(mc_system.stdout[8] == "#$ -o j100_1_an_cat_l_aa_number_1_s_300.out\n")
+        self.assertTrue(mc_system.stdout[9] == "#$ -e j100_1_an_cat_l_aa_number_1_s_300.err\n")
+        self.assertTrue(mc_system.stdout[10] == "#\n")
+        self.assertTrue(mc_system.stdout[11] == "#see where the job is being run\n")
+        self.assertTrue(mc_system.stdout[12] == "hostname\n")
+        self.assertTrue(mc_system.stdout[13] == "echo AAA 1 300 > ./sample_results/unittest/trial1/an_cat_l_aa_number_1_s_300/AAA_1_one.txt\n")
+        self.assertTrue(mc_system.stdout[14] == "touch ./sample_results/unittest/trial1/an_cat_l_aa_number_1_s_300/permutation_done_marker.txt\n")
+
         
     def test_generate(self):
         mc_system = mock_cluster_system.MockClusterSystem()

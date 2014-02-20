@@ -17,7 +17,7 @@ class ClusterScript(PermutationDriverFile):
         self.script_name = "{0}.sh".format(self.get_job_file_name())
         
     def generate(self):
-        self.cluster_system.println("  generating script file: {0}".format(self.pathname))
+        print("  generating script file: {0}".format(self.pathname))
         f = self.cluster_system.open_file(self.pathname, 'w')
         f.write("#!/bin/csh\n")
         f.write("#\n")
@@ -59,7 +59,7 @@ class ClusterScript(PermutationDriverFile):
             cluster_system = self.cluster_system
             starting_dir = cluster_system.getcwd()
             cluster_system.chdir(self.script_dir)
-            self.cluster_system.println("calling qsub {0}".format(self.pathname))
+            print("calling qsub {0}".format(self.pathname))
             #args = "{0}.sh > {0}__invoke.txt".format(self.get_job_file_name())
             #args = "{0} > {1}".format(self.pathname, self.stdout_capture_filepath)
             #print "args : {0}".format(args)  
@@ -70,8 +70,8 @@ class ClusterScript(PermutationDriverFile):
             cluster_system.chdir(starting_dir)
             
         except subprocess.CalledProcessError:
-            self.cluster_system.println("There was a problem invoking the script: {0}".format(self.pathname))
-            self.cluster_system.println("Return code was {0}".format(subprocess.CalledProcessError.returncode))
+            print("There was a problem invoking the script: {0}".format(self.pathname))
+            print("Return code was {0}".format(subprocess.CalledProcessError.returncode))
         
         
         
