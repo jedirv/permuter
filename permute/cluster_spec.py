@@ -27,8 +27,9 @@ class ClusterSpec(object):
             
             # verify first line has cspec flag
             header = lines[0]
+            header = "".join(header.split()) # remove white spaces
             #print("header : {0} length {1} ".format(header, len(header)))
-            if (header != "#cspec\n"):
+            if (header != "#cspec"):
                 self.cluster_system.println("cspec file must have this header:  '#cspec', {0} does not. Exiting.".format(path))
                 exit()
             
@@ -92,6 +93,7 @@ class ClusterSpec(object):
     def load_scores_from(self, lines):
         for line in lines:
             line = line.rstrip()
+            line = "".join(line.split()) # remove white spaces
             if (line.startswith('scores_from:')):
                 command, scores_from_info = line.split(":")
                 file_info, column_info, row_info = scores_from_info.split(',')
@@ -103,6 +105,7 @@ class ClusterSpec(object):
     def load_dir(self, lines, dir_flag):
         for line in lines:
             line = line.rstrip()
+            line = "".join(line.split()) # remove white spaces
             if (line.startswith(dir_flag)):
                 command, dir = line.split(":")
                 dir = resolve_value(self.key_val_map, dir)
@@ -112,6 +115,7 @@ class ClusterSpec(object):
     def load_special_value(self, lines, flag):
         for line in lines:
             line = line.rstrip()
+            line = "".join(line.split()) # remove white spaces
             if (line.startswith(flag)):
                 flag_sans_colon, target = line.split(":")
                 if (hasattr(self, 'key_val_map')):
@@ -124,6 +128,7 @@ class ClusterSpec(object):
     def load_list(self, lines, flag):
         for line in lines:
             line = line.rstrip()
+            line = "".join(line.split()) # remove white spaces
             if (line.startswith(flag)):
                 flag_sans_colon, target_list = line.split(":")
                 list_items = target_list.split(',')
@@ -139,6 +144,7 @@ class ClusterSpec(object):
         permuters = {}
         for line in lines:
             line = line.rstrip()
+            line = "".join(line.split()) # remove white spaces
             if (line.startswith(flag1) or line.startswith(flag2)):
                 logging.debug("  processing permute line - {0}".format(line))
                 permute_command, permutation_info = line.split(':')
@@ -167,6 +173,7 @@ class ClusterSpec(object):
         key_val_map['tag'] = ""
         for line in lines:
             line = line.rstrip()
+            line = "".join(line.split()) # remove white spaces
             if (line.startswith("#")):
                 pass
             elif (line.startswith("<replace>")):
@@ -212,6 +219,7 @@ class ClusterSpec(object):
         concisePrintMap = {}
         for line in lines:
             line = line.rstrip()
+            line = "".join(line.split()) # remove white spaces
             if (line.startswith("concise_print:") or line.startswith("encode:")):
                 logging.debug("  processing concise_print line - {0}".format(line))
                 command, conciseKeyVal = line.split(":")
@@ -301,7 +309,7 @@ def validate(lines, cluster_system):
     if not(result_trials):
         cluster_system.println("problem found in trials statement")
     
-    result_scores_info = validate_scores_gathering_info(lines)
+    result_scores_info = validate_scores_gathering_info(lines, cluster_system)
     if not(result_scores_info):
         cluster_system.println("problem found in scores gathering info entries")
         
@@ -331,6 +339,7 @@ def validate_replace_entries(lines):
     for line in lines:
         line = line.rstrip()
         if (line.startswith("<replace>:")):
+            line = "".join(line.split()) # remove white spaces
             colon_count = line.count(':')
             if (colon_count != 1):
                 # should be one : 
@@ -361,7 +370,8 @@ def validate_permute_entries(lines):
     result = True
     for line in lines:
         line = line.rstrip()
-        if (line.startswith("permute:")):
+        if (line.startswith("permute:") or line.startswith("(permute):")):
+            line = "".join(line.split()) # remove white spaces
             # should be 3 colons
             colon_count = line.count(':')
             if (colon_count != 1):
@@ -373,8 +383,8 @@ def validate_permute_entries(lines):
             else:
                 permutecommand, permutation_info = line.split(':')
                 permuteKey, permute_list_string = permutation_info.split('=')
-                if (permute_list_string.find(" ") != -1):
-                    permute_start, permute_end = permute_list_string.split(" ")
+                if (permute_list_string.find("-") != -1):
+                    permute_start, permute_end = permute_list_string.split("-")
                     # start of range is an int?
                     try:
                         foo = int(permute_start)
@@ -408,7 +418,7 @@ def lines_contains_prefix(lines, prefix):
             return True
     return False
 
-def validate_scores_gathering_info(lines):
+def validate_scores_gathering_info(lines, cluster_system):
     x_axis_info_present = lines_contains_prefix(lines, 'scores_x_axis')
     y_axis_info_present = lines_contains_prefix(lines, 'scores_y_axis')
     permute_info_present = lines_contains_prefix(lines, 'scores_permute')
@@ -447,7 +457,7 @@ def validate_scores_gathering_info(lines):
         print 'problem in scores_y_axis: declaration'
         return False
     
-    if (not(validate_scores_to(lines))):
+    if (not(validate_scores_to(lines, cluster_system))):
         print 'problem in scores_to: declaration'
         return False
     
@@ -475,6 +485,7 @@ def validate_scores_from(lines):
     for line in lines:
         line = line.rstrip()
         if (line.startswith('scores_from:')):
+            line = "".join(line.split()) # remove white spaces
             flag, from_info = line.split(':')
             path_info, column_info, row_info = from_info.split(',')
             path_flag, path = path_info.split('=')
@@ -509,6 +520,7 @@ def validate_scores_to(lines,cluster_system):
     for line in lines:
         line = line.rstrip()
         if (line.startswith('scores_to:')):
+            line = "".join(line.split()) # remove white spaces
             flag, dir = line.split(':')
             if (cluster_system.exists(dir)):
                 return True
@@ -527,6 +539,7 @@ def validate_axis_list(lines, axis_choice):
     for line in lines:
         line = line.rstrip()
         if (line.startswith(axis_choice)):
+            line = "".join(line.split()) # remove white spaces
             # grab the list and make sure each entry is a valid permuter
             axis_flag, list_info = line.split(":")
             axis_var_list = list_info.split(',')
@@ -538,7 +551,8 @@ def validate_axis_list(lines, axis_choice):
 
 def is_valid_permuter(name, lines):
     for line in lines:
-        if (line.startswith('permute:') or line.startswith('scores_permute')):
+        if (line.startswith('permute:') or line.startswith('scores_permute') or line.startswith('(permute):') or line.startswith('(scores_permute)')):
+            line = "".join(line.split()) # remove white spaces
             permute_flag, permute_info = line.split(':')
             permuter_name, vals = permute_info.split('=')
             if permuter_name == name:
