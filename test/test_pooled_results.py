@@ -15,7 +15,7 @@ class TestPooledResultsFile(unittest.TestCase):
     def test_gather_file_permuters(self):
         lines = []
         lines.append("#cspec\n")
-        lines.append("permute:number=1 3\n")
+        lines.append("permute:number=1-3\n")
         lines.append("permute:letter=AAA,BBB\n")
         lines.append("permute:singleton_val=300\n")
         lines.append("permute:animal=dog,cat\n")
@@ -39,7 +39,7 @@ class TestPooledResultsFile(unittest.TestCase):
         lines.append("#cspec\n")
 
         lines.append("trials:2\n")
-        lines.append("permute:number=1 3\n")
+        lines.append("permute:number=1-3\n")
         lines.append("permute:letter=AAA,BBB\n")
         lines.append("permute:singleton_val=300\n")
         lines.append("permute:animal=dog,cat\n")
@@ -66,7 +66,7 @@ class TestPooledResultsFile(unittest.TestCase):
         lines.append("#cspec\n")
         lines.append("master_job_name:unittest\n")
         lines.append("trials:2\n")
-        lines.append("permute:number=1 3\n")
+        lines.append("permute:number=1-3\n")
         lines.append("permute:letter=AAA,BBB\n")
         lines.append("permute:singleton_val=300\n")
         lines.append("permute:animal=dog,cat\n")
@@ -96,7 +96,7 @@ class TestPooledResultsFile(unittest.TestCase):
         lines = []
         lines.append("#cspec\n")
         lines.append("master_job_name:unittest\n")
-        lines.append("permute:number=1 3\n")
+        lines.append("permute:number=1-3\n")
         lines.append("permute:letter=AAA,BBB\n")
         lines.append("permute:singleton_val=300\n")
         lines.append("permute:animal=dog,cat\n")

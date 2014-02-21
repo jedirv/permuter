@@ -143,8 +143,8 @@ class ClusterSpec(object):
                 logging.debug("  processing permute line - {0}".format(line))
                 permute_command, permutation_info = line.split(':')
                 permuteKey, permute_list_string = permutation_info.split('=')
-                if (permute_list_string.find(" ") != -1):
-                    permute_start, permute_end = permute_list_string.split(" ")
+                if (permute_list_string.find("-") != -1):
+                    permute_start, permute_end = permute_list_string.split("-")
                     permute_list = range(int(permute_start), int(permute_end)+1)
                     permute_list = map(str, permute_list)
                     permute_list = zero_pad_to_widest(permute_list)
