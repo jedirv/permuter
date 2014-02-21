@@ -30,6 +30,8 @@ class PermutationDriver(object):
         cluster_runs = self.cluster_runs
         cluster_system = self.cluster_system
         cspec_path = self.cspec_path
+        if (permute_command == "new_spec"):
+            generate_new_spec(cluster_system, self.cspec_path)
         if (permute_command == "gen"):
             generate_scripts(cluster_runs,cluster_system)
         elif (permute_command == "launch"):
@@ -426,4 +428,8 @@ def clean_pooled_results(cluster_runs, cluster_system):
     cspec = cluster_runs.cspec
     pooled_results_dir = "{0}/{1}".format(cspec.scores_to, cspec.master_job_name)
     cluster_system.clean_out_dir(pooled_results_dir)
+    
+def generate_new_spec(cluster_system, cspec_path):
+    new_spec = new_spec.NewSpec(cluster_system)
+    new_spec.persist()
     
