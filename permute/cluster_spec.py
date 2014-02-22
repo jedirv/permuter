@@ -1,5 +1,6 @@
 
 import logging
+import new_spec
 
 def resolve_value(keyValMap, given_val):
     result = given_val
@@ -559,22 +560,12 @@ def is_valid_permuter(name, lines):
                 return True
     print 'invalid permuter detected: {0}'.format(name)
     return False
-            
-def generate_new_spec(path, cluster_system):
-    if (path == "" or path == None):
-        cluster_system.println ("new_spec command missing pathname argument")
-        return
-    parent_dir = cluster_system.get_par_dir(path)
-    if not(cluster_system.exists()):
-        cluster_system.make_dirs(parent_dir)
-    lines = []
-    lines.append("#cspec")
+
+
+def generate_new_spec(cluster_system, cspec_path):
+    cspec = new_spec.NewSpec(cluster_system, cspec_path)
+    cspec.persist()
     
-    f = cluster_system.open_file(path, 'w')
-    for line in lines:
-        line_out = "{0}\n".format(line)
-        f.write(line_out)
-    f.close()
             
             
             

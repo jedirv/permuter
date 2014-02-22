@@ -575,6 +575,12 @@ class TestClusterSpec(unittest.TestCase):
         self.assertFalse(cluster_spec.lines_contains_prefix(lines,'prefix2'))
         self.assertTrue(cluster_spec.lines_contains_prefix(lines,'prefix3'))
     
+    def test_generate_new_spec(self):
+        mc_system = mock_cluster_system.MockClusterSystem()
+        cluster_spec.generate_new_spec(mc_system, "/foo/test.cspec")
+        mock_file = mc_system.files["/foo/test.cspec"]
+        self.assertTrue(mock_file.lines[0] == "#cspec\n")
+    
 if __name__ == '__main__':
     unittest.main()
     

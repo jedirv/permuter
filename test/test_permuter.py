@@ -207,14 +207,6 @@ class TestPermuter(unittest.TestCase):
         self.assertTrue(lines2[2] == 'l_bb,5211.0,5221.0,5231.0,6211.0,6221.0,6231.0\n')
         f2.close()
        
-   # def clean_dir(self, folder):
-   #     for the_file in os.listdir(folder):
-   #         file_path = os.path.join(folder, the_file)
-   #         try:
-   #             if os.path.isfile(file_path):
-   #                 os.unlink(file_path)
-   #         except Exception, e:
-   #             print e
                 
 if __name__ == '__main__':
     unittest.main()
