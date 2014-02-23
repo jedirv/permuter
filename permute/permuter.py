@@ -8,15 +8,23 @@ import cluster_spec
 import logging
 import cluster_system
 import permutation_driver
+import spec_help
 
 def main():
+    if (len(sys.argv) == 2 and sys.argv[1] == "spec_help"):
+        spechelp = spec_help.SpecHelp()
+        spechelp.express()
+        exit()
+        
     if (len(sys.argv) < 3):
         usage()
         exit()
     permute_command = sys.argv[1]
     cspec_path = sys.argv[2]
+        
+    real_cluster_system = cluster_system.ClusterSystem()
     if (permute_command == "new_spec"):
-        cluster_spec.generate_new_spec(cspec_path)
+        cluster_spec.generate_new_spec(real_cluster_system, cspec_path)
         exit()
         
     flags = ""
@@ -38,11 +46,10 @@ def main():
     cspec_lines = f.readlines()
     f.close()
     
-    cluster_system = cluster_system.ClusterSystem()
-    if (not(cluster_spec.validate(cspec_lines, cluster_system))):
+    if (not(cluster_spec.validate(cspec_lines, real_cluster_system))):
         exit()
         
-    permutation_driver = permutation_driver.PermutationDriver(cspec_lines, cspec_path, cluster_system)
+    permutation_driver = permutation_driver.PermutationDriver(cspec_lines, cspec_path, real_cluster_system)
     permutation_driver.run_command(permute_command)
 
  
@@ -63,7 +70,6 @@ def validate_args(permute_command, cspec_path, flags):
             permute_command == "clean_results" or 
             permute_command == "clean_pooled_results" or 
             permute_command == "clean_all" or 
-            permute_command == "new_spec" or 
             permute_command == "test_launch")):
         usage()
         exit()
@@ -90,6 +96,7 @@ def usage():
     print "   where some_command can be..."
     print"        ...for generating a template cspec file" 
     print"               new_spec               # generate a template cspec file the user can fill out"  
+    print"               spec_help              # prints documentation for the cspec file contents."  
     print""            
     print"        ...for actions to launch permutations"               
     print"               preview                # print to stdout what the first script generated will look like"     

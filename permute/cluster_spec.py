@@ -563,8 +563,8 @@ def is_valid_permuter(name, lines):
 
 
 def generate_new_spec(cluster_system, cspec_path):
-    cspec = new_spec.NewSpec(cluster_system, cspec_path)
-    cspec.persist()
+    new_cspec = new_spec.NewSpec(cluster_system, cspec_path)
+    new_cspec.persist()
     
             
             
