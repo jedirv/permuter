@@ -15,9 +15,6 @@ scores_x_axis:x
 #
 
 #
-<replace>:root=/nfs/foo/bar
-<replace>:x_dir=<root>/(letter)/<config[(letter)]>/(number)
-<replace>:algs_dir=/nfs/algs
 <replace>:root=/nfs/stak/students/i/irvine/python/cluster/test
 #
 #  results_dir is where the generated results will be
@@ -28,12 +25,11 @@ root_results_dir:<root>/runtest_out/results
 #
 script_dir:<root>/runtest_out/scripts
 #
-qsub_command:-q eecs,eecs1,eecs,share
+#qsub_command:-q eecs,eecs1,eecs,share
+qsub_command:-q eecs,share
 #qsub_command:-M someone@gmail.com
 #qsub_command:-m beas
 qsub_command:-cwd
 one_up_basis:0
 
-command:python <root>/run_test.py (x) (y) <permutation_results_dir>/run_test.csv
-#
-
+command:python <root>/run_test.py (x) (y) 5 <permutation_results_dir>/run_test.csv

@@ -7,15 +7,16 @@ import sys, os
 import time
 
 def main():
-    if (len(sys.argv) < 4):
+    if (len(sys.argv) < 5):
         usage()
         exit()
     x = int(sys.argv[1])
     y = int(sys.argv[2])
-    outpath = sys.argv[3]
+    delay = int(sys.argv[3])
+    outpath = sys.argv[4]
     product = x * y
     for i in range(0,product):
-        time.sleep(15)
+        time.sleep(delay)
         print "sleeping at i: {0}".format(i)
     dir = os.path.dirname(outpath)
     os.makedirs(dir);
@@ -25,7 +26,7 @@ def main():
     f.close()
 
 def usage():
-    print "python run_test <x> <y> <outfile>.csv "  
+    print "python run_test <x> <y> <delay> <outfile>.csv "  
     print "    # where x and y are integers.  They will be multiplied together and "
     print "    # to yield a count of how many times the sleep-for-30-sec is called"
     print "    # also delivers that product to result file."
