@@ -20,6 +20,7 @@ class ClusterRunsInfo(object):
         self.permutation_info_list_full = permutations.expand_permutations(self.permuters_including_trials)
         self.run_perm_codes_list = []
         self.job_num_width = self.get_job_number_width(self.permutation_info_list_full)
+        
         # associate job numbers here and lookup from then on
         user_job_number = 1
         if cspec.one_up_basis != '':
@@ -36,7 +37,21 @@ class ClusterRunsInfo(object):
             
             user_job_number = user_job_number + 1
             
+        #self.scripts = self.generate_scripts()    
+    
+    #def generate_scripts(self, cluster_system):  
+    #    cluster_scripts = []
+    #    cspec = cluster_runs.cspec
+        #for trial in range(1, int(cspec.trials) + 1):
+    #    for run_permutation_code in run_perm_codes_list:
+    #        results_dir = cluster_runs.get_results_dir_for_run_permutation_code(run_permutation_code)
+    #        cluster_system.make_dirs(results_dir)
+    #        user_job_number_as_string = cluster_runs.get_job_number_string_for_run_permutation_code(run_permutation_code)
+    #        permutation_info = cluster_runs.run_permutation_info_for_run_permutation_code_map[run_permutation_code]
+    #        cscript = cluster_script.ClusterScript(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'], cluster_system)
+    #        cluster_scripts.append(cscript)
             
+                 
     def get_results_dir_for_run_permutation_code(self, permutation_code):
         result = self.result_dir_for_run_permutation_code_map[permutation_code]
         return result
