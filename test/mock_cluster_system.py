@@ -188,6 +188,8 @@ class MockClusterSystem(object):
             self.dirs.remove(path)
             
     def clean_out_dir(self,dirpath):
+        if "." in dirpath:
+            raise Exception("mock_cluster_system.clean_out_dir not implemented for relative paths : {0}".format(dirpath))
         keys_to_remove = []
         for key in self.files.keys():
             if key.startswith(dirpath):
