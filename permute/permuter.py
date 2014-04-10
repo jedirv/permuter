@@ -9,11 +9,14 @@ import logging
 import cluster_system
 import permutation_driver
 import spec_help
+import user_usage
 
 def main():
     if (len(sys.argv) == 2 and sys.argv[1] == "spec_help"):
         spechelp = spec_help.SpecHelp()
         spechelp.express()
+        uu = user_usage.UserUsage()
+        uu.log_command("spec_help")
         exit()
         
     if (len(sys.argv) < 3):
@@ -25,6 +28,8 @@ def main():
     real_cluster_system = cluster_system.ClusterSystem()
     if (permute_command == "new_spec"):
         cluster_spec.generate_new_spec(real_cluster_system, cspec_path)
+        uu = user_usage.UserUsage()
+        uu.log_command(permute_command)
         exit()
         
     flags = ""
@@ -50,6 +55,8 @@ def main():
         exit()
         
     permutation_driver = permutation_driver.PermutationDriver(cspec_lines, cspec_path, real_cluster_system)
+    uu = user_usage.UserUsage()
+    uu.log_command(permute_command)
     permutation_driver.run_command(permute_command)
 
  
