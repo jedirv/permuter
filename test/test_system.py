@@ -56,7 +56,7 @@ class TestSystem(unittest.TestCase):
     def test_preview(self):
         mc_system = mock_cluster_system.MockClusterSystem()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, mc_system)
-        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
+        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, mc_system)
         #permdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec",mc_system)
         permutation_driver.preview_scripts(cluster_runs, mc_system)
         self.assertTrue(mc_system.stdout[0] == "#!/bin/csh\n")
@@ -79,9 +79,9 @@ class TestSystem(unittest.TestCase):
     def test_generate(self):
         mc_system = mock_cluster_system.MockClusterSystem()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, mc_system)
-        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
+        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, mc_system)
         #permdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec",mc_system)
-        permutation_driver.generate_scripts(cluster_runs, mc_system)
+        permutation_driver.generate_scripts(cluster_runs)
         
         self.assertTrue(mc_system.isfile('./scripts_unittest/j100_1_an_cat_l_aa_number_1_s_300.sh'))
         self.assertTrue(mc_system.isfile('./scripts_unittest/j101_2_an_cat_l_aa_number_1_s_300.sh'))

@@ -22,7 +22,7 @@ class PermutationDriver(object):
     
     def __init__(self,cspec_lines, cspec_path, cluster_system):
         self.cspec = cluster_spec.ClusterSpec(cspec_path, cspec_lines, cluster_system)
-        self.cluster_runs = cluster_runs_info.ClusterRunsInfo(self.cspec)
+        self.cluster_runs = cluster_runs_info.ClusterRunsInfo(self.cspec, cluster_system)
         self.cspec_path = cspec_path
         self.cluster_system = cluster_system
         
@@ -31,7 +31,7 @@ class PermutationDriver(object):
         cluster_system = self.cluster_system
         cspec_path = self.cspec_path
         if (permute_command == "gen"):
-            generate_scripts(cluster_runs,cluster_system)
+            generate_scripts(cluster_runs)
         elif (permute_command == "launch"):
             if (detect_still_running_runs(cluster_runs, cluster_system)):
                 cluster_system.println("Permutation jobs still running.  Use 'stop' to stop them before 'launch' to avoid replicated jobs")
@@ -43,7 +43,7 @@ class PermutationDriver(object):
             if (detect_still_running_runs(cluster_runs, cluster_system)):
                 cluster_system.println("Permutation jobs still running.  Use 'stop' to stop them before 'auto' to avoid replicated jobs")
             else:
-                generate_scripts(cluster_runs, cluster_system)
+                generate_scripts(cluster_runs)
                 launch_scripts(cluster_runs, cluster_system)
         elif (permute_command == "preview"):
             preview_scripts(cluster_runs)
@@ -368,23 +368,25 @@ def launch_scripts(cluster_runs, cluster_system):
     cspec = cluster_runs.cspec
     delete_results(cspec, cluster_system)
     for run_permutation_code in cluster_runs.run_perm_codes_list:
-        user_job_number_as_string = cluster_runs.get_job_number_string_for_run_permutation_code(run_permutation_code)
-        permutation_info = cluster_runs.run_permutation_info_for_run_permutation_code_map[run_permutation_code]
-        cscript = cluster_script.ClusterScript(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'], cluster_system)
+        #user_job_number_as_string = cluster_runs.get_job_number_string_for_run_permutation_code(run_permutation_code)
+        #permutation_info = cluster_runs.run_permutation_info_for_run_permutation_code_map[run_permutation_code]
+        #cscript = cluster_script.ClusterScript(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'], cluster_system)
+        cscript = cluster_runs.get_script_for_run_permutation_code(run_permutation_code)
         cscript.launch()
         time.sleep(cluster_system.get_time_delay())
 
     
-def generate_scripts(cluster_runs, cluster_system):
+def generate_scripts(cluster_runs):
     logging.info('GENERATING scripts')
-    cspec = cluster_runs.cspec
+    #cspec = cluster_runs.cspec
     #for trial in range(1, int(cspec.trials) + 1):
     for run_permutation_code in cluster_runs.run_perm_codes_list:
-        results_dir = cluster_runs.get_results_dir_for_run_permutation_code(run_permutation_code)
-        cluster_system.make_dirs(results_dir)
-        user_job_number_as_string = cluster_runs.get_job_number_string_for_run_permutation_code(run_permutation_code)
-        permutation_info = cluster_runs.run_permutation_info_for_run_permutation_code_map[run_permutation_code]
-        cscript = cluster_script.ClusterScript(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'], cluster_system)
+        #results_dir = cluster_runs.get_results_dir_for_run_permutation_code(run_permutation_code)
+        #cluster_system.make_dirs(results_dir)
+        #user_job_number_as_string = cluster_runs.get_job_number_string_for_run_permutation_code(run_permutation_code)
+        #permutation_info = cluster_runs.run_permutation_info_for_run_permutation_code_map[run_permutation_code]
+        #cscript = cluster_script.ClusterScript(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'], cluster_system)
+        cscript = cluster_runs.get_script_for_run_permutation_code(run_permutation_code)
         cscript.generate()
 
 def clean_scripts(cluster_runs,cluster_system):
@@ -397,20 +399,22 @@ def clean_scripts(cluster_runs,cluster_system):
 
 def preview_scripts(cluster_runs, cluster_system):
     logging.info("PREVIEWING scripts")
-    cspec = cluster_runs.cspec
-    permutation_info = cluster_runs.permutation_info_list_full[0]
-    user_job_number_as_string = cluster_runs.get_job_number_string_for_permutation_info(permutation_info)
-    cscript = cluster_script.ClusterScript(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'], cluster_system)
+    #cspec = cluster_runs.cspec
+    #permutation_info = cluster_runs.permutation_info_list_full[0]
+    #user_job_number_as_string = cluster_runs.get_job_number_string_for_permutation_info(permutation_info)
+    #cscript = cluster_script.ClusterScript(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'], cluster_system)
+    
+    cscript = cluster_runs.get_first_script()
     cscript.preview()
 
 
 def test_launch_single_script(cluster_runs, cluster_system):
     logging.info('TEST_LAUNCH single script')
-    cspec = cluster_runs.cspec
-    run_permutation_code = cluster_runs.run_perm_codes_list[0]
-    user_job_number_as_string = cluster_runs.get_job_number_string_for_permutation_code(run_permutation_code)
-    permutation_info = cluster_runs.run_permutation_info_for_run_permutation_code_map[run_permutation_code]
-    cscript = cluster_script.ClusterScript(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'], cluster_system)
+    #cspec = cluster_runs.cspec
+    #run_permutation_code = cluster_runs.run_perm_codes_list[0]
+    #user_job_number_as_string = cluster_runs.get_job_number_string_for_permutation_code(run_permutation_code)
+    #permutation_info = cluster_runs.run_permutation_info_for_run_permutation_code_map[run_permutation_code]
+    cscript = cluster_runs.get_first_script()
     cscript.launch()
            
 

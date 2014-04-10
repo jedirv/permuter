@@ -5,13 +5,16 @@ Created on Dec 17, 2013
 '''
 import permutations
 import logging
+import cluster_script
 
 class ClusterRunsInfo(object):
     
-    def __init__(self,cspec):
+    def __init__(self,cspec, cluster_system):
         self.cspec = cspec
+        self.cluster_system = cluster_system
         
         self.job_number_for_run_permutation_code_map = {}
+        self.cluster_script_for_run_permutation_code_map = {}
         self.run_permutation_info_for_run_permutation_code_map = {}
         self.run_permutation_code_for_run_permutation_info_map = {}
         self.result_dir_for_run_permutation_code_map = {}
@@ -28,28 +31,18 @@ class ClusterRunsInfo(object):
         for run_permutation_info in self.permutation_info_list_full:
             run_permutation_code = permutations.generate_permutation_code(run_permutation_info, cspec.concise_print_map, True)
             self.run_perm_codes_list.append(run_permutation_code)
-            self.job_number_for_run_permutation_code_map[run_permutation_code] = get_formatted_user_job_number(user_job_number, self.job_num_width)
+            
+            user_job_number_as_string = get_formatted_user_job_number(user_job_number, self.job_num_width)
+            self.job_number_for_run_permutation_code_map[run_permutation_code] = user_job_number_as_string
             self.run_permutation_info_for_run_permutation_code_map[run_permutation_code] = run_permutation_info
             run_permutation_info_string = "{0}".format(run_permutation_info)
             self.run_permutation_code_for_run_permutation_info_map[run_permutation_info_string] = run_permutation_code
             resolved_results_dir =  permutations.get_resolved_results_dir_for_permutation(run_permutation_info, cspec)
             self.result_dir_for_run_permutation_code_map[run_permutation_code] = resolved_results_dir
-            
+            cluster_system.make_dirs(resolved_results_dir)
+            cscript = cluster_script.ClusterScript(user_job_number_as_string, run_permutation_info, cspec, run_permutation_info['trials'], cluster_system)
+            self.cluster_script_for_run_permutation_code_map[run_permutation_code] = cscript
             user_job_number = user_job_number + 1
-            
-        #self.scripts = self.generate_scripts()    
-    
-    #def generate_scripts(self, cluster_system):  
-    #    cluster_scripts = []
-    #    cspec = cluster_runs.cspec
-        #for trial in range(1, int(cspec.trials) + 1):
-    #    for run_permutation_code in run_perm_codes_list:
-    #        results_dir = cluster_runs.get_results_dir_for_run_permutation_code(run_permutation_code)
-    #        cluster_system.make_dirs(results_dir)
-    #        user_job_number_as_string = cluster_runs.get_job_number_string_for_run_permutation_code(run_permutation_code)
-    #        permutation_info = cluster_runs.run_permutation_info_for_run_permutation_code_map[run_permutation_code]
-    #        cscript = cluster_script.ClusterScript(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'], cluster_system)
-    #        cluster_scripts.append(cscript)
             
                  
     def get_results_dir_for_run_permutation_code(self, permutation_code):
@@ -82,6 +75,12 @@ class ClusterRunsInfo(object):
     def get_permutation_info_for_permutation_code(self, permutation_code):
         result = self.run_permutation_info_for_run_permutation_code_map[permutation_code]
         return result
+    
+    def get_first_script(self):
+        return self.cluster_script_for_run_permutation_code_map[self.run_perm_codes_list[0]]
+    
+    def get_script_for_run_permutation_code(self, run_permutation_code):
+        return self.cluster_script_for_run_permutation_code_map[run_permutation_code]
     
 def get_formatted_user_job_number(user_job_number, width):
     return str(user_job_number).zfill(width)

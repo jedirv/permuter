@@ -6,7 +6,7 @@ Created on Feb 13, 2014
 import unittest
 import mock_cluster_system
 from permute import cluster_spec
-class Test(unittest.TestCase):
+class TestMockClusterSystem(unittest.TestCase):
 
 
 
@@ -187,6 +187,36 @@ class Test(unittest.TestCase):
         self.assertTrue("line1\n" == lines[0])
         self.assertTrue("line2\n" == lines[1])
         self.assertTrue("line3start_line3end\n" == lines[2])
+        
+    def test_assert_job_done(self):
+        print "agagagagag"
+        mc_system = mock_cluster_system.MockClusterSystem()
+        mc_system.running_jobs['1'] = "foo1.sh"
+        mc_system.running_jobs['2'] = "foo2.sh"
+        mc_system.running_jobs['3'] = "foo3.sh"
+        mc_system.running_jobs['4'] = "foo4.sh"
+        mc_system.running_jobs['5'] = "foo5.sh"
+        mc_system.running_jobs['6'] = "foo6.sh"
+        self.assertTrue(len(mc_system.running_jobs) == 6)
+        mc_system.assert_job_done("foo5.sh")
+        self.assertTrue(len(mc_system.running_jobs) == 5)
+        self.assertTrue(mc_system.running_jobs['1'] == "foo1.sh")
+        self.assertTrue(mc_system.running_jobs['2'] == "foo2.sh")
+        self.assertTrue(mc_system.running_jobs['3'] == "foo3.sh")
+        self.assertTrue(mc_system.running_jobs['4'] == "foo4.sh")
+        self.assertTrue(mc_system.running_jobs['6'] == "foo6.sh")
+        mc_system.assert_job_done("foo1.sh")
+        self.assertTrue(len(mc_system.running_jobs) == 4)
+        self.assertTrue(mc_system.running_jobs['2'] == "foo2.sh")
+        self.assertTrue(mc_system.running_jobs['3'] == "foo3.sh")
+        self.assertTrue(mc_system.running_jobs['4'] == "foo4.sh")
+        self.assertTrue(mc_system.running_jobs['6'] == "foo6.sh")
+        mc_system.assert_job_done("foo16.sh")
+        self.assertTrue(len(mc_system.running_jobs) == 4)
+        self.assertTrue(mc_system.running_jobs['2'] == "foo2.sh")
+        self.assertTrue(mc_system.running_jobs['3'] == "foo3.sh")
+        self.assertTrue(mc_system.running_jobs['4'] == "foo4.sh")
+        self.assertTrue(mc_system.running_jobs['6'] == "foo6.sh")
                 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

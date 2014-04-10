@@ -33,6 +33,14 @@ class MockClusterSystem(object):
             return True
         return False
         
+    def assert_job_done(self, job_script):
+        matching_job = "unknown"
+        for key, val in self.running_jobs.items():
+            if val == job_script:
+                matching_job = key
+        if matching_job != "unknown":
+            self.running_jobs.pop(matching_job)
+            
     def execute_command(self,command):
         self.commands.append(command)
         if command.startswith("qsub"): #assume this is always the unit test context
