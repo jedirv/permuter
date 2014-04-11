@@ -46,7 +46,7 @@ class PermutationDriver(object):
                 generate_scripts(cluster_runs)
                 launch_scripts(cluster_runs, cluster_system)
         elif (permute_command == "preview"):
-            preview_scripts(cluster_runs)
+            preview_scripts(cluster_runs, cluster_system)
         elif (permute_command == "test_launch"):
             clean_results(cluster_runs, cluster_system)
             clean_pooled_results(cluster_runs, cluster_system)
@@ -76,7 +76,7 @@ class PermutationDriver(object):
         elif (permute_command == "clean_pooled_results"):
             clean_pooled_results(cluster_runs, cluster_system)
         elif (permute_command == "clean_all"):
-            stop_runs(cluster_runs)
+            stop_runs(cluster_runs, cluster_system)
             clean_scripts(cluster_runs, cluster_system)
             clean_results(cluster_runs, cluster_system)
             clean_pooled_results(cluster_runs, cluster_system)

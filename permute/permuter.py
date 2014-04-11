@@ -54,10 +54,10 @@ def main():
     if (not(cluster_spec.validate(cspec_lines, real_cluster_system))):
         exit()
         
-    permutation_driver = permutation_driver.PermutationDriver(cspec_lines, cspec_path, real_cluster_system)
+    pdriver = permutation_driver.PermutationDriver(cspec_lines, cspec_path, real_cluster_system)
     uu = user_usage.UserUsage()
     uu.log_command(permute_command)
-    permutation_driver.run_command(permute_command)
+    pdriver.run_command(permute_command)
 
  
 def validate_args(permute_command, cspec_path, flags):
