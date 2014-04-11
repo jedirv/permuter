@@ -9,7 +9,7 @@ class TestPermuter(unittest.TestCase):
         mc_system = mock_cluster_system.MockClusterSystem()
         lines = []
         lines.append("#cspec\n")
-        lines.append("permute:number=1-3\n")
+        lines.append("permute:number=range(1,4)\n")
         lines.append("permute:letter=AAA,BBB\n")
         lines.append("permute:singleton_val=300\n")
         lines.append("permute:animal=dog,cat\n")

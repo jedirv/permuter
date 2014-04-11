@@ -35,7 +35,7 @@ class TestClusterSpec(unittest.TestCase):
         lines.append("master_job_name:unittest\n")
         lines.append("trials:2\n")
         lines.append("tag=_myTag\n")
-        lines.append("(permute):number=1-3\n") # new form
+        lines.append("(permute):number=range(1,4)\n") # new form
         lines.append("permute:letter=AAA,BBB\n")
         lines.append("permute:singleton_val=300\n")
         lines.append("permute:animal=dog,cat\n")
@@ -149,14 +149,35 @@ class TestClusterSpec(unittest.TestCase):
         self.assertTrue(qsub_commands_as_string == "['-q eecs,eecs1,eecs,share', '-M someone@gmail.com', '-m beas']")
         
         
-    
+    def test_permute_stepwise_range(self):
+        lines = []
+        lines.append("(permute):number=range(1,10,2)\n") # by 2
+        permuters = cluster_spec.load_permuters(lines, 'permute:', '(permute):')
+        self.assertTrue(permuters['number'] == ['1','3','5','7','9'])
+        
+        lines = []
+        lines.append("(permute):number=range(1,10,3)\n") # by 3
+        permuters = cluster_spec.load_permuters(lines, 'permute:', '(permute):')
+        self.assertTrue(permuters['number'] == ['1','4','7'])
+        
+        lines = []
+        lines.append("(permute):number=range(1, 10,2)\n") # with spaces
+        permuters = cluster_spec.load_permuters(lines, 'permute:', '(permute):')
+        self.assertTrue(permuters['number'] == ['1','3','5','7','9'])
+        
+        
+        lines = []
+        lines.append("(permute):number=range(1,6)\n") # traditional start and end range
+        permuters = cluster_spec.load_permuters(lines, 'permute:', '(permute):')
+        self.assertTrue(permuters['number'] == ['1','2','3','4','5'])
+       
     def test_load_cspec_with_white_spaces(self):
         lines = []
         lines.append("#cspec \n")
         lines.append("master_job_name:unittest \n")
         lines.append("trials:\t2\n")
         lines.append("tag=_myTag \n")
-        lines.append("(permute):number=1   - 3\n") # new form
+        lines.append("(permute):number=range(1   , 4)\n") # new form
         lines.append("permute:letter=AAA, BBB\n")
         lines.append("permute:singleton_val=\t300\n")
         lines.append("permute:animal= dog,cat\n")
@@ -290,26 +311,32 @@ class TestClusterSpec(unittest.TestCase):
         self.assertFalse(cluster_spec.validate_permute_entries(lines))
         
         lines = []
-        lines.append("permute:number=a-3") # first integer bad in range
+        lines.append("permute:number=range(a,3)") # first integer bad in range
         self.assertFalse(cluster_spec.validate_permute_entries(lines))
         
         lines = []
-        lines.append("permute:number=1-a") # second integer bad in range
+        lines.append("permute:number=range(1,a)") # second integer bad in range
         self.assertFalse(cluster_spec.validate_permute_entries(lines))
         
         lines = []
-        lines.append("permute:number=3-2") # integer range out of order
+        lines.append("permute:number=range(3,2)") # integer range out of order
         self.assertFalse(cluster_spec.validate_permute_entries(lines))
         
         lines = []
-        lines.append("permute:number=1-10") # integer range
+        lines.append("permute:number=range(1,10)") # integer range
         self.assertTrue(cluster_spec.validate_permute_entries(lines))
         lines = []
-        lines.append("permute:number= 1-10") # integer range with spaces
+        lines.append("permute:number= range(1,10)") # integer range with spaces
         self.assertTrue(cluster_spec.validate_permute_entries(lines))
         lines = []
-        lines.append("permute:number=1-10 ") # integer range
+        lines.append("permute:number=range(1,10) ") # integer range
         self.assertTrue(cluster_spec.validate_permute_entries(lines))
+        
+        
+        lines = []
+        lines.append("(permute):number=range(1,1,2)\n") # single result
+        self.assertFalse(cluster_spec.validate_permute_entries(lines))
+        
         
         lines = []
         lines.append("permute:foo=2") # singleton integer 
@@ -327,6 +354,8 @@ class TestClusterSpec(unittest.TestCase):
         lines = []
         lines.append("permute:foo=\t\t\ta , 33 , zxc     ") # comma list with spaces
         self.assertTrue(cluster_spec.validate_permute_entries(lines))
+        
+        
         
     def test_validate_replaces(self):
         lines = []
@@ -545,7 +574,7 @@ class TestClusterSpec(unittest.TestCase):
         #all present
         mc_system = mock_cluster_system.MockClusterSystem()
         lines = []
-        lines.append('(permute):number=1-3\n')
+        lines.append('(permute):number=range(1,3)\n')
         lines.append('(permute):animal=cat,dog\n')
         lines.append('(permute):letter=a,b,c\n')
         lines.append('scores_from:file=<permutation_results_dir>/foo.csv,column_name=auc,row_number=1')
@@ -558,7 +587,7 @@ class TestClusterSpec(unittest.TestCase):
         #all present with spaces
         mc_system = mock_cluster_system.MockClusterSystem()
         lines = []
-        lines.append('(permute):number=1-3\n')
+        lines.append('(permute):number=range(1,3)\n')
         lines.append('(permute):animal=cat,dog\n')
         lines.append('(permute):letter=a,b,c\n')
         lines.append('scores_from:file= <permutation_results_dir>/foo.csv, column_name=auc,row_number=1')

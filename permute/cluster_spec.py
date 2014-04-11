@@ -37,7 +37,7 @@ class ClusterSpec(object):
             
             self.master_job_name = self.load_special_value(self.lines, 'master_job_name:')
             self.trials = self.load_special_value(self.lines, 'trials:')
-            self.permuters = self.load_permuters(self.lines, 'permute:', '(permute):')
+            self.permuters = load_permuters(self.lines, 'permute:', '(permute):')
             self.concise_print_map = self.load_concise_print_map(self.lines)
             
             self.key_val_map = self.load_replaces(self.lines)
@@ -55,7 +55,7 @@ class ClusterSpec(object):
             self.script_dir = self.load_dir(self.lines, "script_dir")
             self.one_up_basis = self.load_special_value(self.lines, 'one_up_basis:')
             
-            self.scores_permuters = self.load_permuters(self.lines, 'scores_permute:','(scores_permute):')
+            self.scores_permuters = load_permuters(self.lines, 'scores_permute:','(scores_permute):')
             self.scores_from_filepath = ""
             self.scores_from_colname = ""
             self.scores_from_rownum = ""
@@ -141,32 +141,7 @@ class ClusterSpec(object):
                     resolved_list.append(resolved_item)
                 return resolved_list
         return ""    
-    def load_permuters(self, lines, flag1, flag2):
-        permuters = {}
-        for line in lines:
-            line = line.rstrip()
-            line = "".join(line.split()) # remove white spaces
-            if (line.startswith(flag1) or line.startswith(flag2)):
-                logging.debug("  processing permute line - {0}".format(line))
-                permute_command, permutation_info = line.split(':')
-                permuteKey, permute_list_string = permutation_info.split('=')
-                if (permute_list_string.find("-") != -1):
-                    permute_start, permute_end = permute_list_string.split("-")
-                    permute_list = range(int(permute_start), int(permute_end)+1)
-                    permute_list = map(str, permute_list)
-                    permute_list = zero_pad_to_widest(permute_list)
-                elif (permute_list_string.find(",") != -1):
-                    permute_list = permute_list_string.split(",")
-                    permute_list = convert_escaped_commas(permute_list) # supports "6_comma_8_comma_10" -->  "6,8,10"
-                    permute_list = zero_pad_to_widest(permute_list)
-                else:
-                    # must be a singleton cvalue
-                    permute_list = [ permute_list_string ]
-                permuters[permuteKey] = permute_list
-            else:
-                pass
-        logging.debug("  permuters : {0}".format(permuters))
-        return permuters
+    
     
     def load_replaces(self, lines):
         key_val_map = {}
@@ -230,7 +205,47 @@ class ClusterSpec(object):
                 pass
         logging.debug("  concisePrintMap {0}".format(concisePrintMap))
         return concisePrintMap
-        
+
+
+def load_permuters(lines, flag1, flag2):
+    permuters = {}
+    for line in lines:
+        line = line.rstrip()
+        line = "".join(line.split()) # remove white spaces
+        if (line.startswith(flag1) or line.startswith(flag2)):
+            logging.debug("  processing permute line - {0}".format(line))
+            permute_command, permutation_info = line.split(':')
+            permuteKey, permute_list_string = permutation_info.split('=')
+            permute_list = []
+            if (permute_list_string.startswith("range(")):
+                range_spec = permute_list_string[6:]
+                range_spec_length = len(range_spec)
+                nums = range_spec.strip(')')
+                numlist = nums.split(",")
+                start = numlist[0]
+                end = numlist[1]
+                permute_list = []
+                if (len(numlist) == 2):
+                    permute_list = range(int(start), int(end))
+                elif (len(numlist) == 3): 
+                    permute_list = range(int(start), int(end), int(numlist[2]))
+                else:
+                    pass # shouldn't get here as validator prevents
+                permute_list = map(str, permute_list)
+                permute_list = zero_pad_to_widest(permute_list)
+            elif (permute_list_string.find(",") != -1):
+                permute_list = permute_list_string.split(",")
+                permute_list = convert_escaped_commas(permute_list) # supports "6_comma_8_comma_10" -->  "6,8,10"
+                permute_list = zero_pad_to_widest(permute_list)
+            else:
+                # must be a singleton cvalue
+                permute_list = [ permute_list_string ]
+            permuters[permuteKey] = permute_list
+        else:
+            pass
+        logging.debug("  permuters : {0}".format(permuters))
+    return permuters     
+   
 def convert_escaped_commas(list):
     newList = []
     for val in list:
@@ -377,32 +392,46 @@ def validate_permute_entries(lines):
             colon_count = line.count(':')
             if (colon_count != 1):
                 print "permute line malformed - {0} - should be permute:var=vals where vals can be:".format(line)
-                print "   range of integers with a space    1 5 (expanded to 1,2,3,4,5)"
+                print "   range of integers with a space    range(1,5) (expanded to 1,2,3,4,5)"
+                print "   range of integers with a space    range(1,5,2) (expanded to 1,3,5)"
                 print "   single value                    x   (this exposes the value in the permutation code)"
                 print "   comma separated list of values  aa,bb,cc"
                 result = False
             else:
                 permutecommand, permutation_info = line.split(':')
                 permuteKey, permute_list_string = permutation_info.split('=')
-                if (permute_list_string.find("-") != -1):
-                    permute_start, permute_end = permute_list_string.split("-")
-                    # start of range is an int?
-                    try:
-                        foo = int(permute_start)
-                    except:
-                        print "{0} is not an integer in {1}".format(permute_start, line)
+                if (permute_list_string.startswith("range(")):
+                    range_spec = permute_list_string[6:]
+                    range_spec_length = len(range_spec)
+                    if range_spec[range_spec_length - 1] != ')':
+                        print "range spec should be of form range(a,b) or range(a,b,c) : {0}".format(permute_list_string)
                         result = False
-                    # end of range is an int?    
-                    try:
-                        foo = int(permute_end)
-                    except:
-                        print "{0} is not an integer in {1}".format(permute_end, line)
-                        result = False
-                    if (result):
-                        start = int(permute_start)
-                        end = int(permute_end)
+                    else: 
+                        nums = range_spec.strip(')')
+                        numlist = nums.split(",")
+                        for num in numlist:
+                            if not num.isdigit():
+                                print "{0} is not an integer in range: {1}".format(num, line)
+                                result = False
+                                return
+
+                        start = int(numlist[0])
+                        end = int(numlist[1])
                         if (start > end):
                             print "start or range is greater than end {0}".format(line)
+                            result = False
+                            return
+                        if (len(numlist) == 2):
+                            result = True
+                        elif (len(numlist) == 3):
+                            stepInt = int(numlist[2])
+                            if not end > stepInt:
+                                print "step interval must be less than range end {0}".format(line)
+                                result = False
+                            else:
+                                result = True    
+                        else:
+                            print "wrong number of digits in range expression - should be range(a,b) or range(a,b,c)"
                             result = False
                 elif (permute_list_string.find(",") != -1):
                     # no way I can think of to mess this up
