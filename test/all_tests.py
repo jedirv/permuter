@@ -6,6 +6,7 @@ import test_permuter
 import test_system
 import test_ranked_results_file
 import test_mock_cluster_system
+import test_user_usage
 
 def main():
     mySuite = suite()
@@ -21,6 +22,7 @@ def suite():
     test_suite.addTest(unittest.TestLoader().loadTestsFromTestCase(test_system.TestSystem))
     test_suite.addTest(unittest.TestLoader().loadTestsFromTestCase(test_ranked_results_file.TestRankedResultsFile))
     test_suite.addTest(unittest.TestLoader().loadTestsFromTestCase(test_mock_cluster_system.TestMockClusterSystem))
+    test_suite.addTest(unittest.TestLoader().loadTestsFromTestCase(test_user_usage.TestUserUsage))
     return test_suite
     
 if __name__ == '__main__':
