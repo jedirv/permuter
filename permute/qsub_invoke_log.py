@@ -43,7 +43,7 @@ class QsubInvokeLog(PermutationDriverFile):
             self.cluster_system.chdir(starting_dir)
             if (len(parts) != 7):
                 #raise monitor_exception.MonitorException("qsub invoke log has incorrect number of fields {0}. Should look like 'Your job 4174438 (jobname) has been submitted'")
-                raise Exception("qsub invoke log has incorrect number of fields {0}. Should look like 'Your job 4174438 (jobname) has been submitted'")
+                raise Exception("\n\nlogfile that captures the output of qsub is malformed:\n\n{0}.qil \n\nIt should look like 'Your job 4174438 (jobname) has been submitted'\n\nInstead, it looks like: '{1}'\n\nDelete this file to clear the Exception".format(self.script_path_root, line))
             result = parts[2]
         else:
             result = "NA"
