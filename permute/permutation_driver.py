@@ -211,7 +211,7 @@ def run_command_on_all_specs(cspec_path, permuter_command,cluster_system):
         #print command
         cluster_system.execute_command(command) 
     
-def check_status_of_runs(cluster_runs, output_style):
+def check_status_of_runs(cluster_runs, output_style, cluster_system):
     logging.info('CHECKING status of runs')
     cspec = cluster_runs.cspec
     running_count = 0
@@ -222,7 +222,7 @@ def check_status_of_runs(cluster_runs, output_style):
     not_yet_launched_count = 0
     unknown_count = 0
     for run_permutation_code in cluster_runs.run_perm_codes_list:
-        status = check_status_of_run(cluster_runs, run_permutation_code, cspec, output_style)
+        status = check_status_of_run(cluster_runs, run_permutation_code, cspec, output_style, cluster_system)
         if (status=="not_yet_launched"):
             not_yet_launched_count = not_yet_launched_count + 1
         elif (status=="permission_block"):
@@ -261,8 +261,8 @@ def check_status_of_run(cluster_runs, run_permutation_code, cspec, output_style,
     if (len(missing_output_files) != 0):
         missing_output_file = True 
             
-    user_job_number_as_string = cluster_runs.get_job_number_string_for_permutation_code(run_permutation_code)
-    qil = qsub_invoke_log.QsubInvokeLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'])
+    user_job_number_as_string = cluster_runs.get_job_number_string_for_run_permutation_code(run_permutation_code)
+    qil = qsub_invoke_log.QsubInvokeLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'], cluster_system)
     cluster_job_number = qil.cluster_job_number
     # summary , full, pending
     if (cluster_job_number == "NA"):
