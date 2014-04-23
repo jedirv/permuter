@@ -45,6 +45,8 @@ class PermutationDriverFile(object):
             job_filename = "j{0}_{1}_{2}{3}".format(self.user_job_number, self.trial, self.permute_code_sans_trial, tag)
         else:
             job_filename = "j{0}_{1}_{2}".format(self.user_job_number, self.trial, self.permute_code_sans_trial)
+        # replace any commas (like the ones in gmm args) with dashes
+        job_filename = job_filename.replace(",","-")
         return job_filename   
       
     def get_script_path_root(self):

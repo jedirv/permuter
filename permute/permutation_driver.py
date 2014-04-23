@@ -176,8 +176,8 @@ def stop_run_if_running(cluster_runs, run_permutation_code, cspec, cluster_syste
     run_finished = cluster_runs_info.did_run_finish(cluster_runs, run_permutation_code, cluster_system)
     permutation_info = cluster_runs.run_permutation_info_for_run_permutation_code_map[run_permutation_code]
     trial = permutation_info['trials']
-    user_job_number_as_string = cluster_runs.get_job_number_string_for_permutation_code(run_permutation_code)
-    qil = qsub_invoke_log.QsubInvokeLog(user_job_number_as_string, permutation_info, cspec, trial)
+    user_job_number_as_string = cluster_runs.get_job_number_string_for_run_permutation_code(run_permutation_code)
+    qil = qsub_invoke_log.QsubInvokeLog(user_job_number_as_string, permutation_info, cspec, trial, cluster_system)
     cluster_job_number = qil.cluster_job_number
     if (cluster_job_number == "NA"):
         cluster_system.println("{0} - no evidence of having launched".format(user_job_number_as_string))

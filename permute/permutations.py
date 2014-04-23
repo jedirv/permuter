@@ -51,6 +51,8 @@ def generate_permutation_code(permutation_info, concisePrintMap, include_trials)
             code = "{0}_{1}_{2}".format(code, key, val)
     code = code.lstrip('_')
     logging.info("   perm code : {0}".format(code))
+    # change commas to dashes
+    code = code.replace(",","-")
     return code        
 
     
