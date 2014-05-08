@@ -27,7 +27,17 @@ class QacctLog(PermutationDriverFile):
         
         self.error_reading = False
         
-      
+    def exists(self):
+        if (self.cluster_system.exists(self.pathname)):
+            return True
+        return False      
+    
+    def get_last_modification_time(self):
+        if (self.exists()):
+            return self.cluster_system.get_last_modification_time(self.pathname)
+        else:
+            return 'NA'  
+        
     def run_failed(self):
         result = self.error_reading or (self.failed != '0'  and self.failed != "?")
         #print "{0} run failed: {1}".format(self.script_path_root, result)
@@ -79,6 +89,11 @@ class QacctLog(PermutationDriverFile):
         self.cluster_system.chdir(starting_dir)
         #os.unlink(self.qstat_log)
         #print "closed {0}".format(self.qstat_log)
+    def is_corrupt(self):
+        self.load_qacct_log()
+        if self.error_reading:
+            return True
+        return False
     
     def load_qacct_log(self):
         self.error_reading = False

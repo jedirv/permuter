@@ -21,7 +21,7 @@ class RankedResultsFile(object):
         self.cluster_system = cluster_system
         self.cluster_runs = cluster_runs
         self.cspec = cluster_runs.cspec
-        self.target_dir = pooled_results_file.generate_target_dirname(self.cspec)
+        self.target_dir = pooled_results_file.generate_target_dirname(self.cspec, cluster_system)
         self.perm_code_for_filename  = pooled_results_file.build_code_using_dictionary(filename_permutation_info, self.cspec)
         if (self.perm_code_for_filename == ""):
             self.target_path = "{0}/pooled_results_ranked.txt".format(self.target_dir)

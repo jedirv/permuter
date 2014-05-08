@@ -10,10 +10,12 @@ Created on Feb 10, 2014
 '''
 import os
 import mock_file
+import time
 
 class MockClusterSystem(object):
     def __init__(self):
         self.files = {}
+        self.file_create_times = {}
         self.dirs = []
         self.cur_dir = '.'
         self.commands = []
@@ -26,8 +28,12 @@ class MockClusterSystem(object):
         self.cspec = cspec
         
     def println(self,s):
-        self.stdout.append(s)
+        string_with_newline = '{0}\n'.format(s)
+        self.stdout.append(string_with_newline)
         
+    def print_without_newline(self,s):
+        self.stdout.append(s)
+            
     def is_cluster_job_still_running(self, cluster_job_number, script_dir, qstat_log):
         if cluster_job_number in self.running_jobs:
             return True
@@ -124,7 +130,7 @@ class MockClusterSystem(object):
         if (self.files.has_key(path)):
             print "{0} : {1}".format(comment, path)
             self.files.pop(path)
-         
+            self.file_create_times.pop(path)
        
     def chdir(self, path):
         self.cur_dir = path
@@ -165,7 +171,13 @@ class MockClusterSystem(object):
                     trimmed_key_parts = trimmed_key.split("/")
                     result_list.append(trimmed_key_parts[1])
         return result_list
-    
+ 
+    def get_last_modification_time(self, path):
+        if (not(self.exists(path))):
+            return 'NA'
+        else:
+            return self.file_create_times[path]
+           
     def isfile(self, path):
         if self.files.has_key(path):
             return True
@@ -196,12 +208,15 @@ class MockClusterSystem(object):
                 keys_to_remove.append(key)    
         for key in keys_to_remove:
             print "removing file {0}".format(key)
-            self.files.pop(key)                   
+            self.files.pop(key)
+            self.file_create_times.pop(key)                   
 
     def open_file(self, path, mode):
         if (mode == 'w'):
             mfile = mock_file.MockFile(path)
             self.files[path] = mfile
+            create_time = time.time()
+            self.file_create_times[path] = create_time
             parent = os.path.dirname(path)
             if (not(parent in self.dirs)):
                 self.dirs.append(parent)

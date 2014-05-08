@@ -7,15 +7,21 @@ INCLUDE_TRIALS = True
 def get_list_of_output_files(permutation_info, cspec):
     output_file_paths = []
     scores_permutations = expand_permutations(cspec.scores_permuters)
-    #print "scores_permutations {0}".format(scores_permutations)
     complete_permutation_infos = []
-    for scores_permutation in scores_permutations:
+    if (len(scores_permutations) == 0):
         complete_permutation = {}
         for key, val in permutation_info.items():
             complete_permutation[key] = val
-        for key, val in scores_permutation.items():
-            complete_permutation[key] = val
         complete_permutation_infos.append(complete_permutation)
+    else:
+        #print "scores_permutations {0}".format(scores_permutations)
+        for scores_permutation in scores_permutations:
+            complete_permutation = {}
+            for key, val in permutation_info.items():
+                complete_permutation[key] = val
+            for key, val in scores_permutation.items():
+                complete_permutation[key] = val
+            complete_permutation_infos.append(complete_permutation)
     #print "complete_permutation_infos {0}".format(complete_permutation_infos)   
     for complete_permutation_info in complete_permutation_infos:        
         unresolved_output_files = []

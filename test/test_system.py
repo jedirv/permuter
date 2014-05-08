@@ -263,8 +263,174 @@ class TestSystem(unittest.TestCase):
         self.assertTrue(self.is_echo_line_match(mc_system, './scripts_unittest/j121_2_an_dog_l_bb_number_2_s_300.sh','echo BBB 2 300 > ./sample_results/unittest/trial2/an_dog_l_bb_number_2_s_300/BBB_2_two.txt'))
         self.assertTrue(self.is_echo_line_match(mc_system, './scripts_unittest/j122_1_an_dog_l_bb_number_3_s_300.sh','echo BBB 3 300 > ./sample_results/unittest/trial1/an_dog_l_bb_number_3_s_300/BBB_3_three.txt'))
         self.assertTrue(self.is_echo_line_match(mc_system, './scripts_unittest/j123_2_an_dog_l_bb_number_3_s_300.sh','echo BBB 3 300 > ./sample_results/unittest/trial2/an_dog_l_bb_number_3_s_300/BBB_3_three.txt'))
+    
+    def test_stat_before_gen(self):
+        #self.state_codes['se 0 ile 0 rpb 0 dme 0 ofe 0'] = 'script missing'
+        lines = self.get_lines_for_runTestCspec()
+        mc_system = mock_cluster_system.MockClusterSystem()
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, mc_system)
+        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, mc_system)
+        permutation_driver.check_status_of_runs(cluster_runs, 'full', mc_system)
+        self.assertTrue(mc_system.stdout[0] == "NA trials_1_x_1  script missing\n")
+        self.assertTrue(mc_system.stdout[1] == "NA trials_1_x_2  script missing\n")
+        self.assertTrue(mc_system.stdout[2] == "NA trials_1_x_3  script missing\n")
+        self.assertTrue(mc_system.stdout[3] == "NA trials_1_x_4  script missing\n")
+        self.assertTrue(len(mc_system.stdout) == 4)
+        
+    def test_stat_after_gen(self):
+        #self.state_codes['se 1 ile 0 rpb 0 dme 0 ofe 0'] = 'script ready'
+        lines = self.get_lines_for_runTestCspec()
+        mc_system = mock_cluster_system.MockClusterSystem()
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, mc_system)
+        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, mc_system)
+        permutation_driver.generate_scripts(cluster_runs)
+        permutation_driver.check_status_of_runs(cluster_runs, 'full', mc_system)
+        self.assertTrue(mc_system.stdout[0] == "NA trials_1_x_1  script ready\n")
+        self.assertTrue(mc_system.stdout[1] == "NA trials_1_x_2  script ready\n")
+        self.assertTrue(mc_system.stdout[2] == "NA trials_1_x_3  script ready\n")
+        self.assertTrue(mc_system.stdout[3] == "NA trials_1_x_4  script ready\n")
+        self.assertTrue(len(mc_system.stdout) == 4)
+                      
+    def get_lines_for_runTestCspec(self):
+        lines = []
+        lines.append('#cspec\n')
+        lines.append('master_job_name:runtest\n')
+        lines.append('trials:1\n')
+        lines.append('permute:x=range(1,5)\n')
+        lines.append('scores_from:file=<permutation_results_dir>/run_test.csv,column_name=auc,row_number=1\n')
+        lines.append('scores_to:/nfs/stak/students/i/irvine/python/cluster/test/runtest_out/collected_results\n')
+        lines.append('#\n')
+        lines.append('# permutation-dependent mappings can be expressed like this.  These will be matched by \n')
+        lines.append('# using permutations like this:  <config[(month)]>\n')
+        lines.append('#\n')
+        lines.append('#\n')
+        lines.append('<replace>:root=/nfs/stak/students/i/irvine/python/cluster/test\n')
+        lines.append('#\n')
+        lines.append('#  results_dir is where the generated results will be\n')
+        lines.append('#\n')
+        lines.append('root_results_dir:<root>/runtest_out/results\n')
+        lines.append('#\n')
+        lines.append('#  script is where the generated scripts will be\n')
+        lines.append('#\n')
+        lines.append('script_dir:<root>/runtest_out/scripts\n')
+        lines.append('#\n')
+        lines.append('#qsub_command:-q eecs,eecs1,eecs,share\n')
+        lines.append('qsub_command:-q eecs,share\n')
+        lines.append('#qsub_command:-M someone@gmail.com\n')
+        lines.append('#qsub_command:-m beas\n')
+        lines.append('qsub_command:-cwd\n')
+        lines.append('one_up_basis:0\n')
+        lines.append('command:python <root>/run_test.py (x)  5 <permutation_results_dir>/run_test.csv\n')
+        return lines
+
+        
+'''        
+    def test_stat_after_test_launch(self):
+        #self.state_codes['se 1 ile 1 rpb 0 dme 1 ofe 1'] = 'run complete'
+        self.assertTrue(False)
+    
+
+    def test_stat_after_all_runs_finished(self):
+        #self.state_codes['se 1 ile 1 rpb 0 dme 1 ofe 1'] = 'run complete'
+        self.assertTrue(False)
+        
+    def test_stat_after_(self):
+        self.assertTrue(False)
+
+    def test_stat_after_(self):
+        self.assertTrue(False)        
+        self.state_codes['se 0 ile 1 rpb 0 dme 0 ofe 0'] = 'run_state_error - launch_log but no script_file : clean logs'
+        
+    def test_stat_after_launch_one_still_running(self):
+        self.assertTrue(False)
+        #self.state_codes['se 1 ile 1 rpb 0 dme 0 ofe 0'] = 'running'
         
         
+    def test_stat_after_(self):
+        self.assertTrue(False)   
+        self.state_codes['se 0 ile 0 rpb 1 dme 0 ofe 0'] = 'run_state_error - permission_block_error without script_file : clean logs'
+    def test_stat_after_(self):
+        self.assertTrue(False)   
+        self.state_codes['se 1 ile 0 rpb 1 dme 0 ofe 0'] = 'run_state_error - permission_block_error without launch_log : clean logs'
+    def test_stat_after_(self):
+        self.assertTrue(False)   
+        self.state_codes['se 0 ile 1 rpb 1 dme 0 ofe 0'] = 'run_state_error - launch_log present without script_file : clean logs'
+    def test_stat_after_(self):
+        self.assertTrue(False)   
+        self.state_codes['se 1 ile 1 rpb 1 dme 0 ofe 0'] = 'run permission issue'
+ 
+    def test_stat_after_(self):
+        self.assertTrue(False)   
+        self.state_codes['se 0 ile 0 rpb 0 dme 1 ofe 0'] = 'run_state_error - done_marker exists without script_file : clean results'
+    def test_stat_after_(self):
+        self.assertTrue(False)   
+        self.state_codes['se 1 ile 0 rpb 0 dme 1 ofe 0'] = 'run_state_error - done_marker exists without launch_log : clean results'
+    def test_stat_after_(self):
+        self.assertTrue(False)   
+        self.state_codes['se 0 ile 1 rpb 0 dme 1 ofe 0'] = 'run_state_error - done_marker exists without script_file but launch_log present : clean results, logs'
+    def test_stat_after_(self):
+        self.assertTrue(False)   
+        self.state_codes['se 1 ile 1 rpb 0 dme 1 ofe 0'] = 'run error'
+    def test_stat_after_(self):
+        self.assertTrue(False)   
+        self.state_codes['se 0 ile 0 rpb 1 dme 1 ofe 0'] = 'run_state_error - done_marker and permission_error should not coexist'
+    def test_stat_after_(self):
+        self.assertTrue(False)   
+        self.state_codes['se 1 ile 0 rpb 1 dme 1 ofe 0'] = 'run_state_error - done_marker and permission_error should not coexist'
+    def test_stat_after_(self):
+        self.assertTrue(False)   
+        self.state_codes['se 0 ile 1 rpb 1 dme 1 ofe 0'] = 'run_state_error - done_marker and permission_error should not coexist'
+    def test_stat_after_(self):
+        self.assertTrue(False)   
+        self.state_codes['se 1 ile 1 rpb 1 dme 1 ofe 0'] = 'run_state_error - done_marker and permission_error should not coexist'
+ 
+    def test_stat_after_(self):
+        self.assertTrue(False)   
+        self.state_codes['se 0 ile 0 rpb 0 dme 0 ofe 1'] = 'run_state_error - output_file exists without script_file : clean results'
+    def test_stat_after_(self):
+        self.assertTrue(False)   
+        self.state_codes['se 1 ile 0 rpb 0 dme 0 ofe 1'] = 'run_state_error - output_file exists without launch_log : clean results'
+    def test_stat_after_(self):
+        self.assertTrue(False)   
+        self.state_codes['se 0 ile 1 rpb 0 dme 0 ofe 1'] = 'run_state_error - output_file exists without script_file, but has launch_log : clean results, logs'
+    def test_stat_after_(self):
+        self.assertTrue(False)   
+        self.state_codes['se 1 ile 1 rpb 0 dme 0 ofe 1'] = 'run near complete'
+    def test_stat_after_(self):
+        self.assertTrue(False)   
+        self.state_codes['se 0 ile 0 rpb 1 dme 0 ofe 1'] = 'run_state_error - done_marker and run_error should not coexist'
+    def test_stat_after_(self):
+        self.assertTrue(False)   
+        self.state_codes['se 1 ile 0 rpb 1 dme 0 ofe 1'] = 'run_state_error - done_marker and run_error should not coexist'
+    def test_stat_after_(self):
+        self.assertTrue(False)   
+        self.state_codes['se 0 ile 1 rpb 1 dme 0 ofe 1'] = 'run_state_error - done_marker and run_error should not coexist'
+    def test_stat_after_(self):
+        self.assertTrue(False)   
+        self.state_codes['se 1 ile 1 rpb 1 dme 0 ofe 1'] = 'run_state_error - done_marker and run_error should not coexist'
+ 
+    def test_stat_after_(self):
+        self.assertTrue(False)   
+        self.state_codes['se 0 ile 0 rpb 0 dme 1 ofe 1'] = 'run_state_error - done_marker exists without script_file : clean results'
+    def test_stat_after_(self):
+        self.assertTrue(False)   
+        self.state_codes['se 1 ile 0 rpb 0 dme 1 ofe 1'] = 'run_state_error - done_marker exists without launch_log : clean results'
+    def test_stat_after_(self):
+        self.assertTrue(False)   
+        self.state_codes['se 0 ile 1 rpb 0 dme 1 ofe 1'] = 'run_state_error - done_marker exists without script_file, but launch_log present : clean results, logs'
+    def test_stat_after_(self):
+        self.assertTrue(False)   
+        self.state_codes['se 0 ile 0 rpb 1 dme 1 ofe 1'] = 'run_state_error - done_marker and result_file should not coexist'
+    def test_stat_after_(self):
+        self.assertTrue(False)   
+        self.state_codes['se 1 ile 0 rpb 1 dme 1 ofe 1'] = 'run_state_error - done_marker and result_file should not coexist'
+    def test_stat_after_(self):
+        self.assertTrue(False)   
+        self.state_codes['se 0 ile 1 rpb 1 dme 1 ofe 1'] = 'run_state_error - done_marker and result_file should not coexist'
+    def test_stat_after_(self):
+        self.assertTrue(False)   
+        self.state_codes['se 1 ile 1 rpb 1 dme 1 ofe 1'] = 'run_state_error - done_marker and result_file should not coexist'
+'''      
 if __name__ == '__main__':
     unittest.main()
     

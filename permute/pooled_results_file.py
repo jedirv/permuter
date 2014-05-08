@@ -8,6 +8,7 @@ import qacct_log
 import permutations
 import logging
 
+
 class PooledResultsFile(object):
     '''
     classdocs
@@ -30,12 +31,18 @@ class PooledResultsFile(object):
             self.target_path = "{0}/pooled_results_{1}.csv".format(self.target_dir, self.perm_code_for_filename)
         self.source_file_map = source_file_map
         self.filename_permutation_info = filename_permutation_info
-       
+
+    def get_last_modification_time(self):
+        if (self.exists()):
+            return self.cluster_system.get_last_modification_time(self.target_path)
+        else:
+            return 'NA'  
+               
     def persist(self):
         cspec = self.cspec
         # generate the column names
         f = self.cluster_system.open_file(self.target_path, 'w')
-        print "persisting {0}".format(self.target_path)
+        self.cluster_system.println("persisting {0}".format(self.target_path))
         
         # scores_y_axis:letter
         # scores_x_axis:number,animal
@@ -63,6 +70,7 @@ class PooledResultsFile(object):
         # the main loop    
         for y_permutation in y_permutations:
             concise_y_permutation = permutations.generate_permutation_code(y_permutation, cspec.concise_print_map, False)
+            self.cluster_system.println('y axis: {0}'.format(concise_y_permutation))
             line = "{0},".format(concise_y_permutation)
             for x_permutation in x_permutations:
                 trials_list = cspec.get_trials_list()
@@ -74,6 +82,7 @@ class PooledResultsFile(object):
                     #print "SOURCE_FILE_PATH : {0}".format(source_file_path)
                     value = get_result_from_file(source_file_path, cspec.scores_from_colname, cspec.scores_from_rownum, self.cluster_system)
                     trial_values.append(value)
+                    
                 median_value = get_median(trial_values, False)
                 line = "{0}{1},".format(line, median_value)
                 x_perm_code = permutations.generate_permutation_code(x_permutation, cspec.concise_print_map, False)
@@ -280,6 +289,7 @@ def build_code_using_dictionary(perm_info, cspec):
         val = coded_key_info[key]
         result = "{0}{1}_{2}_".format(result, key, val)
     # strip off the right_most underscore
-    result = result.rstrip('_')     
+    result = result.rstrip('_')
+    result = result.replace(",","-") # convert commas to dashes due to _comma_ hack     
     return result 
         

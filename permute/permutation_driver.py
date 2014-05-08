@@ -16,12 +16,15 @@ import pooled_results_delta_file
 import pooled_timings_file
 import pooled_results_file
 import ranked_results_file
+import state_of_runs
 import logging
 
 class PermutationDriver(object):
     
     def __init__(self,cspec_lines, cspec_path, cluster_system):
+        cluster_system.println('initializing cluster_spec...')
         self.cspec = cluster_spec.ClusterSpec(cspec_path, cspec_lines, cluster_system)
+        cluster_system.println('initializing cluster_runs_info...')
         self.cluster_runs = cluster_runs_info.ClusterRunsInfo(self.cspec, cluster_system)
         self.cspec_path = cspec_path
         self.cluster_system = cluster_system
@@ -36,6 +39,7 @@ class PermutationDriver(object):
             if (detect_still_running_runs(cluster_runs, cluster_system)):
                 cluster_system.println("Permutation jobs still running.  Use 'stop' to stop them before 'launch' to avoid replicated jobs")
             else:
+                clean_script_dir_except_for_scripts(cluster_runs,cluster_system)
                 clean_results(cluster_runs, cluster_system)
                 clean_pooled_results(cluster_runs, cluster_system)
                 launch_scripts(cluster_runs, cluster_system)
@@ -48,6 +52,7 @@ class PermutationDriver(object):
         elif (permute_command == "preview"):
             preview_scripts(cluster_runs, cluster_system)
         elif (permute_command == "test_launch"):
+            clean_script_dir_except_for_scripts(cluster_runs,cluster_system)
             clean_results(cluster_runs, cluster_system)
             clean_pooled_results(cluster_runs, cluster_system)
             test_launch_single_script(cluster_runs, cluster_system)
@@ -87,11 +92,15 @@ class PermutationDriver(object):
     
 def collect(cluster_runs, cluster_system):
     #warn_of_incomplete_runs(cluster_runs)
-    logging.info('COLLECTING results')
+    #logging.info('COLLECTING results')
+    cluster_system.println('creating pooled results files...')
     resultsFiles = create_pooled_results_files(cluster_runs, cluster_system)
-    create_pooled_results_delta_files(resultsFiles)
-    create_pooled_timings_files(cluster_runs)
-    create_ranked_results_files(cluster_runs)
+    cluster_system.println('creating pooled results delta files...')
+    create_pooled_results_delta_files(resultsFiles, cluster_system)
+    cluster_system.println('creating pooled timings files...')
+    create_pooled_timings_files(cluster_runs, cluster_system)
+    cluster_system.println('creating ranked results files...')
+    create_ranked_results_files(cluster_runs, cluster_system)
     
 def detect_still_running_runs(cluster_runs, cluster_system):
     logging.info('SCANNING for incomplete runs')
@@ -117,52 +126,6 @@ def detect_still_running_runs(cluster_runs, cluster_system):
         return True
     return False
 
-            
-    
-def warn_of_incomplete_runs(cluster_runs, cluster_system):
-    logging.info('CHECKING for incomplete runs')
-    cspec = cluster_runs.cspec
-    still_running_permutations = []
-    still_running_count = 0
-    not_started_count = 0
-    finished_healthy_count = 0
-    finished_error_count = 0
-    
-    for run_permutation_code in cluster_runs.run_perm_codes_list:
-        permutation_info = cluster_runs.run_permutation_info_for_run_permutation_code_map[run_permutation_code]
-        user_job_number_as_string = cluster_runs.get_job_number_string_for_run_permutation_code(run_permutation_code)
-        trial = permutation_info['trials']
-        qil = qsub_invoke_log.QsubInvokeLog(user_job_number_as_string, permutation_info, cspec, trial)
-        cluster_job_number = qil.cluster_job_number
-        #print "cluster_job_number is {0}".format(cluster_job_number)
-        # first, check qstat to see if this job is still running
-        if (cluster_job_number == "NA"):
-            not_started_count = not_started_count + 1
-            cluster_system.println("{0} - no evidence of having launched".format(user_job_number_as_string))
-        else:
-            statloq = qstat_log.QStatLog(user_job_number_as_string, permutation_info, cspec,trial)
-            if (statloq.is_cluster_job_still_running(cluster_job_number)):
-                still_running_permutations.append(run_permutation_code)
-                still_running_count = still_running_count + 1
-                cluster_system.println("{0} still running".format(cluster_job_number))
-            else:
-                #print "{0} done".format(cluster_job_number)
-                qacctlog = qacct_log.QacctLog(user_job_number_as_string, permutation_info, cspec, trial)
-                qacctlog.ingest(cluster_job_number)
-                if (qacctlog.run_failed()):
-                    finished_error_count = finished_error_count + 1
-                    cluster_system.println("{0} run issue : {1} -> {2}".format(cluster_job_number, run_permutation_code, qacctlog.get_failure_reason()))
-                else:
-                    finished_healthy_count = finished_healthy_count + 1
-
-    if (not_started_count != 0):
-        cluster_system.println("{0} permutations not started".format(not_started_count))
-    if (still_running_count != 0):
-        cluster_system.println("{0} permutations still running".format(still_running_count))
-        for still_running_permutation in still_running_permutations:
-            cluster_system.println("still running : {0}".format(still_running_permutation))
-    cluster_system.println("{0} permutations complete".format(finished_healthy_count))
-            
 
 def stop_runs(cluster_runs, cluster_system):
     logging.info('STOPPING runs that are still going')
@@ -212,46 +175,20 @@ def run_command_on_all_specs(cspec_path, permuter_command,cluster_system):
         cluster_system.execute_command(command) 
     
 def check_status_of_runs(cluster_runs, output_style, cluster_system):
-    logging.info('CHECKING status of runs')
-    cspec = cluster_runs.cspec
-    running_count = 0
-    permission_block_count = 0
-    failed_count = 0
-    complete_count = 0
-    total_count = 0
-    not_yet_launched_count = 0
-    unknown_count = 0
-    for run_permutation_code in cluster_runs.run_perm_codes_list:
-        status = check_status_of_run(cluster_runs, run_permutation_code, cspec, output_style, cluster_system)
-        if (status=="not_yet_launched"):
-            not_yet_launched_count = not_yet_launched_count + 1
-        elif (status=="permission_block"):
-            permission_block_count = permission_block_count + 1
-        elif (status=="still_running"):
-            running_count = running_count + 1
-        elif (status=="complete"):
-            complete_count = complete_count + 1
-        elif (status=="failed"):
-            failed_count = failed_count + 1
-        else:
-            unknown_count = unknown_count + 1
-        total_count = total_count + 1
-    message = "{0}({1})\t".format(cspec.master_job_name, total_count)
-    if complete_count != 0:
-        message = "{0}complete: {1}\t".format(message, complete_count)
-    if not_yet_launched_count != 0:
-        message = "{0}not yet launched: {1}\t".format(message, not_yet_launched_count)
-    if running_count != 0:
-        message = "{0}running: {1}\t".format(message, running_count)
-    if permission_block_count != 0:
-        message = "{0}nfs permission issue: {1}\t".format(message, permission_block_count)
-    if failed_count != 0:
-        message = "{0}failed: {1}\t".format(message, failed_count)
-    if unknown_count != 0:
-        message = "{0}unknown fate: {1}\t".format(message, unknown_count)
-    #message = "{0}\n".format(message)
-    print message
+    run_states = state_of_runs.StateOfRuns()
+    run_states.assess(cluster_runs, cluster_system)
+    if output_style == 'summary':
+        run_states.emit_state_summary()
+    elif output_style == 'full':
+        run_states.emit_state_full()
+    else:
+        run_states.emit_state_pending()
         
+'''        
+    logging.info('CHECKING status of runs')
+ 
+'''     
+  
 def check_status_of_run(cluster_runs, run_permutation_code, cspec, output_style, cluster_system):
     logging.debug('CHECKING status of run')
     run_finished = cluster_runs_info.did_run_finish(cluster_runs, run_permutation_code, cluster_system)
@@ -286,7 +223,7 @@ def check_status_of_run(cluster_runs, run_permutation_code, cspec, output_style,
             return "complete"
         else:
             #fun finished but missing an output file, find out the error
-            qacctlog = qacct_log.QacctLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'])
+            qacctlog = qacct_log.QacctLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'], cluster_system)
             qacctlog.ingest(cluster_job_number)
             if (output_style == "full" or output_style == "pending"):
                 cluster_system.println("{0} FAILED -> {1}".format(cluster_job_number, qacctlog.get_failure_reason()))
@@ -396,6 +333,16 @@ def clean_scripts(cluster_runs,cluster_system):
     for f in files:
         path = "{0}/{1}".format(script_dir, f)
         cluster_system.delete_file("deleting script file", path)
+        
+
+def clean_script_dir_except_for_scripts(cluster_runs,cluster_system):
+    logging.info('CLEANING scripts')
+    script_dir = cluster_runs.cspec.script_dir
+    files = cluster_system.listdir(script_dir)
+    for f in files:
+        if not(f.endswith('.sh')):
+            path = "{0}/{1}".format(script_dir, f)
+            cluster_system.delete_file("deleting file", path)
 
 def preview_scripts(cluster_runs, cluster_system):
     logging.info("PREVIEWING scripts")
@@ -412,7 +359,7 @@ def test_launch_single_script(cluster_runs, cluster_system):
     logging.info('TEST_LAUNCH single script')
     #cspec = cluster_runs.cspec
     #run_permutation_code = cluster_runs.run_perm_codes_list[0]
-    #user_job_number_as_string = cluster_runs.get_job_number_string_for_permutation_code(run_permutation_code)
+    #user_job_number_as_string = cluster_runs.get_job_number_string_for_run_permutation_code(run_permutation_code)
     #permutation_info = cluster_runs.run_permutation_info_for_run_permutation_code_map[run_permutation_code]
     cscript = cluster_runs.get_first_script()
     cscript.launch()

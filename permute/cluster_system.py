@@ -5,6 +5,7 @@ Created on Feb 10, 2014
 '''
 import os
 import subprocess
+import sys
 
 class ClusterSystem(object):
     
@@ -30,6 +31,10 @@ class ClusterSystem(object):
         
     def println(self,s):
         print s 
+        
+    def print_without_newline(self,s):
+        sys.stdout.write(s)
+        sys.stdout.flush()
         
     def get_time_delay(self):
         return 1.5
@@ -69,8 +74,15 @@ class ClusterSystem(object):
     def isfile(self, path):
         return os.path.isfile(path)
     
+    def get_last_modification_time(self, path):
+        if (not(self.exists(path))):
+            return 'NA'
+        else:
+            return os.path.getmtime(path)
+        
     def exists(self,path):
         return os.path.exists(path)
+    
     def isdir(self,path):
         return os.path.isdir(path)
     

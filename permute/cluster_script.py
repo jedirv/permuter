@@ -44,13 +44,24 @@ class ClusterScript(PermutationDriverFile):
         f.write("touch {0}/permutation_done_marker.txt\n".format(self.resolved_results_dir))
         f.close()  
     
+    def exists(self):
+        if (self.cluster_system.exists(self.pathname)):
+            return True
+        return False      
+    
+    def get_last_modification_time(self):
+        if (self.exists()):
+            return self.cluster_system.get_last_modification_time(self.pathname)
+        else:
+            return 'NA'
+        
     def preview(self):
         self.pathname = "junk.sh"
         self.generate()
         f = self.cluster_system.open_file(self.pathname, 'r')
         lines = f.readlines()
         for line in lines:
-            self.cluster_system.println(line)
+            self.cluster_system.print_without_newline(line)
         f.close()
         self.cluster_system.delete_file("remove temp junk.sh", self.pathname)
         

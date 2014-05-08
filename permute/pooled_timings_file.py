@@ -64,7 +64,7 @@ class PooledTimingsFile(object):
                     #permutation_info = pooled_results_file.gen_perm_code_from_pieces(y_axis_val, x_axis_val, self.filename_permutation_info, cspec, trial)
                     #cluster_job_perm_code = permutations.generate_permutation_code(permutation_info_with_trial,cspec.concise_print_map,True)
                     #print "cluster_job_perm_code {0}".format(cluster_job_perm_code)
-                    timing_value = get_timing_value_for_run(cluster_job_perm_code,self.cluster_runs)
+                    timing_value = get_timing_value_for_run(cluster_job_perm_code,self.cluster_runs,self.cluster_system)
                     #print 'timing_value : {0}'.format(timing_value)
                     trial_timing_values.append(timing_value)
                 median_timing = pooled_results_file.get_median(trial_timing_values, True)
@@ -114,18 +114,18 @@ def gen_cluster_job_perm_code_from_pieces(y_axis_permutation, x_axis_permutation
         #odd number in list
 #        return sorted_int_series[(size-1)/2]
 
-def get_timing_value_for_run(perm_code, cluster_runs): 
-    user_job_number_as_string = cluster_runs.get_job_number_string_for_permutation_code(perm_code)
+def get_timing_value_for_run(perm_code, cluster_runs, cluster_system): 
+    user_job_number_as_string = cluster_runs.get_job_number_string_for_run_permutation_code(perm_code)
     #print "user_job_number_as_string {0}".format(user_job_number_as_string)
     permutation_info = cluster_runs.get_permutation_info_for_permutation_code(perm_code)
     #print "permutation_info {0}".format(permutation_info)
-    qil = qsub_invoke_log.QsubInvokeLog(user_job_number_as_string, permutation_info, cluster_runs.cspec, permutation_info['trials'])
+    qil = qsub_invoke_log.QsubInvokeLog(user_job_number_as_string, permutation_info, cluster_runs.cspec, permutation_info['trials'], cluster_system)
     cluster_job_number = qil.cluster_job_number
     if (cluster_job_number == "NA"):
         return "missing"
     else:
         #print  "cluster_job_number {0}".format(cluster_job_number)
-        qacctlog = qacct_log.QacctLog(user_job_number_as_string, permutation_info, cluster_runs.cspec, permutation_info['trials'])
+        qacctlog = qacct_log.QacctLog(user_job_number_as_string, permutation_info, cluster_runs.cspec, permutation_info['trials'], cluster_system)
         qacctlog.ingest(cluster_job_number)
         if (qacctlog.run_failed()):
             return "missing"

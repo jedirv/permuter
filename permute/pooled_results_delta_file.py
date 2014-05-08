@@ -17,7 +17,7 @@ class PooledResultsDeltaFile(object):
         '''
         Constructor
         '''
-        self.cluster_system
+        self.cluster_system = cluster_system
         self.resultsFile = resultsFile
         self.dirname = resultsFile.target_dir
         self.filename_code = resultsFile.perm_code_for_filename
