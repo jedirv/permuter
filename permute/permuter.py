@@ -62,6 +62,7 @@ def main():
  
 def validate_args(permute_command, cspec_path, flags):
     if (not(permute_command == "collect" or 
+            permute_command == "count" or 
             permute_command == "stat" or 
             permute_command == "stat_full" or 
             permute_command == "stat_pending" or 
@@ -105,7 +106,8 @@ def usage():
     print"               new_spec               # generate a template cspec file the user can fill out"  
     print"               spec_help              # prints documentation for the cspec file contents."  
     print""            
-    print"        ...for actions to launch permutations"               
+    print"        ...for actions to launch permutations"              
+    print"               count                  # show the number of permutations that will be generated"                   
     print"               preview                # print to stdout what the first script generated will look like"     
     print"               gen                    # generate cluster scripts"              
     print"               test_launch            # launch the first script to see if it runs successfully"            

@@ -3,7 +3,7 @@ Created on Feb 23, 2014
 
 @author: irvine
 '''
-
+import cluster_script
 class SpecHelp(object):
     '''
     classdocs
@@ -300,7 +300,8 @@ class SpecHelp(object):
         print("#  permuter.py appends a command to each script that touches a file in the ")
         print("#  results dir for each run, with this name ")
         print("#  ")
-        print("#  touch <permutation_results_dir>/permutation_done_marker.txt")
+        done_file = cluster_script.get_done_marker_filename()
+        print("#  touch <permutation_results_dir>/{0}".format(done_file))
         print("#  ")
         print("#  This file is used to signal that the script has run through all of its commands.")
         print("#  It does not signify that all commands ran error-free.  it is used by the stat")

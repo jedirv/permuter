@@ -51,6 +51,8 @@ class PermutationDriver(object):
                 launch_scripts(cluster_runs, cluster_system)
         elif (permute_command == "preview"):
             preview_scripts(cluster_runs, cluster_system)
+        elif (permute_command == "count"):
+            count_scripts(cluster_runs, cluster_system)
         elif (permute_command == "test_launch"):
             clean_script_dir_except_for_scripts(cluster_runs,cluster_system)
             clean_results(cluster_runs, cluster_system)
@@ -296,7 +298,8 @@ def delete_results(cspec, cluster_system):
         comment = "deleting result file for {0}".format(permutation)
         cluster_system.delete_file(comment, result_path)
         pardir = cluster_system.get_par_dir(result_path)
-        done_marker_path = "{0}/permutation_done_marker.txt".format(pardir)
+        done_file = cluster_script.get_done_marker_filename()
+        done_marker_path = "{0}/{1}".format(pardir, done_file)
         deletion_message = "deleting done marker path {0}".format(done_marker_path)
         cluster_system.delete_file(deletion_message, done_marker_path)
      
@@ -338,12 +341,15 @@ def clean_scripts(cluster_runs,cluster_system):
 def clean_script_dir_except_for_scripts(cluster_runs,cluster_system):
     logging.info('CLEANING scripts')
     script_dir = cluster_runs.cspec.script_dir
-    files = cluster_system.listdir(script_dir)
+    clean_dir_except_for_scripts(script_dir, cluster_system)
+    
+def clean_dir_except_for_scripts(dir, cluster_system):
+    files = cluster_system.listdir(dir)
     for f in files:
         if not(f.endswith('.sh')):
-            path = "{0}/{1}".format(script_dir, f)
+            path = "{0}/{1}".format(dir, f)
             cluster_system.delete_file("deleting file", path)
-
+            
 def preview_scripts(cluster_runs, cluster_system):
     logging.info("PREVIEWING scripts")
     #cspec = cluster_runs.cspec
@@ -353,6 +359,10 @@ def preview_scripts(cluster_runs, cluster_system):
     
     cscript = cluster_runs.get_first_script()
     cscript.preview()
+
+def count_scripts(cluster_runs, cluster_system):
+    logging.info("COUNTING scripts")
+    cluster_runs.display_count()
 
 
 def test_launch_single_script(cluster_runs, cluster_system):

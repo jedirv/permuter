@@ -42,13 +42,13 @@ class QsubInvokeLog(PermutationDriverFile):
     def is_corrupt(self):
         starting_dir = self.cluster_system.getcwd()
         self.cluster_system.chdir(self.script_dir)
-        #print "opening {0}".format(self.qsub_invoke_log)
+        #print "opening {0}".format(self.qsub_invoke_log_fullpath)
         #print self.script_dir
-        if (self.cluster_system.exists(self.qsub_invoke_log)):
-            f = self.cluster_system.open_file(self.qsub_invoke_log, 'r')
+        if (self.cluster_system.exists(self.qsub_invoke_log_fullpath)):
+            f = self.cluster_system.open_file(self.qsub_invoke_log_fullpath, 'r')
             line = f.readline()
             f.close()
-            #print "closed {0}".format(self.qsub_invoke_log)
+            #print "closed {0}".format(self.qsub_invoke_log_fullpath)
             parts = line.split(' ')
             
             if (len(parts) != 7):
@@ -62,13 +62,13 @@ class QsubInvokeLog(PermutationDriverFile):
     def load_job_number(self):
         starting_dir = self.cluster_system.getcwd()
         self.cluster_system.chdir(self.script_dir)
-        #print "opening {0}".format(self.qsub_invoke_log)
+        #print "opening {0}".format(self.qsub_invoke_log_fullpath)
         #print self.script_dir
-        if (self.cluster_system.exists(self.qsub_invoke_log)):
-            f = self.cluster_system.open_file(self.qsub_invoke_log, 'r')
+        if (self.cluster_system.exists(self.qsub_invoke_log_fullpath)):
+            f = self.cluster_system.open_file(self.qsub_invoke_log_fullpath, 'r')
             line = f.readline()
             f.close()
-            #print "closed {0}".format(self.qsub_invoke_log)
+            #print "closed {0}".format(self.qsub_invoke_log_fullpath)
             parts = line.split(' ')
             
             if (len(parts) != 7):

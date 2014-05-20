@@ -41,7 +41,8 @@ class ClusterScript(PermutationDriverFile):
         f.write("hostname\n")
         for cur_command in self.commands_for_this_permutation:
             f.write("{0}\n".format(cur_command))
-        f.write("touch {0}/permutation_done_marker.txt\n".format(self.resolved_results_dir))
+        done_file = get_done_marker_filename()
+        f.write("touch {0}/{1}\n".format(self.resolved_results_dir, done_file))
         f.close()  
     
     def exists(self):
@@ -84,5 +85,6 @@ class ClusterScript(PermutationDriverFile):
             print("There was a problem invoking the script: {0}".format(self.pathname))
             print("Return code was {0}".format(subprocess.CalledProcessError.returncode))
         
-        
+def get_done_marker_filename():
+    return "permutation_done_marker.txt"   
         

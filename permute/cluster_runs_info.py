@@ -44,7 +44,10 @@ class ClusterRunsInfo(object):
             self.cluster_script_for_run_permutation_code_map[run_permutation_code] = cscript
             user_job_number = user_job_number + 1
             
-                 
+    def display_count(self): 
+        count = len(self.permutation_info_list_full)
+        self.cluster_system.println('{0} permutations will be generated'.format(count))    
+                
     def get_results_dir_for_run_permutation_code(self, permutation_code):
         result = self.result_dir_for_run_permutation_code_map[permutation_code]
         return result
@@ -86,9 +89,11 @@ def get_formatted_user_job_number(user_job_number, width):
     return str(user_job_number).zfill(width)
 
 
+
 def did_run_finish(cluster_runs, run_permutation_code, cluster_system):
     results_dir = cluster_runs.get_results_dir_for_run_permutation_code(run_permutation_code)
-    done_marker_file_path = "{0}/permutation_done_marker.txt".format(results_dir)
+    done_file = cluster_script.get_done_marker_filename()
+    done_marker_file_path = "{0}/{1}".format(results_dir, done_file)
     #print "done_marker_file_path {0}".format(done_marker_file_path)
     run_finished = False
     if (cluster_system.isfile(done_marker_file_path)):

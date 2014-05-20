@@ -10,6 +10,7 @@ import qsub_invoke_log
 import qacct_log
 import permutations
 import os
+import cluster_script
 
 class StateOfRuns(object):
     '''
@@ -159,7 +160,8 @@ class StateOfRuns(object):
                 run_complete_count = run_complete_count + 1
             else:
                 unknown_run_state_count = unknown_run_state_count + 1
-                
+        
+        self.cluster_system.println("")          
         master_job_name = self.cluster_runs_info.cspec.master_job_name
         message = "{0}({1})\t".format(master_job_name, total_count)
         
@@ -239,7 +241,7 @@ class StateOfRuns(object):
             dme = 'dme 1'
         if self.output_files_exist[runID] == True:
             ofe = 'ofe 1'
-            
+        #import ipdb;ipdb.set_trace()   
         state_code = '{0} {1} {2} {3} {4}'.format(se, ile, rpb, dme, ofe)
         run_state = self.state_codes[state_code]
         self.run_error_info[runID] = ''
@@ -265,10 +267,10 @@ class StateOfRuns(object):
         runID = run_permutation_code
         logging.debug('CHECKING status of run')
         # populate self.run_script_exists
-        cluster_script = cluster_runs.get_script_for_run_permutation_code(runID)
-        script_exists = cluster_system.exists(cluster_script.pathname)
+        cluster_script_instance = cluster_runs.get_script_for_run_permutation_code(runID)
+        script_exists = cluster_system.exists(cluster_script_instance.pathname)
         self.run_script_exists[runID] = script_exists
-        self.script_mtime[runID] = cluster_script.get_last_modification_time()
+        self.script_mtime[runID] = cluster_script_instance.get_last_modification_time()
         
         # populate self.invoke_log_exists
         # populate self.invoke_log_corrupt
@@ -315,7 +317,8 @@ class StateOfRuns(object):
         self.done_marker_exists[runID] = cluster_runs_info.did_run_finish(cluster_runs, runID, cluster_system)
         if (self.done_marker_exists[runID] == True):
             results_dir = cluster_runs.get_results_dir_for_run_permutation_code(runID)
-            done_marker_file_path = "{0}/permutation_done_marker.txt".format(results_dir)
+            done_file = cluster_script.get_done_marker_filename()
+            done_marker_file_path = "{0}/{1}".format(results_dir, done_file)
             self.done_marker_mtime[runID] = cluster_system.get_last_modification_time(done_marker_file_path)
         else:
             self.done_marker_mtime[runID] = 'NA'
@@ -339,7 +342,7 @@ class StateOfRuns(object):
             else:
                 if curtime < time:
                     time = curtime
-        if time != 0:
+        if time == 0:
             self.output_files_mtime[runID] = 'NA'
         else:
             self.output_files_mtime[runID] = time
@@ -347,16 +350,16 @@ class StateOfRuns(object):
   
     def check_for_any_scripts(self, cluster_system, cluster_runs_info):
         for run_perm_code in cluster_runs_info.run_perm_codes_list:
-            cluster_script = cluster_runs_info.get_script_for_run_permutation_code(run_perm_code)
-            if (cluster_system.exists(cluster_script.pathname)):
+            cluster_script_instance = cluster_runs_info.get_script_for_run_permutation_code(run_perm_code)
+            if (cluster_system.exists(cluster_script_instance.pathname)):
                 return True
             return False
         
     def check_for_all_scripts(self, cluster_system, cluster_runs_info):
         result = True
         for run_perm_code in cluster_runs_info.run_perm_codes_list:
-            cluster_script = cluster_runs_info.get_script_for_run_permutation_code(run_perm_code)
-            if not(cluster_system.exists(cluster_script.pathname)):
+            cluster_script_instance = cluster_runs_info.get_script_for_run_permutation_code(run_perm_code)
+            if not(cluster_system.exists(cluster_script_instance.pathname)):
                 result = False
         return result
         

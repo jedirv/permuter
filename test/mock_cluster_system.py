@@ -11,6 +11,7 @@ Created on Feb 10, 2014
 import os
 import mock_file
 import time
+from permute import cluster_script
 
 class MockClusterSystem(object):
     def __init__(self):
@@ -20,6 +21,7 @@ class MockClusterSystem(object):
         self.cur_dir = '.'
         self.commands = []
         self.running_jobs = {}
+        self.running_job_numbers = {}
         self.next_job_number = 1
         self.qacct_files = {}
         self.stdout = []
@@ -50,11 +52,14 @@ class MockClusterSystem(object):
     def execute_command(self,command):
         self.commands.append(command)
         if command.startswith("qsub"): #assume this is always the unit test context
-            self.process_unittest_script(command, self.cspec)
             parts = command.split(" ")
             job_script = parts[1]
             next_job_number_string = "{0}".format(self.next_job_number)
             self.running_jobs[next_job_number_string] = job_script
+            self.running_job_numbers[job_script] = next_job_number_string
+            
+            self.process_unittest_script(command, self.cspec)
+            
             self.next_job_number = self.next_job_number + 1
         elif command.startswith("qdel"):
             parts = command.split(" ")
@@ -92,29 +97,55 @@ class MockClusterSystem(object):
         # j105_2_an_cat_l_aa_number_3_s_300.sh
         
         result_permuters = self.answerkey.keys()
-        # now we know how many result files there needs to be
-        for result_permuter in result_permuters:
-            # look up the answer for the result file of this result permuation
-            list_of_trial_answer_dictionaries = self.answerkey[result_permuter]
+        if len(result_permuters) == 1 and "" == result_permuters[0]:
+            # no result_premuters are in play
+            list_of_trial_answer_dictionaries = self.answerkey[""]
             trial_index = int(trial) - 1
             trial_answer_dictionary = list_of_trial_answer_dictionaries[trial_index]
             answer = trial_answer_dictionary[permcode]
-            self.persist_answer(answer, permcode, trial, cspec, result_permuter)
+            self.persist_answer(answer, permcode, trial, cspec, "", script_name)
+        else:
+            # now we know how many result files there needs to be
+            for result_permuter in result_permuters:
+                # look up the answer for the result file of this result permuation
+                list_of_trial_answer_dictionaries = self.answerkey[result_permuter]
+                trial_index = int(trial) - 1
+                trial_answer_dictionary = list_of_trial_answer_dictionaries[trial_index]
+                answer = trial_answer_dictionary[permcode]
+                self.persist_answer(answer, permcode, trial, cspec, result_permuter, script_name)
             
-    def persist_answer(self, answer, permcode, trial, cspec, result_permuter): 
+    def persist_answer(self, answer, permcode, trial, cspec, result_permuter, script_name): 
         scores_from_filepath = cspec.scores_from_filepath
         root_results_dir = cspec.root_results_dir
         permutation_results_dir = "{0}/{1}/trial{2}/{3}".format(root_results_dir, cspec.master_job_name, trial, permcode)
         scores_from_filepath_perm_dir_resolved = scores_from_filepath.replace("<permutation_results_dir>", permutation_results_dir)
-        scores_permute_keys = cspec.scores_permuters.keys()
-        scores_permuter_key = scores_permute_keys[0]
-        permuter_match_string = "({0})".format(scores_permuter_key)
-        resolved_path = scores_from_filepath_perm_dir_resolved.replace(permuter_match_string,result_permuter)
+        if result_permuter == "":
+            # we're done
+            resolved_path = scores_from_filepath_perm_dir_resolved
+        else:
+            scores_permute_keys = cspec.scores_permuters.keys()
+            scores_permuter_key = scores_permute_keys[0]
+            permuter_match_string = "({0})".format(scores_permuter_key)
+            resolved_path = scores_from_filepath_perm_dir_resolved.replace(permuter_match_string,result_permuter)
         f = self.open_file(resolved_path,'w')
         f.write("foo,auc,bar\n")
         f.write("na,")
         f.write(answer)
         f.write(",na\n")
+        f.close()
+        # make the qil file
+        script_name_root = script_name.rstrip(".sh")
+        qil_file_path = "{0}/{1}.qil".format(cspec.script_dir,script_name_root)
+        f = self.open_file(qil_file_path,'w')
+        #Your job 7216388 ("gmm7-j000_1_c_10-11-12-13_fv_CoUq_m_2013-01_r_10") has been submitted
+        cluster_job_number = self.running_job_numbers[script_name]
+        qil_content_string = "Your job {0} (\"job_name_not_comuted_in_test\") has been submitted\n".format(cluster_job_number)
+        f.write(qil_content_string)
+        f.close()
+        # make the done marker
+        done_file = cluster_script.get_done_marker_filename()
+        done_marker_path = "{0}/{1}".format(permutation_results_dir, done_file)
+        f = self.open_file(done_marker_path,'w')
         f.close()
     
     def get_trial_permcode_from_script_name(self, script_name):
@@ -143,14 +174,18 @@ class MockClusterSystem(object):
         return pardir
     
     def make_dirs(self,path):
-        self.mkdir(path)
-        more_dirs = True
-        while more_dirs:
-            path = os.path.dirname(path)
-            if path == '/' or path == '.':
-                more_dirs = False
-            else:
-                self.mkdir(path)
+        if not(self.isdir(path)):
+            self.mkdir(path)
+            more_dirs = True
+            while more_dirs:
+                path = os.path.dirname(path)
+                if path == '/' or path == '.':
+                    more_dirs = False
+                else:
+                    if self.isdir(path):
+                        break
+                    else:
+                        self.mkdir(path)
       
     def mkdir(self, path):
         if not(path in self.dirs):
@@ -218,8 +253,9 @@ class MockClusterSystem(object):
             create_time = time.time()
             self.file_create_times[path] = create_time
             parent = os.path.dirname(path)
-            if (not(parent in self.dirs)):
-                self.dirs.append(parent)
+            self.make_dirs(parent)
+            #if (not(parent in self.dirs)):
+            #    self.dirs.append(parent)
             return mfile
         else: # mode == 'r'
             if not(self.files.has_key(path)):
