@@ -66,6 +66,7 @@ class MockClusterSystem(object):
             job_number = parts[1]
             job_number_string = "{0}".format(job_number)
             self.running_jobs.pop(job_number_string)
+            self.println(command)
         elif command.startswith("python permuter.py"):
             raise 'execute_command("python permuter.py...") not yet implement'
         elif command.startswith("qacct"):
@@ -83,6 +84,7 @@ class MockClusterSystem(object):
             f.write("{0}\n".format(maxvmem_string))
             f.close()
             self.qacct_files[job_number_string] = f
+            self.println(command)
             
     def set_unittest_answers(self, answerkey):
         self.answerkey = answerkey

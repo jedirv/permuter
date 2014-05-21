@@ -85,15 +85,19 @@ class ClusterRunsInfo(object):
     def get_script_for_run_permutation_code(self, run_permutation_code):
         return self.cluster_script_for_run_permutation_code_map[run_permutation_code]
     
+    def get_donefile_path_for_run_permutation_code(self,run_permutation_code):
+        results_dir = self.get_results_dir_for_run_permutation_code(run_permutation_code)
+        done_file = cluster_script.get_done_marker_filename()
+        done_marker_file_path = "{0}/{1}".format(results_dir, done_file)
+        return done_marker_file_path
+    
 def get_formatted_user_job_number(user_job_number, width):
     return str(user_job_number).zfill(width)
 
 
 
 def did_run_finish(cluster_runs, run_permutation_code, cluster_system):
-    results_dir = cluster_runs.get_results_dir_for_run_permutation_code(run_permutation_code)
-    done_file = cluster_script.get_done_marker_filename()
-    done_marker_file_path = "{0}/{1}".format(results_dir, done_file)
+    done_marker_file_path = cluster_runs.get_donefile_path_for_run_permutation_code(run_permutation_code)
     #print "done_marker_file_path {0}".format(done_marker_file_path)
     run_finished = False
     if (cluster_system.isfile(done_marker_file_path)):

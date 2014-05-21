@@ -1,8 +1,8 @@
 #cspec
 master_job_name:runtest
 trials:1
-permute:x=1 4
-permute:y=1,2,3
+(permute):x=range(1,5)
+(permute):y=1,2,3
 
 scores_from:file=<permutation_results_dir>/run_test.csv,column_name=auc,row_number=1
 scores_to:/nfs/stak/students/i/irvine/python/cluster/test/runtest_out/collected_results

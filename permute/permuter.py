@@ -73,6 +73,7 @@ def validate_args(permute_command, cspec_path, flags):
             permute_command == "launch" or 
             permute_command == "auto" or 
             permute_command == "preview" or 
+            permute_command == "retry" or 
             permute_command == "stop" or 
             permute_command == "clean_scripts" or 
             permute_command == "clean_results" or 
@@ -112,7 +113,8 @@ def usage():
     print"               gen                    # generate cluster scripts"              
     print"               test_launch            # launch the first script to see if it runs successfully"            
     print"               launch                 # launch all the generated cluster scripts"                   
-    print"               auto                   # runs gen and then launch in sequence - only use if very confident" 
+    print"               auto                   # runs gen and then launch in sequence - only use if very confident"                   
+    print"               retry                  # launch any jobs that have not generated all output files (calls stop first)" 
     print""
     print"         ...for assessing the status of permutation runs that have been launched:"                      
     print"               stat                   # show the summary counts of status of runs"                   

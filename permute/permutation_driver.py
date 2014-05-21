@@ -49,6 +49,9 @@ class PermutationDriver(object):
             else:
                 generate_scripts(cluster_runs)
                 launch_scripts(cluster_runs, cluster_system)
+        elif (permute_command == "retry"):
+            stop_runs(cluster_runs, cluster_system)
+            launch_incomplete_runs(cluster_runs, cluster_system)
         elif (permute_command == "preview"):
             preview_scripts(cluster_runs, cluster_system)
         elif (permute_command == "count"):
@@ -150,9 +153,9 @@ def stop_run_if_running(cluster_runs, run_permutation_code, cspec, cluster_syste
         if (not(run_finished)):
             #print "{0}\t{1}\tstill running".format(cluster_job_number, qil.get_job_file_name())
             stop_run(cluster_job_number, cluster_system)
-            qil.delete()
+            #qil.delete()
         else:
-            cluster_system.println("{0} detected as finished {1}".format(cluster_job_number, user_job_number_as_string))
+            cluster_system.println("{0} detected as finished (j{1}...)".format(cluster_job_number, user_job_number_as_string))
     
 def stop_run(cluster_job_number, cluster_system):
     command = "qdel {0}".format(cluster_job_number)
@@ -175,7 +178,49 @@ def run_command_on_all_specs(cspec_path, permuter_command,cluster_system):
         cluster_system.println("-------------------------------------------------------------------")
         #print command
         cluster_system.execute_command(command) 
+
+
+     
+def launch_incomplete_runs(cluster_runs, cluster_system):
+    logging.info('assessing state of runs')
+    run_states = state_of_runs.StateOfRuns()
+    run_states.assess(cluster_runs, cluster_system)
+    logging.info('LAUNCHING incomplete runs')
+    cspec = cluster_runs.cspec
+    for run_permutation_code in cluster_runs.run_perm_codes_list:
+        #user_job_number_as_string = cluster_runs.get_job_number_string_for_run_permutation_code(run_permutation_code)
+        #permutation_info = cluster_runs.run_permutation_info_for_run_permutation_code_map[run_permutation_code]
+        #cscript = cluster_script.ClusterScript(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'], cluster_system)
+        if not(run_states.output_files_exist[run_permutation_code]):
+            delete_files_generated_for_run(run_permutation_code,cspec, cluster_system, cluster_runs)
+            cscript = cluster_runs.get_script_for_run_permutation_code(run_permutation_code)
+            cscript.launch()
+            time.sleep(cluster_system.get_time_delay())
     
+def delete_files_generated_for_run(run_permutation_code,cspec,cluster_system, cluster_runs):
+    source_file_map = cluster_runs_info.create_source_file_map(cspec)
+    result_path= source_file_map[run_permutation_code]
+    
+    comment = "deleting result file for {0}".format(run_permutation_code)
+    cluster_system.delete_file(comment, result_path)
+    pardir = cluster_system.get_par_dir(result_path)
+    
+    done_file = cluster_script.get_done_marker_filename()
+    done_marker_path = "{0}/{1}".format(pardir, done_file)
+    deletion_message = "deleting done marker path {0}".format(done_marker_path)
+    cluster_system.delete_file(deletion_message, done_marker_path)
+    
+    cscript = cluster_runs.cluster_script_for_run_permutation_code_map[run_permutation_code]
+    root = cscript.script_path_root
+    err_file = "{0}.err".format(root)
+    qacct_file = "{0}.qacct".format(root)
+    out_file = "{0}.out".format(root)
+    qil_file = "{0}.qil".format(root)
+    cluster_system.delete_file("deleting err file",err_file)
+    cluster_system.delete_file("deleting qacct file",qacct_file)
+    cluster_system.delete_file("deleting out file",out_file)
+    cluster_system.delete_file("deleting qil file",qil_file)
+        
 def check_status_of_runs(cluster_runs, output_style, cluster_system):
     run_states = state_of_runs.StateOfRuns()
     run_states.assess(cluster_runs, cluster_system)

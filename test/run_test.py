@@ -19,7 +19,8 @@ def main():
         time.sleep(delay)
         print "sleeping at i: {0}".format(i)
     dir = os.path.dirname(outpath)
-    os.makedirs(dir);
+    if not(os.path.exists(dir)):
+        os.makedirs(dir);
     f = open(outpath, 'w')
     f.write("foo,auc,bar\n")
     f.write("NA,{0},NA\n".format(product))

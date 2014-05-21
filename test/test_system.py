@@ -416,6 +416,55 @@ class TestSystem(unittest.TestCase):
         self.assertTrue(cluster_system.stdout[3] == ".")
         self.assertTrue(cluster_system.stdout[4] == "\n")
         self.assertTrue(cluster_system.stdout[5] == "runtest(4)\tcomplete: 4\t\n")
+        
+        
+    def test_retry(self):
+        # first, complete all four runs
+        #    i.e. self.state_codes['se 1 ile 1 rpb 0 dme 1 ofe 1'] = 'run complete'
+        lines = self.get_lines_for_simpleCaseCspec()
+        cluster_system = mock_cluster_system.MockClusterSystem()
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, cluster_system)
+        cluster_system.set_cluster_spec(cspec)
+        answerkey = self.get_simple_case_answer_key()
+        cluster_system.set_unittest_answers(answerkey)
+        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, cluster_system)
+        permutation_driver.generate_scripts(cluster_runs)
+        permutation_driver.launch_scripts(cluster_runs, cluster_system)
+        
+        permutation_driver.check_status_of_runs(cluster_runs, 'full', cluster_system)
+        self.assertTrue(cluster_system.stdout[0] == "1 trials_1_x_1  run complete\n")
+        self.assertTrue(cluster_system.stdout[1] == "2 trials_1_x_2  run complete\n")
+        self.assertTrue(cluster_system.stdout[2] == "3 trials_1_x_3  run complete\n")
+        self.assertTrue(cluster_system.stdout[3] == "4 trials_1_x_4  run complete\n")
+        
+        cluster_system.stdout = []
+        # now, convince state_of_runs that two of the runs have no output file
+        source_file_map = cluster_runs_info.create_source_file_map(cspec)
+        result_path1= source_file_map["trials_1_x_1"]
+        result_path3= source_file_map["trials_1_x_3"]
+        cluster_system.delete_file("deleting output for perm_code1",result_path1)
+        cluster_system.delete_file("deleting output for perm_code3",result_path3)
+        donefile_path1 = cluster_runs.get_donefile_path_for_run_permutation_code("trials_1_x_1")
+        donefile_path3 = cluster_runs.get_donefile_path_for_run_permutation_code("trials_1_x_3")
+        cluster_system.delete_file("deleting done_file for perm_code1",donefile_path1)
+        cluster_system.delete_file("deleting done_file for perm_code3",donefile_path3)
+        
+        permutation_driver.stop_runs(cluster_runs, cluster_system)
+        self.assertTrue(cluster_system.stdout[0] == "qdel 1\n")
+        self.assertTrue(cluster_system.stdout[1] == "2 detected as finished (j1...)\n")
+        self.assertTrue(cluster_system.stdout[2] == "qdel 3\n")
+        self.assertTrue(cluster_system.stdout[3] == "4 detected as finished (j3...)\n")
+        cluster_system.stdout = []
+        permutation_driver.launch_incomplete_runs(cluster_runs, cluster_system)
+        
+        
+        cluster_system.stdout = []
+        permutation_driver.check_status_of_runs(cluster_runs, 'full', cluster_system)
+        self.assertTrue(cluster_system.stdout[0] == "5 trials_1_x_1  run complete\n")
+        self.assertTrue(cluster_system.stdout[1] == "2 trials_1_x_2  run complete\n")
+        self.assertTrue(cluster_system.stdout[2] == "6 trials_1_x_3  run complete\n")
+        self.assertTrue(cluster_system.stdout[3] == "4 trials_1_x_4  run complete\n")
+        
 '''       
     def test_stat_after_(self):
         self.assertTrue(False)
