@@ -23,7 +23,7 @@ class MockClusterSystem(object):
         self.running_jobs = {}
         self.running_job_numbers = {}
         self.next_job_number = 1
-        self.qacct_files = {}
+        #self.qacct_files = {}
         self.stdout = []
 
     def set_cluster_spec(self,cspec):
@@ -58,7 +58,7 @@ class MockClusterSystem(object):
             self.running_jobs[next_job_number_string] = job_script
             self.running_job_numbers[job_script] = next_job_number_string
             
-            self.process_unittest_script(command, self.cspec)
+            #self.process_unittest_script(command, self.cspec)
             
             self.next_job_number = self.next_job_number + 1
         elif command.startswith("qdel"):
@@ -91,7 +91,7 @@ class MockClusterSystem(object):
         
     def get_time_delay(self):
         return 0.0
-    
+    '''
     def process_unittest_script(self,command, cspec):
         parts = command.split(" ")
         script_name = parts[1]
@@ -115,7 +115,8 @@ class MockClusterSystem(object):
                 trial_answer_dictionary = list_of_trial_answer_dictionaries[trial_index]
                 answer = trial_answer_dictionary[permcode]
                 self.persist_answer(answer, permcode, trial, cspec, result_permuter, script_name)
-            
+    '''
+    '''        
     def persist_answer(self, answer, permcode, trial, cspec, result_permuter, script_name): 
         scores_from_filepath = cspec.scores_from_filepath
         root_results_dir = cspec.root_results_dir
@@ -149,7 +150,8 @@ class MockClusterSystem(object):
         done_marker_path = "{0}/{1}".format(permutation_results_dir, done_file)
         f = self.open_file(done_marker_path,'w')
         f.close()
-    
+    '''
+    '''
     def get_trial_permcode_from_script_name(self, script_name):
         parts = script_name.split('\.')
         root_name = parts[0]
@@ -157,7 +159,7 @@ class MockClusterSystem(object):
         trial, sep, permcode_and_file_extension = rest.partition('_')
         permcode = permcode_and_file_extension.replace(".sh", "")
         return trial, permcode
-      
+    '''  
         
     def delete_file(self,comment,path):
         if (self.files.has_key(path)):

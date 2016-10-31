@@ -21,13 +21,17 @@ import logging
 
 class PermutationDriver(object):
     
-    def __init__(self,cspec_lines, cspec_path, cluster_system):
-        cluster_system.println('initializing cluster_spec...')
-        self.cspec = cluster_spec.ClusterSpec(cspec_path, cspec_lines, cluster_system)
-        cluster_system.println('initializing cluster_runs_info...')
-        self.cluster_runs = cluster_runs_info.ClusterRunsInfo(self.cspec, cluster_system)
+    def __init__(self,cspec_lines, cspec_path, cluster_system, stdout):
+        stdout.println('initializing cluster_spec...')
+        self.cspec = cluster_spec.ClusterSpec(cspec_path, cspec_lines, stdout)
+        stdout.println('initializing cluster_runs_info...')
+        self.cluster_runs = cluster_runs_info.ClusterRunsInfo(self.cspec)
+        result_dirs = self.cluster_runs.get_results_dirs_to_make()
+        for result_dir in result_dirs:
+            cluster_system.mkdirs(result_dir)
         self.cspec_path = cspec_path
         self.cluster_system = cluster_system
+        self.stdout = stdout
         
     def run_command(self, permute_command):
         cluster_runs = self.cluster_runs
@@ -37,7 +41,7 @@ class PermutationDriver(object):
             generate_scripts(cluster_runs)
         elif (permute_command == "launch"):
             if (detect_still_running_runs(cluster_runs, cluster_system)):
-                cluster_system.println("Permutation jobs still running.  Use 'stop' to stop them before 'launch' to avoid replicated jobs")
+                self.stdout.println("Permutation jobs still running.  Use 'stop' to stop them before 'launch' to avoid replicated jobs")
             else:
                 clean_script_dir_except_for_scripts(cluster_runs,cluster_system)
                 clean_results(cluster_runs, cluster_system)
@@ -45,7 +49,7 @@ class PermutationDriver(object):
                 launch_scripts(cluster_runs, cluster_system)
         elif (permute_command == "auto"):
             if (detect_still_running_runs(cluster_runs, cluster_system)):
-                cluster_system.println("Permutation jobs still running.  Use 'stop' to stop them before 'auto' to avoid replicated jobs")
+                self.stdout.println("Permutation jobs still running.  Use 'stop' to stop them before 'auto' to avoid replicated jobs")
             else:
                 generate_scripts(cluster_runs)
                 launch_scripts(cluster_runs, cluster_system)
@@ -55,7 +59,7 @@ class PermutationDriver(object):
         elif (permute_command == "preview"):
             preview_scripts(cluster_runs, cluster_system)
         elif (permute_command == "count"):
-            count_scripts(cluster_runs, cluster_system)
+            count_scripts(cluster_runs, self.stdout)
         elif (permute_command == "test_launch"):
             clean_script_dir_except_for_scripts(cluster_runs,cluster_system)
             clean_results(cluster_runs, cluster_system)
@@ -95,19 +99,19 @@ class PermutationDriver(object):
             pass
         
     
-def collect(cluster_runs, cluster_system):
+def collect(cluster_runs, stdout, cluster_system):
     #warn_of_incomplete_runs(cluster_runs)
     #logging.info('COLLECTING results')
-    cluster_system.println('creating pooled results files...')
+    stdout.println('creating pooled results files...')
     resultsFiles = create_pooled_results_files(cluster_runs, cluster_system)
-    cluster_system.println('creating pooled results delta files...')
+    stdout.println('creating pooled results delta files...')
     create_pooled_results_delta_files(resultsFiles, cluster_system)
-    cluster_system.println('creating pooled timings files...')
+    stdout.println('creating pooled timings files...')
     create_pooled_timings_files(cluster_runs, cluster_system)
-    cluster_system.println('creating ranked results files...')
+    stdout.println('creating ranked results files...')
     create_ranked_results_files(cluster_runs, cluster_system)
     
-def detect_still_running_runs(cluster_runs, cluster_system):
+def detect_still_running_runs(cluster_runs, stdout, cluster_system):
     logging.info('SCANNING for incomplete runs')
     cspec = cluster_runs.cspec
     still_running_count = 0
@@ -125,7 +129,7 @@ def detect_still_running_runs(cluster_runs, cluster_system):
             statloq = qstat_log.QStatLog(user_job_number_as_string, permutation_info, cspec,trial, cluster_system)
             if (statloq.is_cluster_job_still_running(cluster_job_number)):
                 still_running_count = still_running_count + 1
-                cluster_system.println("{0} still running".format(cluster_job_number))
+                stdout.println("{0} still running".format(cluster_job_number))
             
     if (still_running_count != 0):
         return True
@@ -139,7 +143,7 @@ def stop_runs(cluster_runs, cluster_system):
         stop_run_if_running(cluster_runs, run_permutation_code, cspec, cluster_system)
 
 
-def stop_run_if_running(cluster_runs, run_permutation_code, cspec, cluster_system):
+def stop_run_if_running(cluster_runs, run_permutation_code, cspec, stdout, cluster_system):
     logging.debug('STOPPING run if still running')
     run_finished = cluster_runs_info.did_run_finish(cluster_runs, run_permutation_code, cluster_system)
     permutation_info = cluster_runs.run_permutation_info_for_run_permutation_code_map[run_permutation_code]
@@ -148,20 +152,20 @@ def stop_run_if_running(cluster_runs, run_permutation_code, cspec, cluster_syste
     qil = qsub_invoke_log.QsubInvokeLog(user_job_number_as_string, permutation_info, cspec, trial, cluster_system)
     cluster_job_number = qil.cluster_job_number
     if (cluster_job_number == "NA"):
-        cluster_system.println("{0} - no evidence of having launched".format(user_job_number_as_string))
+        stdout.println("{0} - no evidence of having launched".format(user_job_number_as_string))
     else:
         if (not(run_finished)):
             #print "{0}\t{1}\tstill running".format(cluster_job_number, qil.get_job_file_name())
             stop_run(cluster_job_number, cluster_system)
             #qil.delete()
         else:
-            cluster_system.println("{0} detected as finished (j{1}...)".format(cluster_job_number, user_job_number_as_string))
+            stdout.println("{0} detected as finished (j{1}...)".format(cluster_job_number, user_job_number_as_string))
     
 def stop_run(cluster_job_number, cluster_system):
     command = "qdel {0}".format(cluster_job_number)
     cluster_system.execute_command(command)
                     
-def run_command_on_all_specs(cspec_path, permuter_command,cluster_system):
+def run_command_on_all_specs(cspec_path, permuter_command,stdout, cluster_system):
     spec_dir = os.path.dirname(cspec_path)
     file_or_dirnames = cluster_system.listdir(spec_dir)
     cspec_paths = []
@@ -175,7 +179,7 @@ def run_command_on_all_specs(cspec_path, permuter_command,cluster_system):
                 cspec_paths.append(full_path)
     for path in cspec_paths:
         command = "python permuter.py {0} {1}".format(permuter_command, path)
-        cluster_system.println("-------------------------------------------------------------------")
+        stdout.println("-------------------------------------------------------------------")
         #print command
         cluster_system.execute_command(command) 
 
@@ -236,7 +240,7 @@ def check_status_of_runs(cluster_runs, output_style, cluster_system):
  
 '''     
   
-def check_status_of_run(cluster_runs, run_permutation_code, cspec, output_style, cluster_system):
+def check_status_of_run(cluster_runs, run_permutation_code, cspec, output_style, stdout, cluster_system):
     logging.debug('CHECKING status of run')
     run_finished = cluster_runs_info.did_run_finish(cluster_runs, run_permutation_code, cluster_system)
     missing_output_file = False
@@ -251,31 +255,31 @@ def check_status_of_run(cluster_runs, run_permutation_code, cspec, output_style,
     # summary , full, pending
     if (cluster_job_number == "NA"):
         if (output_style == "full" or output_style == "pending"):
-            cluster_system.println("{0} - no evidence of having launched".format(user_job_number_as_string))
+            stdout.println("{0} - no evidence of having launched".format(user_job_number_as_string))
         return "not_yet_launched"
     else:
         if (not(run_finished)):
             if qil.is_first_error_permission_problem():
                 if (output_style == "full" or output_style == "pending"):
-                    cluster_system.println("{0}\t{1}\tblocked on permissions".format(cluster_job_number, qil.get_job_file_name()))
+                    stdout.println("{0}\t{1}\tblocked on permissions".format(cluster_job_number, qil.get_job_file_name()))
                 return "permission_block"
             else:
                 if (output_style == "full" or output_style == "pending"):
-                    cluster_system.println("{0}\t{1}\tstill running".format(cluster_job_number, qil.get_job_file_name()))
+                    stdout.println("{0}\t{1}\tstill running".format(cluster_job_number, qil.get_job_file_name()))
                 return "still_running"
         elif (run_finished and not(missing_output_file)):
             #done
             if (output_style == "full"):
-                cluster_system.println("{0}\t{1}\tcomplete".format(cluster_job_number, qil.get_job_file_name()))
+                stdout.println("{0}\t{1}\tcomplete".format(cluster_job_number, qil.get_job_file_name()))
             return "complete"
         else:
             #fun finished but missing an output file, find out the error
             qacctlog = qacct_log.QacctLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'], cluster_system)
             qacctlog.ingest(cluster_job_number)
             if (output_style == "full" or output_style == "pending"):
-                cluster_system.println("{0} FAILED -> {1}".format(cluster_job_number, qacctlog.get_failure_reason()))
+                stdout.println("{0} FAILED -> {1}".format(cluster_job_number, qacctlog.get_failure_reason()))
             for missing_file in missing_output_files:
-                cluster_system.println("output file missing: {0}".format(missing_file))
+                stdout.println("output file missing: {0}".format(missing_file))
             return "failed"
    
 
@@ -395,7 +399,7 @@ def clean_dir_except_for_scripts(dir, cluster_system):
             path = "{0}/{1}".format(dir, f)
             cluster_system.delete_file("deleting file", path)
             
-def preview_scripts(cluster_runs, cluster_system):
+def preview_scripts(cluster_runs):
     logging.info("PREVIEWING scripts")
     #cspec = cluster_runs.cspec
     #permutation_info = cluster_runs.permutation_info_list_full[0]
@@ -405,9 +409,10 @@ def preview_scripts(cluster_runs, cluster_system):
     cscript = cluster_runs.get_first_script()
     cscript.preview()
 
-def count_scripts(cluster_runs, cluster_system):
+def count_scripts(cluster_runs, stdout):
     logging.info("COUNTING scripts")
-    cluster_runs.display_count()
+    count = cluster_runs.get_permutation_count()
+    stdout.println('{0} permutations will be generated'.format(count))
 
 
 def test_launch_single_script(cluster_runs, cluster_system):

@@ -5,6 +5,7 @@ from permute import permuter
 from permute import permutation_driver
 from permute import cluster_runs_info
 import mock_cluster_system
+import mock_stdout
 
 class TestSystem(unittest.TestCase):
     def setUp(self):
@@ -55,34 +56,34 @@ class TestSystem(unittest.TestCase):
         self.lines = lines
         
     def test_preview(self):
-        cluster_system = mock_cluster_system.MockClusterSystem()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, cluster_system)
-        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, cluster_system)
+        stdout = mock_stdout.MockStdout()
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
         #permdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec",cluster_system)
-        permutation_driver.preview_scripts(cluster_runs, cluster_system)
-        self.assertTrue(cluster_system.stdout[0] == "#!/bin/csh\n")
-        self.assertTrue(cluster_system.stdout[1] == "#\n")
-        self.assertTrue(cluster_system.stdout[2] == "#$ -q eecs,eecs1,eecs,share\n")
-        self.assertTrue(cluster_system.stdout[3] == "#$ -M someone@gmail.com\n")
-        self.assertTrue(cluster_system.stdout[4] == "#$ -m beas\n")
-        self.assertTrue(cluster_system.stdout[5] == "#$ -N unittest-j100_1_an_cat_l_aa_number_1_s_300\n")
-        self.assertTrue(cluster_system.stdout[6] == "#\n")
-        self.assertTrue(cluster_system.stdout[7] == "# send stdout and stderror to this file\n")
-        self.assertTrue(cluster_system.stdout[8] == "#$ -o j100_1_an_cat_l_aa_number_1_s_300.out\n")
-        self.assertTrue(cluster_system.stdout[9] == "#$ -e j100_1_an_cat_l_aa_number_1_s_300.err\n")
-        self.assertTrue(cluster_system.stdout[10] == "#\n")
-        self.assertTrue(cluster_system.stdout[11] == "#see where the job is being run\n")
-        self.assertTrue(cluster_system.stdout[12] == "hostname\n")
-        self.assertTrue(cluster_system.stdout[13] == "echo AAA 1 300 > ./sample_results/unittest/trial1/an_cat_l_aa_number_1_s_300/AAA_1_one.txt\n")
+        permutation_driver.preview_scripts(cluster_runs)
+        self.assertTrue(stdout.stdout[0] == "#!/bin/csh\n")
+        self.assertTrue(stdout.stdout[1] == "#\n")
+        self.assertTrue(stdout.stdout[2] == "#$ -q eecs,eecs1,eecs,share\n")
+        self.assertTrue(stdout.stdout[3] == "#$ -M someone@gmail.com\n")
+        self.assertTrue(stdout.stdout[4] == "#$ -m beas\n")
+        self.assertTrue(stdout.stdout[5] == "#$ -N unittest-j100_1_an_cat_l_aa_number_1_s_300\n")
+        self.assertTrue(stdout.stdout[6] == "#\n")
+        self.assertTrue(stdout.stdout[7] == "# send stdout and stderror to this file\n")
+        self.assertTrue(stdout.stdout[8] == "#$ -o j100_1_an_cat_l_aa_number_1_s_300.out\n")
+        self.assertTrue(stdout.stdout[9] == "#$ -e j100_1_an_cat_l_aa_number_1_s_300.err\n")
+        self.assertTrue(stdout.stdout[10] == "#\n")
+        self.assertTrue(stdout.stdout[11] == "#see where the job is being run\n")
+        self.assertTrue(stdout.stdout[12] == "hostname\n")
+        self.assertTrue(stdout.stdout[13] == "echo AAA 1 300 > ./sample_results/unittest/trial1/an_cat_l_aa_number_1_s_300/AAA_1_one.txt\n")
         done_file = cluster_script.get_done_marker_filename()
         touch_string = "touch ./sample_results/unittest/trial1/an_cat_l_aa_number_1_s_300/{0}\n".format(done_file)
-        self.assertTrue(cluster_system.stdout[14] == touch_string)
+        self.assertTrue(stdout.stdout[14] == touch_string)
 
         
     def test_generate(self):
         cluster_system = mock_cluster_system.MockClusterSystem()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, cluster_system)
-        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, cluster_system)
+        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
         #permdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec",cluster_system)
         permutation_driver.generate_scripts(cluster_runs)
         
@@ -206,7 +207,7 @@ class TestSystem(unittest.TestCase):
         
         cluster_system = mock_cluster_system.MockClusterSystem()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, cluster_system)
-        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, cluster_system)
+        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
         #permdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec",cluster_system)
         permutation_driver.generate_scripts(cluster_runs)
         
@@ -329,27 +330,30 @@ class TestSystem(unittest.TestCase):
         lines = self.get_lines_for_simpleCaseCspec()
         cluster_system = mock_cluster_system.MockClusterSystem()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, cluster_system)
-        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, cluster_system)
+        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
+        stdout = mock_stdout.MockStdout()
         permutation_driver.check_status_of_runs(cluster_runs, 'full', cluster_system)
-        self.assertTrue(cluster_system.stdout[0] == "NA trials_1_x_1  script missing\n")
-        self.assertTrue(cluster_system.stdout[1] == "NA trials_1_x_2  script missing\n")
-        self.assertTrue(cluster_system.stdout[2] == "NA trials_1_x_3  script missing\n")
-        self.assertTrue(cluster_system.stdout[3] == "NA trials_1_x_4  script missing\n")
-        self.assertTrue(len(cluster_system.stdout) == 4)
+        self.assertTrue(stdout.stdout[0] == "NA trials_1_x_1  script missing\n")
+        self.assertTrue(stdout.stdout[1] == "NA trials_1_x_2  script missing\n")
+        self.assertTrue(stdout.stdout[2] == "NA trials_1_x_3  script missing\n")
+        self.assertTrue(stdout.stdout[3] == "NA trials_1_x_4  script missing\n")
+        self.assertTrue(len(stdout.stdout) == 4)
         
     def test_stat_after_gen(self):
         #self.state_codes['se 1 ile 0 rpb 0 dme 0 ofe 0'] = 'script ready'
         lines = self.get_lines_for_simpleCaseCspec()
         cluster_system = mock_cluster_system.MockClusterSystem()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, cluster_system)
-        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, cluster_system)
+        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
         permutation_driver.generate_scripts(cluster_runs)
         permutation_driver.check_status_of_runs(cluster_runs, 'full', cluster_system)
-        self.assertTrue(cluster_system.stdout[0] == "NA trials_1_x_1  script ready\n")
-        self.assertTrue(cluster_system.stdout[1] == "NA trials_1_x_2  script ready\n")
-        self.assertTrue(cluster_system.stdout[2] == "NA trials_1_x_3  script ready\n")
-        self.assertTrue(cluster_system.stdout[3] == "NA trials_1_x_4  script ready\n")
-        self.assertTrue(len(cluster_system.stdout) == 4)
+        
+        stdout = mock_stdout.MockStdout()
+        self.assertTrue(stdout.stdout[0] == "NA trials_1_x_1  script ready\n")
+        self.assertTrue(stdout.stdout[1] == "NA trials_1_x_2  script ready\n")
+        self.assertTrue(stdout.stdout[2] == "NA trials_1_x_3  script ready\n")
+        self.assertTrue(stdout.stdout[3] == "NA trials_1_x_4  script ready\n")
+        self.assertTrue(len(stdout.stdout) == 4)
  
          
     def test_stat_after_test_launch(self):
@@ -360,30 +364,32 @@ class TestSystem(unittest.TestCase):
         cluster_system.set_cluster_spec(cspec)
         answerkey = self.get_simple_case_answer_key()
         cluster_system.set_unittest_answers(answerkey)
-        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, cluster_system)
+        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
         permutation_driver.generate_scripts(cluster_runs)
         permutation_driver.test_launch_single_script(cluster_runs, cluster_system)
         
         permutation_driver.check_status_of_runs(cluster_runs, 'full', cluster_system)
-        self.assertTrue(cluster_system.stdout[0] == "1 trials_1_x_1  run complete\n")
-        self.assertTrue(cluster_system.stdout[1] == "NA trials_1_x_2  script ready\n")
-        self.assertTrue(cluster_system.stdout[2] == "NA trials_1_x_3  script ready\n")
-        self.assertTrue(cluster_system.stdout[3] == "NA trials_1_x_4  script ready\n")
         
-        cluster_system.stdout = []
+        stdout = mock_stdout.MockStdout()
+        self.assertTrue(stdout.stdout[0] == "1 trials_1_x_1  run complete\n")
+        self.assertTrue(stdout.stdout[1] == "NA trials_1_x_2  script ready\n")
+        self.assertTrue(stdout.stdout[2] == "NA trials_1_x_3  script ready\n")
+        self.assertTrue(stdout.stdout[3] == "NA trials_1_x_4  script ready\n")
+        
+        stdout.stdout = []
         permutation_driver.check_status_of_runs(cluster_runs, 'pending', cluster_system)
-        self.assertTrue(cluster_system.stdout[0] == "NA trials_1_x_2  script ready\n")
-        self.assertTrue(cluster_system.stdout[1] == "NA trials_1_x_3  script ready\n")
-        self.assertTrue(cluster_system.stdout[2] == "NA trials_1_x_4  script ready\n")
+        self.assertTrue(stdout.stdout[0] == "NA trials_1_x_2  script ready\n")
+        self.assertTrue(stdout.stdout[1] == "NA trials_1_x_3  script ready\n")
+        self.assertTrue(stdout.stdout[2] == "NA trials_1_x_4  script ready\n")
       
-        cluster_system.stdout = []
+        stdout.stdout = []
         permutation_driver.check_status_of_runs(cluster_runs, 'summary', cluster_system)
-        self.assertTrue(cluster_system.stdout[0] == ".")
-        self.assertTrue(cluster_system.stdout[1] == ".")
-        self.assertTrue(cluster_system.stdout[2] == ".")
-        self.assertTrue(cluster_system.stdout[3] == ".")
-        self.assertTrue(cluster_system.stdout[4] == "\n")
-        self.assertTrue(cluster_system.stdout[5] == "runtest(4)\tscripts ready to run: 3\tcomplete: 1\t\n")
+        self.assertTrue(stdout.stdout[0] == ".")
+        self.assertTrue(stdout.stdout[1] == ".")
+        self.assertTrue(stdout.stdout[2] == ".")
+        self.assertTrue(stdout.stdout[3] == ".")
+        self.assertTrue(stdout.stdout[4] == "\n")
+        self.assertTrue(stdout.stdout[5] == "runtest(4)\tscripts ready to run: 3\tcomplete: 1\t\n")
     
 
     def test_stat_after_all_runs_finished(self):
@@ -394,28 +400,30 @@ class TestSystem(unittest.TestCase):
         cluster_system.set_cluster_spec(cspec)
         answerkey = self.get_simple_case_answer_key()
         cluster_system.set_unittest_answers(answerkey)
-        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, cluster_system)
+        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
         permutation_driver.generate_scripts(cluster_runs)
         permutation_driver.launch_scripts(cluster_runs, cluster_system)
         
         permutation_driver.check_status_of_runs(cluster_runs, 'full', cluster_system)
-        self.assertTrue(cluster_system.stdout[0] == "1 trials_1_x_1  run complete\n")
-        self.assertTrue(cluster_system.stdout[1] == "2 trials_1_x_2  run complete\n")
-        self.assertTrue(cluster_system.stdout[2] == "3 trials_1_x_3  run complete\n")
-        self.assertTrue(cluster_system.stdout[3] == "4 trials_1_x_4  run complete\n")
         
-        cluster_system.stdout = []
+        stdout = mock_stdout.MockStdout()
+        self.assertTrue(stdout.stdout[0] == "1 trials_1_x_1  run complete\n")
+        self.assertTrue(stdout.stdout[1] == "2 trials_1_x_2  run complete\n")
+        self.assertTrue(stdout.stdout[2] == "3 trials_1_x_3  run complete\n")
+        self.assertTrue(stdout.stdout[3] == "4 trials_1_x_4  run complete\n")
+        
+        stdout.stdout = []
         permutation_driver.check_status_of_runs(cluster_runs, 'pending', cluster_system)
-        self.assertTrue(len(cluster_system.stdout) == 0)
+        self.assertTrue(len(stdout.stdout) == 0)
       
-        cluster_system.stdout = []
+        stdout.stdout = []
         permutation_driver.check_status_of_runs(cluster_runs, 'summary', cluster_system)
-        self.assertTrue(cluster_system.stdout[0] == ".")
-        self.assertTrue(cluster_system.stdout[1] == ".")
-        self.assertTrue(cluster_system.stdout[2] == ".")
-        self.assertTrue(cluster_system.stdout[3] == ".")
-        self.assertTrue(cluster_system.stdout[4] == "\n")
-        self.assertTrue(cluster_system.stdout[5] == "runtest(4)\tcomplete: 4\t\n")
+        self.assertTrue(stdout.stdout[0] == ".")
+        self.assertTrue(stdout.stdout[1] == ".")
+        self.assertTrue(stdout.stdout[2] == ".")
+        self.assertTrue(stdout.stdout[3] == ".")
+        self.assertTrue(stdout.stdout[4] == "\n")
+        self.assertTrue(stdout.stdout[5] == "runtest(4)\tcomplete: 4\t\n")
         
         
     def test_retry(self):
@@ -427,17 +435,18 @@ class TestSystem(unittest.TestCase):
         cluster_system.set_cluster_spec(cspec)
         answerkey = self.get_simple_case_answer_key()
         cluster_system.set_unittest_answers(answerkey)
-        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, cluster_system)
+        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
         permutation_driver.generate_scripts(cluster_runs)
         permutation_driver.launch_scripts(cluster_runs, cluster_system)
         
+        stdout = mock_stdout.MockStdout()
         permutation_driver.check_status_of_runs(cluster_runs, 'full', cluster_system)
-        self.assertTrue(cluster_system.stdout[0] == "1 trials_1_x_1  run complete\n")
-        self.assertTrue(cluster_system.stdout[1] == "2 trials_1_x_2  run complete\n")
-        self.assertTrue(cluster_system.stdout[2] == "3 trials_1_x_3  run complete\n")
-        self.assertTrue(cluster_system.stdout[3] == "4 trials_1_x_4  run complete\n")
+        self.assertTrue(stdout.stdout[0] == "1 trials_1_x_1  run complete\n")
+        self.assertTrue(stdout.stdout[1] == "2 trials_1_x_2  run complete\n")
+        self.assertTrue(stdout.stdout[2] == "3 trials_1_x_3  run complete\n")
+        self.assertTrue(stdout.stdout[3] == "4 trials_1_x_4  run complete\n")
         
-        cluster_system.stdout = []
+        stdout.stdout = []
         # now, convince state_of_runs that two of the runs have no output file
         source_file_map = cluster_runs_info.create_source_file_map(cspec)
         result_path1= source_file_map["trials_1_x_1"]
@@ -450,20 +459,21 @@ class TestSystem(unittest.TestCase):
         cluster_system.delete_file("deleting done_file for perm_code3",donefile_path3)
         
         permutation_driver.stop_runs(cluster_runs, cluster_system)
-        self.assertTrue(cluster_system.stdout[0] == "qdel 1\n")
-        self.assertTrue(cluster_system.stdout[1] == "2 detected as finished (j1...)\n")
-        self.assertTrue(cluster_system.stdout[2] == "qdel 3\n")
-        self.assertTrue(cluster_system.stdout[3] == "4 detected as finished (j3...)\n")
-        cluster_system.stdout = []
+        stdout = mock_stdout.MockStdout()
+        self.assertTrue(stdout.stdout[0] == "qdel 1\n")
+        self.assertTrue(stdout.stdout[1] == "2 detected as finished (j1...)\n")
+        self.assertTrue(stdout.stdout[2] == "qdel 3\n")
+        self.assertTrue(stdout.stdout[3] == "4 detected as finished (j3...)\n")
+        stdout.stdout = []
         permutation_driver.launch_incomplete_runs(cluster_runs, cluster_system)
         
         
-        cluster_system.stdout = []
+        stdout.stdout = []
         permutation_driver.check_status_of_runs(cluster_runs, 'full', cluster_system)
-        self.assertTrue(cluster_system.stdout[0] == "5 trials_1_x_1  run complete\n")
-        self.assertTrue(cluster_system.stdout[1] == "2 trials_1_x_2  run complete\n")
-        self.assertTrue(cluster_system.stdout[2] == "6 trials_1_x_3  run complete\n")
-        self.assertTrue(cluster_system.stdout[3] == "4 trials_1_x_4  run complete\n")
+        self.assertTrue(stdout.stdout[0] == "5 trials_1_x_1  run complete\n")
+        self.assertTrue(stdout.stdout[1] == "2 trials_1_x_2  run complete\n")
+        self.assertTrue(stdout.stdout[2] == "6 trials_1_x_3  run complete\n")
+        self.assertTrue(stdout.stdout[3] == "4 trials_1_x_4  run complete\n")
         
 '''       
     def test_stat_after_(self):

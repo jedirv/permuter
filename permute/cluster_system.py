@@ -6,9 +6,14 @@ Created on Feb 10, 2014
 import os
 import subprocess
 import sys
+import getpass
 
 class ClusterSystem(object):
     
+    def get_user_name(self):
+        username = getpass.getuser()
+        return username
+        
     def is_cluster_job_still_running(self, cluster_job_number, script_dir, qstat_log):
         if (cluster_job_number == "NA"):
             return False
@@ -112,5 +117,8 @@ class ClusterSystem(object):
 
     def open_file(self, path, mode):
         return open(path, mode)
+    
+    def close_file(self, f):
+        f.close()
     
     

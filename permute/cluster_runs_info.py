@@ -9,15 +9,14 @@ import cluster_script
 
 class ClusterRunsInfo(object):
     
-    def __init__(self,cspec, cluster_system):
+    def __init__(self,cspec):
         self.cspec = cspec
-        self.cluster_system = cluster_system
         
-        self.job_number_for_run_permutation_code_map = {}
-        self.cluster_script_for_run_permutation_code_map = {}
-        self.run_permutation_info_for_run_permutation_code_map = {}
-        self.run_permutation_code_for_run_permutation_info_map = {}
-        self.result_dir_for_run_permutation_code_map = {}
+        self.job_number_for_perm_code_map = {}
+        self.cluster_script_for_perm_code_map = {}
+        self.perm_info_for_perm_code_map = {}
+        self.perm_code_for_perm_info_map = {}
+        self.result_dir_for_perm_code_map = {}
         
         self.permuters_including_trials = cspec.get_permuters_trials_included()
         self.permutation_info_list_full = permutations.expand_permutations(self.permuters_including_trials)
@@ -28,28 +27,34 @@ class ClusterRunsInfo(object):
         user_job_number = 1
         if cspec.one_up_basis != '':
             user_job_number = int(cspec.one_up_basis)
-        for run_permutation_info in self.permutation_info_list_full:
-            run_permutation_code = permutations.generate_permutation_code(run_permutation_info, cspec.concise_print_map, True)
-            self.run_perm_codes_list.append(run_permutation_code)
+        for perm_info in self.permutation_info_list_full:
+            perm_code = permutations.generate_permutation_code(perm_info, cspec.concise_print_map, True)
+            self.run_perm_codes_list.append(perm_code)
             
             user_job_number_as_string = get_formatted_user_job_number(user_job_number, self.job_num_width)
-            self.job_number_for_run_permutation_code_map[run_permutation_code] = user_job_number_as_string
-            self.run_permutation_info_for_run_permutation_code_map[run_permutation_code] = run_permutation_info
-            run_permutation_info_string = "{0}".format(run_permutation_info)
-            self.run_permutation_code_for_run_permutation_info_map[run_permutation_info_string] = run_permutation_code
-            resolved_results_dir =  permutations.get_resolved_results_dir_for_permutation(run_permutation_info, cspec)
-            self.result_dir_for_run_permutation_code_map[run_permutation_code] = resolved_results_dir
-            cluster_system.make_dirs(resolved_results_dir)
-            cscript = cluster_script.ClusterScript(user_job_number_as_string, run_permutation_info, cspec, run_permutation_info['trials'], cluster_system)
-            self.cluster_script_for_run_permutation_code_map[run_permutation_code] = cscript
+            self.job_number_for_perm_code_map[perm_code] = user_job_number_as_string
+            self.perm_info_for_perm_code_map[perm_code] = perm_info
+            perm_info_string = "{0}".format(perm_info)
+            self.perm_code_for_perm_info_map[perm_info_string] = perm_code
+            resolved_results_dir =  permutations.get_resolved_results_dir_for_permutation(perm_info, cspec)
+            self.result_dir_for_perm_code_map[perm_code] = resolved_results_dir
+            
+            cscript = cluster_script.ClusterScript(user_job_number_as_string, perm_info, cspec, perm_info['trials'])
+            self.cluster_script_for_perm_code_map[perm_code] = cscript
             user_job_number = user_job_number + 1
             
-    def display_count(self): 
+    def get_results_dirs_to_make(self):
+        result = []
+        for perm_code in self.run_perm_codes_list:
+            result.append(self.result_dir_for_perm_code_map[perm_code])
+        return result;
+           
+    def get_permutation_count(self): 
         count = len(self.permutation_info_list_full)
-        self.cluster_system.println('{0} permutations will be generated'.format(count))    
+        return count    
                 
     def get_results_dir_for_run_permutation_code(self, permutation_code):
-        result = self.result_dir_for_run_permutation_code_map[permutation_code]
+        result = self.result_dir_for_perm_code_map[permutation_code]
         return result
         
     def get_job_number_width(self, permutation_info_list):
@@ -60,33 +65,33 @@ class ClusterRunsInfo(object):
         permute_count_width = len(permute_count_as_string)
         return permute_count_width
         
-    def get_job_number_string_for_run_permutation_code(self, run_permutation_code):
+    def get_job_number_string_for_run_permutation_code(self, perm_code):
         #print 'START'
         #for key, val in self.job_number_for_permutation_code_map.items():
         #    print '{0} {1}'.format(key, val)
         #print 'END'
-        result = self.job_number_for_run_permutation_code_map[run_permutation_code]
+        result = self.job_number_for_perm_code_map[perm_code]
         return result
         
         
     def get_job_number_string_for_permutation_info(self, permutation_info):
         permutation_code = permutations.generate_permutation_code(permutation_info, self.cspec.concise_print_map, True)
-        result = self.job_number_for_run_permutation_code_map[permutation_code]
+        result = self.job_number_for_perm_code_map[permutation_code]
         return result
         
 
     def get_permutation_info_for_permutation_code(self, permutation_code):
-        result = self.run_permutation_info_for_run_permutation_code_map[permutation_code]
+        result = self.perm_info_for_perm_code_map[permutation_code]
         return result
     
     def get_first_script(self):
-        return self.cluster_script_for_run_permutation_code_map[self.run_perm_codes_list[0]]
+        return self.cluster_script_for_perm_code_map[self.run_perm_codes_list[0]]
     
-    def get_script_for_run_permutation_code(self, run_permutation_code):
-        return self.cluster_script_for_run_permutation_code_map[run_permutation_code]
+    def get_script_for_perm_code(self, perm_code):
+        return self.cluster_script_for_perm_code_map[perm_code]
     
-    def get_donefile_path_for_run_permutation_code(self,run_permutation_code):
-        results_dir = self.get_results_dir_for_run_permutation_code(run_permutation_code)
+    def get_donefile_path_for_run_permutation_code(self,perm_code):
+        results_dir = self.get_results_dir_for_run_permutation_code(perm_code)
         done_file = cluster_script.get_done_marker_filename()
         done_marker_file_path = "{0}/{1}".format(results_dir, done_file)
         return done_marker_file_path
@@ -96,21 +101,8 @@ def get_formatted_user_job_number(user_job_number, width):
 
 
 
-def did_run_finish(cluster_runs, run_permutation_code, cluster_system):
-    done_marker_file_path = cluster_runs.get_donefile_path_for_run_permutation_code(run_permutation_code)
-    #print "done_marker_file_path {0}".format(done_marker_file_path)
-    run_finished = False
-    if (cluster_system.isfile(done_marker_file_path)):
-        run_finished=True
-    return run_finished
 
-def get_missing_output_files(permutation_info, cspec, cluster_system):
-    missing_output_files = []
-    list_of_output_files = permutations.get_list_of_output_files(permutation_info, cspec)
-    for output_file_path in list_of_output_files:
-        if (not(cluster_system.isfile(output_file_path))):
-            missing_output_files.append(output_file_path)
-    return missing_output_files
+
 
 def get_fully_resolved_from_filepath(from_file_path_with_results_dir_resolved, permutation_info, cspec, scores_permutations_info):
     # first resolve the regular_permutations info in the scores_from_filepath

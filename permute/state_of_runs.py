@@ -7,6 +7,7 @@ Created on Feb 23, 2014
 import cluster_runs_info
 import logging
 import qsub_invoke_log
+import qstat_log
 import qacct_log
 import permutations
 import os
@@ -30,7 +31,6 @@ class StateOfRuns(object):
         
         self.run_permutation_codes = []
         # status table
-        # NOTE - QStatLog is used by detect_still_running_runs 
         self.run_script_exists =      {}
         self.script_mtime =           {}
         self.invoke_log_exists =      {}
@@ -48,55 +48,164 @@ class StateOfRuns(object):
         # file objects
         self.qil_files =              {}
         self.qacct_files =            {}
+        self.qstat_state_info =       {}
         
         self.missing_output_files =   {}
         self.run_error_info =         {}
         self.cluster_job_numbers =    {}
 
-        self.state_codes = {}
+        self.state_names = {}
+        self.cause  = {}
+        self.action = {}
         # se  ile rpb dme ofe stand for:
         # run_script_exists,invoke_log_exists,run_permission_blocked,done_marker_exists,output_files_exist
-        self.state_codes['se 0 ile 0 rpb 0 dme 0 ofe 0'] = 'script missing'
-        self.state_codes['se 1 ile 0 rpb 0 dme 0 ofe 0'] = 'script ready'
-        self.state_codes['se 0 ile 1 rpb 0 dme 0 ofe 0'] = 'run_state_error - launch_log but no script_file : clean logs'
-        self.state_codes['se 1 ile 1 rpb 0 dme 0 ofe 0'] = 'running'
-        self.state_codes['se 0 ile 0 rpb 1 dme 0 ofe 0'] = 'run_state_error - permission_block_error without script_file : clean logs'
-        self.state_codes['se 1 ile 0 rpb 1 dme 0 ofe 0'] = 'run_state_error - permission_block_error without launch_log : clean logs'
-        self.state_codes['se 0 ile 1 rpb 1 dme 0 ofe 0'] = 'run_state_error - launch_log present without script_file : clean logs'
-        self.state_codes['se 1 ile 1 rpb 1 dme 0 ofe 0'] = 'run permission issue'
+        # se  ile  rpb  dme  ofe
+        # S    L   B    D    O  
+        self.state_names['-----'] = 'script missing'
+        self.state_cause['-----'] = ''
+        self.state_todos['-----'] = ''
+        
+        self.state_names['S----'] = 'script ready'
+        self.state_cause['S----'] = ''
+        self.state_todos['S----'] = ''
+        
+        self.state_names['-L---'] = 'run_state_error - launch_log but no script_file : clean logs'
+        self.state_cause['-L---'] = ''
+        self.state_todos['-L---'] = ''
+        
+        self.state_names['SL---'] = 'running'
+        self.state_cause['SL---'] = ''
+        self.state_todos['SL---'] = ''
+        
+        self.state_names['--B--'] = 'run_state_error - permission_block_error without script_file : clean logs'
+        self.state_cause['--B--'] = ''
+        self.state_todos['--B--'] = ''
+        
+        self.state_names['S-B--'] = 'run_state_error - permission_block_error without launch_log : clean logs'
+        self.state_cause['S-B--'] = ''
+        self.state_todos['S-B--'] = ''
+        
+        self.state_names['-LB--'] = 'run_state_error - launch_log present without script_file : clean logs'
+        self.state_cause['-LB--'] = ''
+        self.state_todos['-LB--'] = ''
+        
+        self.state_names['SLB--'] = 'run permission issue'
+        self.state_cause['SLB--'] = ''
+        self.state_todos['SLB--'] = ''
+        
+        
+        
+        
+
  
-        self.state_codes['se 0 ile 0 rpb 0 dme 1 ofe 0'] = 'run_state_error - done_marker exists without script_file : clean results'
-        self.state_codes['se 1 ile 0 rpb 0 dme 1 ofe 0'] = 'run_state_error - done_marker exists without launch_log : clean results'
-        self.state_codes['se 0 ile 1 rpb 0 dme 1 ofe 0'] = 'run_state_error - done_marker exists without script_file but launch_log present : clean results, logs'
-        self.state_codes['se 1 ile 1 rpb 0 dme 1 ofe 0'] = 'run error'
-        self.state_codes['se 0 ile 0 rpb 1 dme 1 ofe 0'] = 'run_state_error - done_marker and permission_error should not coexist'
-        self.state_codes['se 1 ile 0 rpb 1 dme 1 ofe 0'] = 'run_state_error - done_marker and permission_error should not coexist'
-        self.state_codes['se 0 ile 1 rpb 1 dme 1 ofe 0'] = 'run_state_error - done_marker and permission_error should not coexist'
-        self.state_codes['se 1 ile 1 rpb 1 dme 1 ofe 0'] = 'run_state_error - done_marker and permission_error should not coexist'
+        self.state_names['---D-'] = 'run_state_error - done_marker exists without script_file : clean results'
+        self.state_cause['---D-'] = ''
+        self.state_todos['---D-'] = ''
+        
+        self.state_names['S--D-'] = 'run_state_error - done_marker exists without launch_log : clean results'
+        self.state_cause['S--D-'] = ''
+        self.state_todos['S--D-'] = ''
+        
+        self.state_names['-L-D-'] = 'run_state_error - done_marker exists without script_file but launch_log present : clean results, logs'
+        self.state_cause['-L-D-'] = ''
+        self.state_todos['-L-D-'] = ''
+        
+        self.state_names['SL-D-'] = 'run error'
+        self.state_cause['SL-D-'] = ''
+        self.state_todos['SL-D-'] = ''
+        
+        self.state_names['--BD-'] = 'run_state_error - done_marker and permission_error should not coexist'
+        self.state_cause['--BD-'] = ''
+        self.state_todos['--BD-'] = ''
+        
+        self.state_names['S-BD-'] = 'run_state_error - done_marker and permission_error should not coexist'
+        self.state_cause['S-BD-'] = ''
+        self.state_todos['S-BD-'] = ''
+        
+        self.state_names['-LBD-'] = 'run_state_error - done_marker and permission_error should not coexist'
+        self.state_cause['-LBD-'] = ''
+        self.state_todos['-LBD-'] = ''
+        
+        self.state_names['SLBD-'] = 'run_state_error - done_marker and permission_error should not coexist'
+        self.state_cause['SLBD-'] = ''
+        self.state_todos['SLBD-'] = ''
+        
  
-        self.state_codes['se 0 ile 0 rpb 0 dme 0 ofe 1'] = 'run_state_error - output_file exists without script_file : clean results'
-        self.state_codes['se 1 ile 0 rpb 0 dme 0 ofe 1'] = 'run_state_error - output_file exists without launch_log : clean results'
-        self.state_codes['se 0 ile 1 rpb 0 dme 0 ofe 1'] = 'run_state_error - output_file exists without script_file, but has launch_log : clean results, logs'
-        self.state_codes['se 1 ile 1 rpb 0 dme 0 ofe 1'] = 'run near complete'
-        self.state_codes['se 0 ile 0 rpb 1 dme 0 ofe 1'] = 'run_state_error - done_marker and run_error should not coexist'
-        self.state_codes['se 1 ile 0 rpb 1 dme 0 ofe 1'] = 'run_state_error - done_marker and run_error should not coexist'
-        self.state_codes['se 0 ile 1 rpb 1 dme 0 ofe 1'] = 'run_state_error - done_marker and run_error should not coexist'
-        self.state_codes['se 1 ile 1 rpb 1 dme 0 ofe 1'] = 'run_state_error - done_marker and run_error should not coexist'
  
-        self.state_codes['se 0 ile 0 rpb 0 dme 1 ofe 1'] = 'run_state_error - done_marker exists without script_file : clean results'
-        self.state_codes['se 1 ile 0 rpb 0 dme 1 ofe 1'] = 'run_state_error - done_marker exists without launch_log : clean results'
-        self.state_codes['se 0 ile 1 rpb 0 dme 1 ofe 1'] = 'run_state_error - done_marker exists without script_file, but launch_log present : clean results, logs'
-        self.state_codes['se 1 ile 1 rpb 0 dme 1 ofe 1'] = 'run complete'
-        self.state_codes['se 0 ile 0 rpb 1 dme 1 ofe 1'] = 'run_state_error - done_marker and result_file should not coexist'
-        self.state_codes['se 1 ile 0 rpb 1 dme 1 ofe 1'] = 'run_state_error - done_marker and result_file should not coexist'
-        self.state_codes['se 0 ile 1 rpb 1 dme 1 ofe 1'] = 'run_state_error - done_marker and result_file should not coexist'
-        self.state_codes['se 1 ile 1 rpb 1 dme 1 ofe 1'] = 'run_state_error - done_marker and result_file should not coexist'
+ 
+ 
+        self.state_names['----O'] = 'run_state_error - output_file exists without script_file : clean results'
+        self.state_cause['----O'] = ''
+        self.state_todos['----O'] = ''
+        
+        self.state_names['S---O'] = 'run_state_error - output_file exists without launch_log : clean results'
+        self.state_cause['S---O'] = ''
+        self.state_todos['S---O'] = ''
+        
+        self.state_names['-L--O'] = 'run_state_error - output_file exists without script_file, but has launch_log : clean results, logs'
+        self.state_cause['-L--O'] = ''
+        self.state_todos['-L--O'] = ''
+        
+        self.state_names['SL--O'] = 'run near complete'
+        self.state_cause['SL--O'] = ''
+        self.state_todos['SL--O'] = ''
+        
+        self.state_names['--B-O'] = 'inconsistent'
+        self.state_cause['--B-O'] = 'output exists, but done marker, launch log and script missing'
+        self.state_todos['--B-O'] = ''
+        
+        self.state_names['S-B-O'] = 'inconsistent'
+        self.state_cause['S-B-O'] = 'output exists, done marker and launch log missing'
+        self.state_todos['S-B-O'] = 'redo'
+        
+        self.state_names['-LB-O'] = 'inconsistent'
+        self.state_cause['-LB-O'] = 'output exists, done marker missing, script missing'
+        self.state_todos['-LB-O'] = 'redo'
+        
+        self.state_names['SLB-O'] = 'inconsistent'
+        self.state_cause['SLB-O'] = 'output exists, done marker missing and permission issue'
+        self.state_todos['SLB-O'] = 'redo'
+        
+ 
+ 
+ 
+ 
+        self.state_names['---DO'] = 'run complete'
+        self.state_cause['---DO'] = 'warning: output exists, script and launch file missing'
+        self.state_todos['---DO'] = 'redo?'
+        
+        self.state_names['S--DO'] = ''
+        self.state_cause['S--DO'] = ''
+        self.state_todos['S--DO'] = ''
+        
+        self.state_names['-L-DO'] = 'run complete'
+        self.state_cause['-L-DO'] = 'warning: output exists, script missing'
+        self.state_todos['-L-DO'] = 'redo?'
+        
+        self.state_names['SL-DO'] = 'run complete'
+        self.state_cause['SL-DO'] = ''
+        self.state_todos['SL-DO'] = ''
+        
+        self.state_names['--BDO'] = 'run complete'
+        self.state_cause['--BDO'] = 'warning: script and launch log missing'
+        self.state_todos['--BDO'] = 'redo?'
+        
+        self.state_names['S-BDO'] = 'run complete'
+        self.state_cause['S-BDO'] = 'warning: output exists, run was blocked, launch log missing'
+        self.state_todos['S-BDO'] = 'redo?'
+        
+        self.state_names['-LBDO'] = 'run complete'
+        self.state_cause['-LBDO'] = 'warning: output exists, run was blocked, script missing'
+        self.state_todos['-LBDO'] = 'redo?'
+        
+        self.state_names['SLBDO'] = 'run complete'
+        self.state_cause['SLBDO'] = 'warning: permission problem should have prevented run'
+        self.state_todos['SLBDO'] = 'redo?'
        
-        self.corrupt_qil_state_codes = {} 
         # se ile ilc   stand for 
-        # run_script_exists,invoke_log_exists,invoke_log_corrupt
-        self.corrupt_qil_state_codes['se 0 ile 1 ilc 1'] = 'run_state_error - launch_log but no script_file : clean logs'
-        self.corrupt_qil_state_codes['se 1 ile 1 ilc 1'] = 'launch may have failed - can not acquire cluster_run_number'
+        # run_script_exists,invoke_log_corrupt
+        self.state_names['-C'] = 'run_state_error - launch_log but no script_file : clean logs'
+        self.state_names['SC'] = 'launch may have failed - can not acquire cluster_run_number'
 
         # derived_state_table
         #self.run_not_yet_launched =   {}
@@ -120,6 +229,112 @@ class StateOfRuns(object):
         
         self.check_milestones_of_runs(cluster_runs_info, cluster_system)
         self.derive_state_of_runs(cluster_runs_info)
+        
+    def assess_all_runs(self, cluster_runs_info, cluster_system):
+        # get qstat output in case it has relevant info for later
+        qstat = qstat_log.QStatLog(cluster_system)
+        for perm_code in cluster_runs_info.run_perm_codes_list:
+            self.assess_run(perm_code, qstat, cluster_runs_info, cluster_system)
+            
+    def assess_run(self, perm_code, qstat, cluster_runs_info, cluster_system):
+        # see of script is there
+        self.check_script(perm_code, cluster_runs_info, cluster_system)
+        # see if invoke log is there and if it is corrupt
+        self.check_invoke_log(perm_code, cluster_runs_info, cluster_system)
+        cluster_run_id = self.get_cluster_run_id(perm_code, cluster_system)
+        self.qstat_state_info[perm_code] = 'unknown'
+        if (not(cluster_run_id == 'unknown')):
+            # use cluster run id to find run status using qstat
+            self.qstat_state_info[perm_code]= qstat.get_state_info(cluster_run_id)
+                
+        # check file system evidence
+        self.check_for_permission_problem(perm_code)
+        self.check_done_marker(perm_code, cluster_runs_info, cluster_system)
+        self.check_output_files(perm_code, cluster_runs_info, cluster_system)
+        self.derive_state_of_run(cluster_runs_info,perm_code)
+               
+    def check_output_files(self, perm_code, cluster_runs_info, cluster_system):
+        # populate self.output_files_exist
+        # populate self.output_files_mtime
+        cspec = cluster_runs_info.cspec
+        permutation_info = cluster_runs_info.run_permutation_info_for_run_permutation_code_map[perm_code]
+        missing_output_file = False
+        missing_output_files = cluster_runs_info.get_missing_output_files(permutation_info, cspec, cluster_system)
+        self.missing_output_files[perm_code] = missing_output_files
+        if (len(missing_output_files) != 0):
+            missing_output_file = True 
+        self.output_files_exist[perm_code] = not(missing_output_file)
+        
+        list_of_output_files = permutations.get_list_of_output_files(permutation_info, cspec)
+        time = 0
+        # find the oldest output_file mod time
+        for output_file in list_of_output_files:
+            curtime = cluster_system.get_last_modification_time(output_file)
+            if time == 0:
+                time = curtime
+            else:
+                if curtime < time:
+                    time = curtime
+        if time == 0:
+            self.output_files_mtime[perm_code] = 'NA'
+        else:
+            self.output_files_mtime[perm_code] = time
+        
+    def check_done_marker(self, perm_code, cluster_runs_info, cluster_system):
+        # populate  self.done_marker_exists
+        self.done_marker_exists[perm_code] = cluster_runs_info.did_run_finish(cluster_runs_info, perm_code, cluster_system)
+        if (self.done_marker_exists[perm_code] == True):
+            results_dir = cluster_runs_info.get_results_dir_for_run_permutation_code(perm_code)
+            done_file = cluster_script.get_done_marker_filename()
+            done_marker_file_path = "{0}/{1}".format(results_dir, done_file)
+            self.done_marker_mtime[perm_code] = cluster_system.get_last_modification_time(done_marker_file_path)
+        else:
+            self.done_marker_mtime[perm_code] = 'NA'
+           
+    def check_for_permission_problem(self, perm_code):
+        # populate self.run_permission_blocked
+        qil = self.qil_files[perm_code]    
+        self.run_permission_blocked[perm_code] = qil.is_first_error_permission_problem()
+        
+    def get_cluster_run_id(self, perm_code, cluster_system):
+        if (not(self.invoke_log_exists[perm_code])):
+            return 'unknown'
+        if (self.invoke_log_corrupt[perm_code]):
+            return 'unknown'
+        # this would have been set in the check_invoke_log phase
+        return self.cluster_job_numbers[perm_code]
+                
+        
+    def check_invoke_log(self, run_permutation_code, cluster_runs_info, cluster_system):
+        # populate self.invoke_log_exists
+        # populate self.invoke_log_corrupt
+        # populate self.invoke_log_mtime
+        self.cluster_job_numbers[run_permutation_code] = 'unknown'
+        permutation_info = cluster_runs_info.run_permutation_info_for_run_permutation_code_map[run_permutation_code]
+        user_job_number_as_string = cluster_runs_info.get_job_number_string_for_run_permutation_code(run_permutation_code)
+        cspec = cluster_runs_info.cspec
+        qil = qsub_invoke_log.QsubInvokeLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'], cluster_system)
+        self.qil_files[run_permutation_code] = qil
+        self.invoke_log_exists[run_permutation_code] = cluster_system.isfile(qil.qsub_invoke_log_fullpath)
+        if self.invoke_log_exists[run_permutation_code] == True:
+            self.invoke_log_corrupt[run_permutation_code] = qil.is_corrupt()
+            if self.invoke_log_corrupt[run_permutation_code] == True:
+                self.cluster_job_numbers[run_permutation_code] = 'unknown'
+                self.invoke_log_mtime[run_permutation_code] = 'NA'
+            else:
+                self.cluster_job_numbers[run_permutation_code] = qil.cluster_job_number
+                self.invoke_log_mtime[run_permutation_code] = qil.get_last_modification_time()
+        else:
+            self.cluster_job_numbers[run_permutation_code] = 'unknown'
+            self.invoke_log_corrupt[run_permutation_code] = 'NA'
+            self.invoke_log_mtime[run_permutation_code] = 'NA'
+            
+    def check_script(self, run_permutation_code, cluster_runs, cluster_system):
+        # populate self.run_script_exists
+        cluster_script_instance = cluster_runs.get_script_for_run_permutation_code(run_permutation_code)
+        script_exists = cluster_system.exists(cluster_script_instance.pathname)
+        self.run_script_exists[run_permutation_code] = script_exists
+        self.script_mtime[run_permutation_code] = cluster_script_instance.get_last_modification_time()        
         
     def emit_state_full(self):
         for runID in self.run_permutation_codes:
@@ -209,15 +424,14 @@ class StateOfRuns(object):
             self.derive_state_of_run_basic(cluster_runs, runID)
     
     def derive_state_of_run_invoke_log_corrupt(self,cluster_runs,runID):
-        # se ile ilc   stand for 
-        # run_script_exists,invoke_log_exists,invoke_log_corrupt
-        se = 'se 0'
-        ile = 'ile 1'     # if it's corrupt , it must exist
-        ilc = 'ilc 1'     # given
+        # se ilc   stand for 
+        # run_script_exists,invoke_log_corrupt
+        se = '-'
+        ilc = 'C'     # given
         if self.run_script_exists[runID] == True:
-            se = 'se 1'
-        state_code = '{0} {1} {2}'.format(se, ile, ilc)
-        run_state = self.corrupt_qil_state_codes[state_code]       
+            se = 'S'
+        state_code = '{0}{1}'.format(se, ilc)
+        run_state = self.stat_names[state_code]       
         self.run_states[runID] = run_state
   
  
@@ -225,29 +439,29 @@ class StateOfRuns(object):
         # se  ile rpb dme ofe stand for:
         # run_script_exists,invoke_log_exists,run_permission_blocked,done_marker_exists,output_files_exist
         # build a string that looks like this: 'se 0 ile 0 rpb 0 dme 0 ofe 0'
-        se = 'se 0'
-        ile = 'ile 0'
-        rpb = 'rpb 0'
-        dme = 'dme 0'
-        ofe = 'ofe 0'
+        se = '-'
+        ile = '-'
+        rpb = '-'
+        dme = '-'
+        ofe = '-'
         
         if self.run_script_exists[runID] == True:
-            se = 'se 1'
+            se = 'S'
         if self.invoke_log_exists[runID] == True:
-            ile = 'ile 1'
+            ile = 'L'
         if self.run_permission_blocked[runID] == True:
-            rpb = 'rpb 1'
+            rpb = 'B'
         if self.done_marker_exists[runID] == True:
-            dme = 'dme 1'
+            dme = 'D'
         if self.output_files_exist[runID] == True:
-            ofe = 'ofe 1'
+            ofe = 'O'
         #import ipdb;ipdb.set_trace()   
-        state_code = '{0} {1} {2} {3} {4}'.format(se, ile, rpb, dme, ofe)
-        run_state = self.state_codes[state_code]
+        state_code = '{0}{1}{2}{3}{4}'.format(se, ile, rpb, dme, ofe)
+        run_state_name = self.state_names[state_code]
         self.run_error_info[runID] = ''
-        if run_state == 'run had errors':
+        if run_state_name == 'run_state_error':
             self.run_error_info[runID] = self.get_error_reason(runID,cluster_runs, self.cluster_system)
-        self.run_states[runID] = run_state
+        self.run_states[runID] = state_code
    
    
     def get_error_reason(self,runID, cluster_runs, cluster_system): 

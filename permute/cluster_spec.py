@@ -15,11 +15,11 @@ class ClusterSpec(object):
     Wraps the cluster specification file *.cspec
     '''
     
-    def __init__(self, path, lines, cluster_system):
+    def __init__(self, path, lines, stdout):
         '''
         Constructor
         '''
-        self.cluster_system = cluster_system
+        self.stdout = stdout
         self.path = path
         self.lines = lines
         try:
@@ -31,7 +31,7 @@ class ClusterSpec(object):
             header = "".join(header.split()) # remove white spaces
             #print("header : {0} length {1} ".format(header, len(header)))
             if (header != "#cspec"):
-                self.cluster_system.println("cspec file must have this header:  '#cspec', {0} does not. Exiting.".format(path))
+                self.stdout.println("cspec file must have this header:  '#cspec', {0} does not. Exiting.".format(path))
                 exit()
             
             
@@ -65,7 +65,7 @@ class ClusterSpec(object):
             self.scores_y_axis = self.load_list(self.lines, 'scores_y_axis:')
             #print "done loading cspec"
         except IOError:
-            self.cluster_system.println("An error occurred trying to open cspec file {0}".format(path))
+            self.stdout.println("An error occurred trying to open cspec file {0}".format(path))
             exit()
 
     def get_permuters_trials_included(self):
@@ -300,39 +300,39 @@ def is_string_a_float(val):
     except ValueError:
         return False
                
-def validate(lines, cluster_system):
+def validate(lines, stdout, cluster_system):
     result_permute = validate_permute_entries(lines)
     if not(result_permute):
-        cluster_system.println("problem found in permute statements")
+        stdout.println("problem found in permute statements")
         
     result_replace = validate_replace_entries(lines)
     if not(result_replace):
-        cluster_system.println("problem found in replace statements")
+        stdout.println("problem found in replace statements")
         
-    result_script_dir = validate_statement_present(lines,"script_dir:","some_dir", cluster_system)
+    result_script_dir = validate_statement_present(lines,"script_dir:","some_dir", stdout)
     if not(result_script_dir):
-        cluster_system.println("problem found in script_dir statement")
+        stdout.println("problem found in script_dir statement")
   
-    result_root_results_dir = validate_statement_present(lines,"root_results_dir:","some_dir", cluster_system)
+    result_root_results_dir = validate_statement_present(lines,"root_results_dir:","some_dir", stdout)
     if not(result_root_results_dir):
-        cluster_system.println("problem found in root_results_dir statement")
+        stdout.println("problem found in root_results_dir statement")
         
-    result_master_job_name = validate_statement_present(lines,"master_job_name:","some_name", cluster_system)
+    result_master_job_name = validate_statement_present(lines,"master_job_name:","some_name", stdout)
     if not(result_master_job_name):
-        cluster_system.println("problem found in master_job_name statement")
+        stdout.println("problem found in master_job_name statement")
         
-    result_trials = validate_statement_present(lines,"trials:","some_integer", cluster_system)
+    result_trials = validate_statement_present(lines,"trials:","some_integer", stdout)
     if not(result_trials):
-        cluster_system.println("problem found in trials statement")
+        stdout.println("problem found in trials statement")
     
-    result_scores_info = validate_scores_gathering_info(lines, cluster_system)
+    result_scores_info = validate_scores_gathering_info(lines, stdout, cluster_system)
     if not(result_scores_info):
-        cluster_system.println("problem found in scores gathering info entries")
+        stdout.println("problem found in scores gathering info entries")
         
     return result_permute and result_replace and result_script_dir and result_root_results_dir and result_master_job_name and result_trials and result_scores_info
 
 
-def validate_statement_present(lines, statement, val, cluster_system):
+def validate_statement_present(lines, statement, val, stdout):
     result = True
     value = "unknown"
     statement_command = "unknown"
@@ -343,10 +343,10 @@ def validate_statement_present(lines, statement, val, cluster_system):
             statement_command, value = line.split(":")
     if (statement_command == "unknown"):
         result = False
-        cluster_system.println("cluster_spec missing statement {0}{1}".format(statement, val))
+        stdout.println("cluster_spec missing statement {0}{1}".format(statement, val))
     if (value == "unknown" or value == "" or value == None):
         result = False
-        cluster_system.println("cluster_spec missing value for statement {0}{1}".format(statement, val))
+        stdout.println("cluster_spec missing value for statement {0}{1}".format(statement, val))
     return result
     
 
@@ -448,7 +448,7 @@ def lines_contains_prefix(lines, prefix):
             return True
     return False
 
-def validate_scores_gathering_info(lines, cluster_system):
+def validate_scores_gathering_info(lines, stdout, cluster_system):
     x_axis_info_present = lines_contains_prefix(lines, 'scores_x_axis')
     y_axis_info_present = lines_contains_prefix(lines, 'scores_y_axis')
     permute_info_present = lines_contains_prefix(lines, 'scores_permute')

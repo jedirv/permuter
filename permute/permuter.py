@@ -10,6 +10,7 @@ import cluster_system
 import permutation_driver
 import spec_help
 import user_usage
+import stdout
 
 def main():
     if (len(sys.argv) == 2 and sys.argv[1] == "spec_help"):
@@ -50,8 +51,8 @@ def main():
     f = open(cspec_path, 'r')
     cspec_lines = f.readlines()
     f.close()
-    
-    if (not(cluster_spec.validate(cspec_lines, real_cluster_system))):
+    stdout = stdout.Stdout()
+    if (not(cluster_spec.validate(cspec_lines, stdout, real_cluster_system))):
         exit()
         
     pdriver = permutation_driver.PermutationDriver(cspec_lines, cspec_path, real_cluster_system)

@@ -1,6 +1,7 @@
 import unittest
 from permute import cluster_spec
 import mock_cluster_system
+import mock_stdout
 
 class TestClusterSpec(unittest.TestCase):
 
@@ -74,8 +75,8 @@ class TestClusterSpec(unittest.TestCase):
         lines.append("one_up_basis:100\n")
 
         lines.append("command:echo (letter) (number) (singleton_val) > <permutation_results_dir>/(letter)_(number)_<pretty[(number)]>.txt\n")
-        mc_system = mock_cluster_system.MockClusterSystem()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines,mc_system)
+        stdout = mock_stdout.MockStdout()
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines,stdout)
         #print self.cspec.concise_print_map
         # concise_name
         self.assertTrue(cspec.get_concise_name('number') == 'number')
@@ -216,8 +217,8 @@ class TestClusterSpec(unittest.TestCase):
         lines.append("one_up_basis:100 \n")
 
         lines.append("command:echo (letter) (number) (singleton_val) > <permutation_results_dir>/(letter)_(number)_<pretty[(number)]>.txt\n")
-        mc_system = mock_cluster_system.MockClusterSystem()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines,mc_system)
+        stdout = mock_stdout.MockStdout()
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines,stdout)
         #print self.cspec.concise_print_map
         # concise_name
         self.assertTrue(cspec.get_concise_name('number') == 'number')

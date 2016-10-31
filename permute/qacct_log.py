@@ -1,5 +1,6 @@
 from permutation_driver_file import PermutationDriverFile
 import logging
+import os
 #from monitor import monitor_exception
 
 class QacctLog(PermutationDriverFile):
@@ -10,7 +11,7 @@ class QacctLog(PermutationDriverFile):
     def configure(self):
         self.script_path_root = self.get_script_path_root()
         self.pathname = "{0}.qacct".format(self.script_path_root)
-        self.qacct_log = "{0}.qacct".format(self.get_job_file_name())
+        self.qacct_log_path = "{0}.qacct".format(self.get_job_file_name())
         self.type = "qacct_log"
         self.cpu = "missing"
         self.mem = "missing"
@@ -27,14 +28,18 @@ class QacctLog(PermutationDriverFile):
         
         self.error_reading = False
         
+    def delete(self):
+        if (os.path.exists(self.pathname)):
+            os.unlink(self.pathname)
+            
     def exists(self):
-        if (self.cluster_system.exists(self.pathname)):
+        if (os.path.exists(self.pathname)):
             return True
         return False      
     
     def get_last_modification_time(self):
         if (self.exists()):
-            return self.cluster_system.get_last_modification_time(self.pathname)
+            return os.path.getmtime(self.pathname)
         else:
             return 'NA'  
         
@@ -53,25 +58,17 @@ class QacctLog(PermutationDriverFile):
         else:
             return "no failure detected"
         
-    def create_log(self, cluster_job_number):
-        if (cluster_job_number == "NA"):
-            self.cluster_system.println("skipping qacct, job not started yet")
-        else:
-            #print "opening {0}".format(self.qstat_log)
-            command = "qacct -j {0} > {1}".format(cluster_job_number, self.qacct_log)
-            self.cluster_system.execute_command(command) 
-        
     def ingest(self, cluster_job_number):
         if (cluster_job_number == "NA"):
             error = "qacct_log cannot ingest job number 'NA'"
             logging.error(error)
-            self.cluster_system.println(error)
+            self.stdout.println(error)
         else:
-            starting_dir = self.cluster_system.getcwd()
-            self.cluster_system.chdir(self.script_dir)
+            starting_dir = os.getcwd()
+            os.chdir(self.script_dir)
             self.cluster_job_number = cluster_job_number
 
-            if (self.cluster_system.isfile(self.qacct_log) and has_content(self.qacct_log, self.cluster_system)):
+            if (os.path.isfile(self.qacct_log_path) and has_content(self.qacct_log_path)):
                 #print "file exists"
                 self.load_qacct_log()
                 if (self.error_reading):
@@ -86,7 +83,7 @@ class QacctLog(PermutationDriverFile):
             
         
         
-        self.cluster_system.chdir(starting_dir)
+        os.chdir(starting_dir)
         #os.unlink(self.qstat_log)
         #print "closed {0}".format(self.qstat_log)
     def is_corrupt(self):
@@ -97,7 +94,7 @@ class QacctLog(PermutationDriverFile):
     
     def load_qacct_log(self):
         self.error_reading = False
-        f = self.cluster_system.open_file(self.qacct_log,'r')
+        f = open(self.qacct_log_path,'r')
         lines = f.readlines()
         f.close()
         for line in lines:
@@ -145,8 +142,8 @@ class QacctLog(PermutationDriverFile):
         #    print "{0} start_time : {1}".format(self.cluster_job_number,self.start_time)   
         #    print "{0} end_time : {1}".format(self.cluster_job_number,self.end_time)   
 
-def has_content(path, cluster_system):
-    f = cluster_system.open_file(path,'r')
+def has_content(path):
+    f = open(path,'r')
     lines = f.readlines()
     f.close()
     if (len(lines) > 10):

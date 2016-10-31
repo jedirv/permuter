@@ -11,11 +11,11 @@ class PermutationDriverFile(object):
     classdocs
     '''
 
-    def __init__(self, user_job_number, permutation_info, cspec, trial, cluster_system):
+    def __init__(self, user_job_number, permutation_info, cspec, trial):
         '''
         Constructor
         '''
-        self.cluster_system = cluster_system
+        #self.cluster_system = cluster_system
         self.cspec = cspec
         self.trial = trial
         self.permutation_info = permutation_info
@@ -50,8 +50,6 @@ class PermutationDriverFile(object):
         return job_filename   
       
     def get_script_path_root(self):
-        if (not(self.cluster_system.isdir(self.script_dir))):
-            self.cluster_system.make_dirs(self.script_dir)
         job_filename = self.get_job_file_name()
         pathname_root = "{0}{1}{2}".format(self.script_dir, "/", job_filename)
         return pathname_root 
