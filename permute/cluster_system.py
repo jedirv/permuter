@@ -91,30 +91,7 @@ class ClusterSystem(object):
     def isdir(self,path):
         return os.path.isdir(path)
     
-    def clean_out_dir(self,dirpath):
-        if not(os.path.exists(dirpath)):
-            return
-        items = os.listdir(dirpath)
-        for item in items:
-            path = "{0}/{1}".format(dirpath, item)
-            if os.path.isdir(path):
-                try: 
-                    print "deleting dir {0}".format(path)
-                    command = "rm -rf {0}".format(path)
-                    os.system(command) 
-                except subprocess.CalledProcessError:
-                    print "There was a problem calling rm -rf on {0}".format(path)
-                    print "Return code was {0}".format(subprocess.CalledProcessError.returncode)
-                    
-            else:
-                try: 
-                    print "deleting file {0}".format(path)
-                    command = "rm -f {0}".format(path)
-                    os.system(command) 
-                except subprocess.CalledProcessError:
-                    print "There was a problem calling rm -f on {0}".format(path)
-                    print "Return code was {0}".format(subprocess.CalledProcessError.returncode)                        
-
+    
     def open_file(self, path, mode):
         return open(path, mode)
     

@@ -20,12 +20,20 @@ class Cluster(object):
         cscript = self.cluster_runs.get_script_for_run_permutation_code(pcode)
         self.scripts[pcode] = cscript
         cscript.persist()
+        return cscript
         
     def delete_script(self, pcode):
         if self.scripts.has_key(pcode):
             cscript = self.scripts[pcode]
             cscript.delete()
-
+            
+    def get_script_mod_time(self,pcode):
+        if self.is_script_present(pcode):
+            cscript = self.scripts[pcode]
+            path = cscript.pathname
+            return os.path.getmtime(path)
+        return 'NA'
+    
     def delete_invoke_log(self, pcode):
         if self.invoke_logs.has_key(pcode):
             qil = self.invoke_logs[pcode]
@@ -95,6 +103,12 @@ class Cluster(object):
         qil = qsub_invoke_log.QsubInvokeLog(user_job_number_as_string, perm_info, cspec, trial)
         self.invoke_logs[pcode] = qil
         
+    def get_invoke_log_mod_time(self,pcode):
+        if self.invoke_log_exists(pcode):
+            invoke_log = self.get_invoke_log(pcode)
+            return os.path.getmtime(invoke_log.pathname)
+        return 'NA'
+        
     def get_cluster_job_number(self, pcode):
         qil = self.get_invoke_log(pcode)
         return qil.cluster_job_number
@@ -129,7 +143,7 @@ class Cluster(object):
         permutation_info = self.cluster_runs.run_permutation_info_for_run_permutation_code_map[pcode]
         cspec = self.cluster_runs.cspec
         cluster_job_number = self.get_cluster_job_number(pcode)
-        if (cluster_job_number == "NA"):
+        if (cluster_job_number == "NA" or self.is_running(pcode) or self.is_waiting(pcode)):
             self.stdout.println("skipping qacct, job not started yet")
             return 0
         else:
@@ -149,7 +163,8 @@ class Cluster(object):
         return False
     
     def get_qstat_log(self):
-        #always get this one fresh for most up to date info
+        if self.qstat_log:
+            return self.qstat_log
         cspec = self.cluster_runs.cspec
         self.qstat_log = qstat_log.QStatLog(cspec.script_dir)
         username = getpass.getuser()
@@ -180,9 +195,6 @@ class Cluster(object):
                 if qil.is_first_error_permission_problem():
                     return True
         return False
-            
-        
-        if qil.is_first_error_permission_problem():
     
     def is_done_marker_present(self, pcode):
         done_marker_file_path = self.cluster_runs.get_donefile_path_for_run_permutation_code(pcode)
@@ -192,6 +204,12 @@ class Cluster(object):
             run_finished=True
         return run_finished
 
+    def get_done_marker_mode_time(self,pcode):
+        if self.is_done_marker_present(pcode):
+            done_marker_file_path = self.cluster_runs.get_donefile_path_for_run_permutation_code(pcode)
+            return os.path.getmtime(done_marker_file_path)
+        return 'NA'
+        
     def get_missing_output_files(self, pcode, cluster_system):
         missing_output_files = []
         permutation_info = self.cluster_runs_info.get_permutation_info_for_permutation_code(pcode)
@@ -224,7 +242,11 @@ class Cluster(object):
         else:
             return time
         
-
+    def get_failure_reason(self,pcode):
+        acct_log = self.get_qacct_log(pcode)
+        if acct_log != 0:
+            return acct_log.get_failure_reason()
+        return 'NA'
 
     def __init__(self, cluster_runs):
         self.cluster_runs = cluster_runs

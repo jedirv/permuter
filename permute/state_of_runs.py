@@ -6,12 +6,13 @@ Created on Feb 23, 2014
 
 import cluster_runs_info
 import logging
-import qsub_invoke_log
-import qstat_log
-import qacct_log
+#import qsub_invoke_log
+#import qstat_log
+#import qacct_log
 import permutations
 import os
 import cluster_script
+import cluster
 
 class StateOfRuns(object):
     '''
@@ -46,8 +47,8 @@ class StateOfRuns(object):
         self.run_permission_blocked = {}
         
         # file objects
-        self.qil_files =              {}
-        self.qacct_files =            {}
+        #self.qil_files =              {}
+        #self.qacct_files =            {}
         self.qstat_state_info =       {}
         
         self.missing_output_files =   {}
@@ -55,8 +56,8 @@ class StateOfRuns(object):
         self.cluster_job_numbers =    {}
 
         self.state_names = {}
-        self.cause  = {}
-        self.action = {}
+        self.state_cause = {}
+        self.state_todos = {}
         # se  ile rpb dme ofe stand for:
         # run_script_exists,invoke_log_exists,run_permission_blocked,done_marker_exists,output_files_exist
         # se  ile  rpb  dme  ofe
@@ -222,37 +223,50 @@ class StateOfRuns(object):
         self.total_count = 0
         self.not_yet_launched_count = 0
         self.unknown_count = 0
-        
+    
+    '''    
     def assess(self, cluster_runs_info, cluster_system):    
         self.cluster_system = cluster_system
         self.cluster_runs_info = cluster_runs_info
         
         self.check_milestones_of_runs(cluster_runs_info, cluster_system)
         self.derive_state_of_runs(cluster_runs_info)
-        
-    def assess_all_runs(self, cluster_runs_info, cluster_system):
+    '''    
+    def assess_all_runs(self, cluster_runs_info, cluster):
         # get qstat output in case it has relevant info for later
-        qstat = qstat_log.QStatLog(cluster_system)
-        for perm_code in cluster_runs_info.run_perm_codes_list:
-            self.assess_run(perm_code, qstat, cluster_runs_info, cluster_system)
+        for pcode in cluster_runs_info.run_perm_codes_list:
+            self.assess_run(pcode, cluster_runs_info, cluster)
             
-    def assess_run(self, perm_code, qstat, cluster_runs_info, cluster_system):
-        # see of script is there
-        self.check_script(perm_code, cluster_runs_info, cluster_system)
-        # see if invoke log is there and if it is corrupt
-        self.check_invoke_log(perm_code, cluster_runs_info, cluster_system)
-        cluster_run_id = self.get_cluster_run_id(perm_code, cluster_system)
-        self.qstat_state_info[perm_code] = 'unknown'
-        if (not(cluster_run_id == 'unknown')):
-            # use cluster run id to find run status using qstat
-            self.qstat_state_info[perm_code]= qstat.get_state_info(cluster_run_id)
+    def assess_run(self, pcode, cluster_runs_info, cluster):
+        # script status
+        self.run_script_exists[pcode]   = cluster.is_script_present(pcode)
+        self.script_mtime[pcode]        = cluster.get_script_mod_time(pcode)        
+        
+        #invoke_log_status
+        self.invoke_log_exists[pcode]   = cluster.is_invoke_log_present(pcode)
+        self.invoke_log_corrupt[pcode]  = cluster.is_invoke_log_corrupt(pcode)
+        self.cluster_job_numbers[pcode] = cluster.get_cluster_job_number(pcode)
+        self.invoke_log_mtime[pcode]    = cluster.get_invoke_log_mod_time(pcode)
+        
+        #qstat status
+        if cluster.is_running(pcode):
+            self.qstat_state_info[pcode]= 'running'
+        elif cluster.is_waiting(pcode):
+            self.qstat_state_info[pcode] = 'waiting'
+        else:
+            self.qstat_state_info[pcode] = 'NA'
                 
         # check file system evidence
-        self.check_for_permission_problem(perm_code)
-        self.check_done_marker(perm_code, cluster_runs_info, cluster_system)
-        self.check_output_files(perm_code, cluster_runs_info, cluster_system)
-        self.derive_state_of_run(cluster_runs_info,perm_code)
+        self.run_permission_blocked[pcode] = cluster.is_permission_blocked(pcode)
+        
+        self.done_marker_exists[pcode] = cluster.is_done_marker_present(pcode)
+        self.done_marker_mtime[pcode] = cluster.get_done_marker_mod_time(pcode)
+        
+        self.output_files_exist[pcode] = cluster.is_output_files_present(pcode)
+        self.output_files_mtime[pcode] = cluster.get_output_file_mod_time(pcode)
+        self.derive_state_of_run(cluster_runs_info,pcode, cluster)
                
+    '''
     def check_output_files(self, perm_code, cluster_runs_info, cluster_system):
         # populate self.output_files_exist
         # populate self.output_files_mtime
@@ -279,7 +293,8 @@ class StateOfRuns(object):
             self.output_files_mtime[perm_code] = 'NA'
         else:
             self.output_files_mtime[perm_code] = time
-        
+    '''
+    '''    
     def check_done_marker(self, perm_code, cluster_runs_info, cluster_system):
         # populate  self.done_marker_exists
         self.done_marker_exists[perm_code] = cluster_runs_info.did_run_finish(cluster_runs_info, perm_code, cluster_system)
@@ -290,21 +305,8 @@ class StateOfRuns(object):
             self.done_marker_mtime[perm_code] = cluster_system.get_last_modification_time(done_marker_file_path)
         else:
             self.done_marker_mtime[perm_code] = 'NA'
-           
-    def check_for_permission_problem(self, perm_code):
-        # populate self.run_permission_blocked
-        qil = self.qil_files[perm_code]    
-        self.run_permission_blocked[perm_code] = qil.is_first_error_permission_problem()
-        
-    def get_cluster_run_id(self, perm_code, cluster_system):
-        if (not(self.invoke_log_exists[perm_code])):
-            return 'unknown'
-        if (self.invoke_log_corrupt[perm_code]):
-            return 'unknown'
-        # this would have been set in the check_invoke_log phase
-        return self.cluster_job_numbers[perm_code]
-                
-        
+    '''
+    '''       
     def check_invoke_log(self, run_permutation_code, cluster_runs_info, cluster_system):
         # populate self.invoke_log_exists
         # populate self.invoke_log_corrupt
@@ -328,22 +330,17 @@ class StateOfRuns(object):
             self.cluster_job_numbers[run_permutation_code] = 'unknown'
             self.invoke_log_corrupt[run_permutation_code] = 'NA'
             self.invoke_log_mtime[run_permutation_code] = 'NA'
+    ''' 
+    def emit_run_states_full(self, stdout):
+        for pcode in self.run_permutation_codes:
+            self.emit_run_state_full(stdout, pcode)
             
-    def check_script(self, run_permutation_code, cluster_runs, cluster_system):
-        # populate self.run_script_exists
-        cluster_script_instance = cluster_runs.get_script_for_run_permutation_code(run_permutation_code)
-        script_exists = cluster_system.exists(cluster_script_instance.pathname)
-        self.run_script_exists[run_permutation_code] = script_exists
-        self.script_mtime[run_permutation_code] = cluster_script_instance.get_last_modification_time()        
-        
-    def emit_state_full(self):
-        for runID in self.run_permutation_codes:
-            run_state = self.run_states[runID]
-            cluster_job_number = self.cluster_job_numbers[runID]
-            self.cluster_system.println('{0} {1}  {2}'.format(cluster_job_number, runID,run_state))
-            
-            
-    def emit_state_summary(self):
+    def emit_run_state_full(self, stdout, pcode):
+        run_state = self.run_states[pcode]
+        cluster_job_number = self.cluster_job_numbers[pcode]
+        stdout.println('{0} {1}  {2}'.format(cluster_job_number, pcode ,run_state))
+                    
+    def emit_state_summary(self, stdout):
         script_missing_count = 0
         script_ready_count = 0
         run_state_error_count = 0
@@ -376,7 +373,7 @@ class StateOfRuns(object):
             else:
                 unknown_run_state_count = unknown_run_state_count + 1
         
-        self.cluster_system.println("")          
+        stdout.println("")          
         master_job_name = self.cluster_runs_info.cspec.master_job_name
         message = "{0}({1})\t".format(master_job_name, total_count)
         
@@ -399,29 +396,32 @@ class StateOfRuns(object):
         if unknown_run_state_count != 0:
             message = "{0}state undefined: {1}\t".format(message, unknown_run_state_count)
         #message = "{0}\n".format(message)
-        self.cluster_system.println(message)
+        stdout.println(message)
         
-    def emit_state_pending(self):
-        for runID in self.run_permutation_codes:     
-            run_state = self.run_states[runID]
-            cluster_job_number = self.cluster_job_numbers[runID]
-            if run_state != 'run complete':
-                self.cluster_system.println('{0} {1}  {2}'.format(cluster_job_number, runID, run_state))
-             
+    def emit_run_states_pending(self, stdout):
+        for pcode in self.run_permutation_codes:     
+            self.emit_run_state_pending(stdout, pcode)
+                
+    def emit_run_state_pending(self, stdout, pcode):
+        run_state = self.run_states[pcode]
+        cluster_job_number = self.cluster_job_numbers[pcode]
+        if run_state != 'run complete':
+            stdout.println('{0} {1}  {2}'.format(cluster_job_number, pcode, run_state))
+    '''         
     def check_milestones_of_runs(self, cluster_runs, cluster_system):
         for run_permutation_code in cluster_runs.run_perm_codes_list:
             self.run_permutation_codes.append(run_permutation_code)
             self.check_milestones_of_run(cluster_runs, run_permutation_code, cluster_runs.cspec, cluster_system)
-        
-    def derive_state_of_runs(self,cluster_runs):
+    '''    
+    def derive_state_of_runs(self,cluster_runs, cluster):
         for run_permutation_code in cluster_runs.run_perm_codes_list:
-            self.derive_state_of_run(cluster_runs,run_permutation_code)    
+            self.derive_state_of_run(cluster_runs,run_permutation_code, cluster)    
             
-    def derive_state_of_run(self,cluster_runs,runID):
+    def derive_state_of_run(self,cluster_runs,runID, cluster):
         if self.invoke_log_corrupt[runID] == True:
             self.derive_state_of_run_invoke_log_corrupt(cluster_runs, runID)
         else:
-            self.derive_state_of_run_basic(cluster_runs, runID)
+            self.derive_state_of_run_basic(cluster_runs, runID, cluster)
     
     def derive_state_of_run_invoke_log_corrupt(self,cluster_runs,runID):
         # se ilc   stand for 
@@ -435,7 +435,7 @@ class StateOfRuns(object):
         self.run_states[runID] = run_state
   
  
-    def derive_state_of_run_basic(self,cluster_runs,runID):
+    def derive_state_of_run_basic(self,cluster_runs,pcode, cluster):
         # se  ile rpb dme ofe stand for:
         # run_script_exists,invoke_log_exists,run_permission_blocked,done_marker_exists,output_files_exist
         # build a string that looks like this: 'se 0 ile 0 rpb 0 dme 0 ofe 0'
@@ -445,39 +445,111 @@ class StateOfRuns(object):
         dme = '-'
         ofe = '-'
         
-        if self.run_script_exists[runID] == True:
+        if self.run_script_exists[pcode] == True:
             se = 'S'
-        if self.invoke_log_exists[runID] == True:
+        if self.invoke_log_exists[pcode] == True:
             ile = 'L'
-        if self.run_permission_blocked[runID] == True:
+        if self.run_permission_blocked[pcode] == True:
             rpb = 'B'
-        if self.done_marker_exists[runID] == True:
+        if self.done_marker_exists[pcode] == True:
             dme = 'D'
-        if self.output_files_exist[runID] == True:
+        if self.output_files_exist[pcode] == True:
             ofe = 'O'
         #import ipdb;ipdb.set_trace()   
         state_code = '{0}{1}{2}{3}{4}'.format(se, ile, rpb, dme, ofe)
         run_state_name = self.state_names[state_code]
-        self.run_error_info[runID] = ''
+        self.run_error_info[pcode] = ''
         if run_state_name == 'run_state_error':
-            self.run_error_info[runID] = self.get_error_reason(runID,cluster_runs, self.cluster_system)
-        self.run_states[runID] = state_code
+            self.run_error_info[pcode] = self.cluster.get_failure_reason(pcode)
+        self.run_states[pcode] = state_code
    
    
-    def get_error_reason(self,runID, cluster_runs, cluster_system): 
-        # get info for QacctLog
-        permutation_info = cluster_runs.run_permutation_info_for_run_permutation_code_map[runID]  
-        user_job_number_as_string = cluster_runs.get_job_number_string_for_run_permutation_code(runID) 
-        cspec = cluster_runs.cspec
+    '''
+    def check_milestones_of_run(self, cluster_runs, pcode, cspec, cluster):
+        logging.debug('CHECKING status of run')
+        cluster = cluster.Cluster(cluster_runs)
+        # populate self.run_script_exists
+        cscript = cluster_runs.get_script_for_run_permutation_code(pcode)
+        self.run_script_exists[pcode] = cluster.is_script_present(pcode)
+        self.script_mtime[runID] = cluster_script_instance.get_last_modification_time()
         
-        qacctlog = qacct_log.QacctLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'])
-        cluster_job_number = self.cluster_job_numbers[runID]
-        qacctlog.ingest(cluster_job_number)
-        failure_reason = qacctlog.get_failure_reason()
-        return failure_reason
-    
- 
-    def check_milestones_of_run(self, cluster_runs, run_permutation_code, cspec, cluster_system):
+        # populate self.invoke_log_exists
+        # populate self.invoke_log_corrupt
+        # populate self.invoke_log_mtime
+        permutation_info = cluster_runs.run_permutation_info_for_run_permutation_code_map[runID]
+        user_job_number_as_string = cluster_runs.get_job_number_string_for_run_permutation_code(runID)
+        qil = qsub_invoke_log.QsubInvokeLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'], cluster_system)
+        self.cluster_job_numbers[runID] = qil.cluster_job_number
+        self.qil_files[runID] = qil
+        self.invoke_log_exists[runID] = cluster_system.isfile(qil.qsub_invoke_log_fullpath)
+        if self.invoke_log_exists[runID] == True:
+            self.invoke_log_corrupt[runID] = qil.is_corrupt()
+            if self.invoke_log_corrupt[runID] == True:
+                self.invoke_log_mtime[runID] = 'NA'
+            else:
+                self.invoke_log_mtime[runID] = qil.get_last_modification_time()
+        else:
+            self.invoke_log_corrupt[runID] = 'NA'
+            self.invoke_log_mtime[runID] = 'NA'
+            
+            
+        # populate self.run_permission_blocked    
+        self.run_permission_blocked[runID] = qil.is_first_error_permission_problem()
+        
+        # populate self.qacct_log_exists
+        # populate self.qacct_log_corrupt
+        # populate self.qacct_log_mtime
+        qacctlog = qacct_log.QacctLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'], cluster_system)
+        self.qacct_files[runID] = qacctlog
+        self.qacct_log_exists[runID] = cluster_system.isfile(qacctlog.qacct_log)
+        if self.qacct_log_exists[runID] == True:
+            self.qacct_log_corrupt[runID] = qacctlog.is_corrupt()
+            if self.qacct_log_corrupt[runID] == True:
+                self.qacct_log_mtime[runID] = 'NA'
+            else:
+                self.qacct_log_mtime[runID] = qacctlog.get_last_modification_time()
+        else:
+            self.qacct_log_corrupt[runID] = 'NA'
+            self.qacct_log_mtime[runID] = 'NA'
+        
+        
+        
+        # populate  self.done_marker_exists
+        self.done_marker_exists[runID] = cluster_runs_info.did_run_finish(cluster_runs, runID, cluster_system)
+        if (self.done_marker_exists[runID] == True):
+            results_dir = cluster_runs.get_results_dir_for_run_permutation_code(runID)
+            done_file = cluster_script.get_done_marker_filename()
+            done_marker_file_path = "{0}/{1}".format(results_dir, done_file)
+            self.done_marker_mtime[runID] = cluster_system.get_last_modification_time(done_marker_file_path)
+        else:
+            self.done_marker_mtime[runID] = 'NA'
+        
+        # populate self.output_files_exist
+        # populate self.output_files_mtime
+        missing_output_file = False
+        missing_output_files = cluster_runs_info.get_missing_output_files(permutation_info, cspec, cluster_system)
+        self.missing_output_files[runID] = missing_output_files
+        if (len(missing_output_files) != 0):
+            missing_output_file = True 
+        self.output_files_exist[runID] = not(missing_output_file)
+        
+        list_of_output_files = permutations.get_list_of_output_files(permutation_info, cspec)
+        time = 0
+        # find the oldest output_file mod time
+        for output_file in list_of_output_files:
+            curtime = cluster_system.get_last_modification_time(output_file)
+            if time == 0:
+                time = curtime
+            else:
+                if curtime < time:
+                    time = curtime
+        if time == 0:
+            self.output_files_mtime[runID] = 'NA'
+        else:
+            self.output_files_mtime[runID] = time
+    '''
+    '''
+    def check_milestones_of_runOld(self, cluster_runs, run_permutation_code, cspec, cluster_system):
         runID = run_permutation_code
         logging.debug('CHECKING status of run')
         # populate self.run_script_exists
@@ -560,8 +632,8 @@ class StateOfRuns(object):
             self.output_files_mtime[runID] = 'NA'
         else:
             self.output_files_mtime[runID] = time
-   
-  
+    '''
+    '''
     def check_for_any_scripts(self, cluster_system, cluster_runs_info):
         for run_perm_code in cluster_runs_info.run_perm_codes_list:
             cluster_script_instance = cluster_runs_info.get_script_for_run_permutation_code(run_perm_code)
@@ -576,4 +648,5 @@ class StateOfRuns(object):
             if not(cluster_system.exists(cluster_script_instance.pathname)):
                 result = False
         return result
+    '''
         
