@@ -679,6 +679,38 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == 'SL-DO')
 
+    # 'SC'
+    def test_assess_run__SC(self):
+        #pcode = 'l_A_n_1_trials_1'
+        stdout = mock_stdout.MockStdout()
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
+        cluster = mock_cluster.MockCluster(cluster_runs)
+        pcodes = cluster_runs.run_perm_codes_list
+        pcode = pcodes[0]
+        cluster.create_script(pcode)
+        cluster.launch(pcode)
+        cluster.test_helper_corrupt_invoke_log(pcode)
+        states = state_of_runs.StateOfRuns()
+        states.assess_run(pcode, cluster_runs, cluster)
+        self.assertTrue(states.run_states[pcode] == 'SC')
+        
+    # '-C'
+    def test_assess_run___C(self):
+        #pcode = 'l_A_n_1_trials_1'
+        stdout = mock_stdout.MockStdout()
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
+        cluster = mock_cluster.MockCluster(cluster_runs)
+        pcodes = cluster_runs.run_perm_codes_list
+        pcode = pcodes[0]
+        cluster.create_script(pcode)
+        cluster.launch(pcode)
+        cluster.test_helper_corrupt_invoke_log(pcode)
+        cluster.delete_script(pcode)
+        states = state_of_runs.StateOfRuns()
+        states.assess_run(pcode, cluster_runs, cluster)
+        self.assertTrue(states.run_states[pcode] == '-C')
 if __name__ == '__main__':
     unittest.main()
     

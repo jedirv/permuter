@@ -417,22 +417,21 @@ class StateOfRuns(object):
         for run_permutation_code in cluster_runs.run_perm_codes_list:
             self.derive_state_of_run(cluster_runs,run_permutation_code, cluster)    
             
-    def derive_state_of_run(self,cluster_runs,runID, cluster):
-        if self.invoke_log_corrupt[runID] == True:
-            self.derive_state_of_run_invoke_log_corrupt(cluster_runs, runID)
+    def derive_state_of_run(self,cluster_runs,pcode, cluster):
+        if self.invoke_log_corrupt[pcode] == True:
+            self.derive_state_of_run_invoke_log_corrupt(cluster_runs, pcode)
         else:
-            self.derive_state_of_run_basic(cluster_runs, runID, cluster)
+            self.derive_state_of_run_basic(cluster_runs, pcode, cluster)
     
-    def derive_state_of_run_invoke_log_corrupt(self,cluster_runs,runID):
+    def derive_state_of_run_invoke_log_corrupt(self,cluster_runs,pcode):
         # se ilc   stand for 
         # run_script_exists,invoke_log_corrupt
         se = '-'
         ilc = 'C'     # given
-        if self.run_script_exists[runID] == True:
+        if self.run_script_exists[pcode] == True:
             se = 'S'
         state_code = '{0}{1}'.format(se, ilc)
-        run_state = self.stat_names[state_code]       
-        self.run_states[runID] = run_state
+        self.run_states[pcode] = state_code
   
  
     def derive_state_of_run_basic(self,cluster_runs,pcode, cluster):
