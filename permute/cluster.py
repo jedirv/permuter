@@ -55,6 +55,11 @@ class Cluster(object):
         results_dir = self.cluster_runs.cspec.job_results_dir
         self.clean_out_dir(results_dir)
 
+    def delete_done_marker(self, pcode):
+        done_marker_file_path = self.cluster_runs.get_donefile_path_for_run_permutation_code(pcode)
+        if (os.path.exists(done_marker_file_path)):
+            os.unlink(done_marker_file_path)
+            
     def clean_out_dir(self,dirpath):
         if not(os.path.exists(dirpath)):
             return

@@ -74,8 +74,13 @@ class MockCluster(object):
     def delete_results(self, pcode):
         if self.output_files.has_key(pcode):
             self.output_files.pop(pcode)
-            self.output_files_mod_time[pcode]= get_time()
-
+            self.output_files_mod_time.pop(pcode)
+            
+    def delete_done_marker(self, pcode):
+        if self.done_markers.has_key(pcode):
+            self.done_markers.pop(pcode)
+            self.done_markers_mod_time.pop(pcode)
+            
     #TESTED
     def launch(self, pcode):
         if self.scripts.has_key(pcode):
