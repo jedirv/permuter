@@ -51,6 +51,11 @@ class TestStateOfRuns(unittest.TestCase):
         states = state_of_runs.StateOfRuns()
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == '-----')
+        states.emit_state_summary(stdout, cluster_runs)
+        self.assertTrue(stdout.lines[0] == '....\n')
+        self.assertTrue(stdout.lines[1] == '\n')
+        self.assertTrue(stdout.lines[2] == 'unittest(4)\tscripts missing: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
     
     # '-----'
     def test_assess_run_______after_cleanup(self):
@@ -92,6 +97,11 @@ class TestStateOfRuns(unittest.TestCase):
         states = state_of_runs.StateOfRuns()
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == 'S----')
+        states.emit_state_summary(stdout, cluster_runs)
+        self.assertTrue(stdout.lines[0] == '....\n')
+        self.assertTrue(stdout.lines[1] == '\n')
+        self.assertTrue(stdout.lines[2] == 'unittest(4)\tscripts ready to run: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
     # '-L---'
     def test_assess_run___L___(self):
@@ -112,6 +122,13 @@ class TestStateOfRuns(unittest.TestCase):
         states = state_of_runs.StateOfRuns()
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == '-L---')
+        states.emit_state_summary(stdout, cluster_runs)
+        for line in stdout.lines:
+            print line
+        self.assertTrue(stdout.lines[0] == '....\n')
+        self.assertTrue(stdout.lines[1] == '\n')
+        self.assertTrue(stdout.lines[2] == 'unittest(4)\tscripts ready to run: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
     # 'SL---'
     def test_assess_run__SL___(self):
@@ -693,7 +710,7 @@ class TestStateOfRuns(unittest.TestCase):
         cluster.test_helper_corrupt_invoke_log(pcode)
         states = state_of_runs.StateOfRuns()
         states.assess_run(pcode, cluster_runs, cluster)
-        self.assertTrue(states.run_states[pcode] == 'SC')
+        self.assertTrue(states.run_states[pcode] == 'SC-XX')
         
     # '-C'
     def test_assess_run___C(self):
@@ -710,7 +727,7 @@ class TestStateOfRuns(unittest.TestCase):
         cluster.delete_script(pcode)
         states = state_of_runs.StateOfRuns()
         states.assess_run(pcode, cluster_runs, cluster)
-        self.assertTrue(states.run_states[pcode] == '-C')
+        self.assertTrue(states.run_states[pcode] == '-C-XX')
 if __name__ == '__main__':
     unittest.main()
     
