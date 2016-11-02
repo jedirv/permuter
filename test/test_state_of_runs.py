@@ -51,6 +51,7 @@ class TestStateOfRuns(unittest.TestCase):
         states = state_of_runs.StateOfRuns()
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == '-----')
+        
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
         self.assertTrue(stdout.lines[1] == '\n')
@@ -97,6 +98,7 @@ class TestStateOfRuns(unittest.TestCase):
         states = state_of_runs.StateOfRuns()
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == 'S----')
+        
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
         self.assertTrue(stdout.lines[1] == '\n')
@@ -122,12 +124,11 @@ class TestStateOfRuns(unittest.TestCase):
         states = state_of_runs.StateOfRuns()
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == '-L---')
+        
         states.emit_state_summary(stdout, cluster_runs)
-        for line in stdout.lines:
-            print line
         self.assertTrue(stdout.lines[0] == '....\n')
         self.assertTrue(stdout.lines[1] == '\n')
-        self.assertTrue(stdout.lines[2] == 'unittest(4)\tscripts ready to run: 1\n')
+        self.assertTrue(stdout.lines[2] == 'unittest(4)\trun state inconsistent: 1\n')
         self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
     # 'SL---'
@@ -148,6 +149,12 @@ class TestStateOfRuns(unittest.TestCase):
         states = state_of_runs.StateOfRuns()
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == 'SL---')
+        
+        states.emit_state_summary(stdout, cluster_runs)
+        self.assertTrue(stdout.lines[0] == '....\n')
+        self.assertTrue(stdout.lines[1] == '\n')
+        self.assertTrue(stdout.lines[2] == 'unittest(4)\trun state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
     # '--B--'
     def test_assess_run____B__(self):
@@ -171,6 +178,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == '--B--')
         
+        states.emit_state_summary(stdout, cluster_runs)
+        self.assertTrue(stdout.lines[0] == '....\n')
+        self.assertTrue(stdout.lines[1] == '\n')
+        self.assertTrue(stdout.lines[2] == 'unittest(4)\trun state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        
     # 'S-B--'
     def test_assess_run__S_B__(self):
         #pcode = 'l_A_n_1_trials_1'
@@ -191,6 +204,12 @@ class TestStateOfRuns(unittest.TestCase):
         states = state_of_runs.StateOfRuns()
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == 'S-B--')
+        
+        states.emit_state_summary(stdout, cluster_runs)
+        self.assertTrue(stdout.lines[0] == '....\n')
+        self.assertTrue(stdout.lines[1] == '\n')
+        self.assertTrue(stdout.lines[2] == 'unittest(4)\trun state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
     #'-LB--'
     def test_assess_run___LB__(self):
@@ -213,6 +232,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == '-LB--')
         
+        states.emit_state_summary(stdout, cluster_runs)
+        self.assertTrue(stdout.lines[0] == '....\n')
+        self.assertTrue(stdout.lines[1] == '\n')
+        self.assertTrue(stdout.lines[2] == 'unittest(4)\trun state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        
     # 'SLB--'
     def test_assess_run__SLB__(self):
         #pcode = 'l_A_n_1_trials_1'
@@ -233,6 +258,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == 'SLB--')
         
+        states.emit_state_summary(stdout, cluster_runs)
+        self.assertTrue(stdout.lines[0] == '....\n')
+        self.assertTrue(stdout.lines[1] == '\n')
+        self.assertTrue(stdout.lines[2] == 'unittest(4)\tinvoke error: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        
     # '---D-'
     def test_assess_run_____D_(self):
         #pcode = 'l_A_n_1_trials_1'
@@ -252,6 +283,12 @@ class TestStateOfRuns(unittest.TestCase):
         states = state_of_runs.StateOfRuns()
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == '---D-')
+        
+        states.emit_state_summary(stdout, cluster_runs)
+        self.assertTrue(stdout.lines[0] == '....\n')
+        self.assertTrue(stdout.lines[1] == '\n')
+        self.assertTrue(stdout.lines[2] == 'unittest(4)\trun state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
             
     # 'S--D-'
     def test_assess_run__S__D_(self):
@@ -272,6 +309,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == 'S--D-')
         
+        states.emit_state_summary(stdout, cluster_runs)
+        self.assertTrue(stdout.lines[0] == '....\n')
+        self.assertTrue(stdout.lines[1] == '\n')
+        self.assertTrue(stdout.lines[2] == 'unittest(4)\trun state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        
     # '-L-D-'
     def test_assess_run___L_D_(self):
         #pcode = 'l_A_n_1_trials_1'
@@ -291,6 +334,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == '-L-D-')
         
+        states.emit_state_summary(stdout, cluster_runs)
+        self.assertTrue(stdout.lines[0] == '....\n')
+        self.assertTrue(stdout.lines[1] == '\n')
+        self.assertTrue(stdout.lines[2] == 'unittest(4)\trun state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        
     # 'SL-D-'
     def test_assess_run__SL_D_(self):
         #pcode = 'l_A_n_1_trials_1'
@@ -308,6 +357,12 @@ class TestStateOfRuns(unittest.TestCase):
         states = state_of_runs.StateOfRuns()
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == 'SL-D-')
+        
+        states.emit_state_summary(stdout, cluster_runs)
+        self.assertTrue(stdout.lines[0] == '....\n')
+        self.assertTrue(stdout.lines[1] == '\n')
+        self.assertTrue(stdout.lines[2] == 'unittest(4)\toutput files missing: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
     # '--BD-'
     def test_assess_run____BD_(self):
@@ -329,6 +384,12 @@ class TestStateOfRuns(unittest.TestCase):
         states = state_of_runs.StateOfRuns()
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == '--BD-')
+        
+        states.emit_state_summary(stdout, cluster_runs)
+        self.assertTrue(stdout.lines[0] == '....\n')
+        self.assertTrue(stdout.lines[1] == '\n')
+        self.assertTrue(stdout.lines[2] == 'unittest(4)\trun state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
 
     # 'S-BD-'
     def test_assess_run__S_BD_(self):
@@ -349,6 +410,12 @@ class TestStateOfRuns(unittest.TestCase):
         states = state_of_runs.StateOfRuns()
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == 'S-BD-')
+        
+        states.emit_state_summary(stdout, cluster_runs)
+        self.assertTrue(stdout.lines[0] == '....\n')
+        self.assertTrue(stdout.lines[1] == '\n')
+        self.assertTrue(stdout.lines[2] == 'unittest(4)\trun state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
 
     # '-LBD-'
     def test_assess_run___LBD_(self):
@@ -369,6 +436,12 @@ class TestStateOfRuns(unittest.TestCase):
         states = state_of_runs.StateOfRuns()
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == '-LBD-')
+        
+        states.emit_state_summary(stdout, cluster_runs)
+        self.assertTrue(stdout.lines[0] == '....\n')
+        self.assertTrue(stdout.lines[1] == '\n')
+        self.assertTrue(stdout.lines[2] == 'unittest(4)\trun state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
 
 
     # 'SLBD-'
@@ -389,6 +462,12 @@ class TestStateOfRuns(unittest.TestCase):
         states = state_of_runs.StateOfRuns()
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == 'SLBD-')
+        
+        states.emit_state_summary(stdout, cluster_runs)
+        self.assertTrue(stdout.lines[0] == '....\n')
+        self.assertTrue(stdout.lines[1] == '\n')
+        self.assertTrue(stdout.lines[2] == 'unittest(4)\trun state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
 
 
     # '----O'
@@ -411,6 +490,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == '----O')
         
+        states.emit_state_summary(stdout, cluster_runs)
+        self.assertTrue(stdout.lines[0] == '....\n')
+        self.assertTrue(stdout.lines[1] == '\n')
+        self.assertTrue(stdout.lines[2] == 'unittest(4)\tpossible stale results: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        
     # 'S---O'
     def test_assess_run__S___O(self):
         #pcode = 'l_A_n_1_trials_1'
@@ -429,6 +514,12 @@ class TestStateOfRuns(unittest.TestCase):
         states = state_of_runs.StateOfRuns()
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == 'S---O')
+        
+        states.emit_state_summary(stdout, cluster_runs)
+        self.assertTrue(stdout.lines[0] == '....\n')
+        self.assertTrue(stdout.lines[1] == '\n')
+        self.assertTrue(stdout.lines[2] == 'unittest(4)\tpossible stale results: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
     # '-L--O'
     def test_assess_run___L__O(self):
@@ -449,6 +540,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == '-L--O')
         
+        states.emit_state_summary(stdout, cluster_runs)
+        self.assertTrue(stdout.lines[0] == '....\n')
+        self.assertTrue(stdout.lines[1] == '\n')
+        self.assertTrue(stdout.lines[2] == 'unittest(4)\tpossible stale results: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+      
     # 'SL--O'
     def test_assess_run__SL__O(self):
         #pcode = 'l_A_n_1_trials_1'
@@ -466,6 +563,12 @@ class TestStateOfRuns(unittest.TestCase):
         states = state_of_runs.StateOfRuns()
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == 'SL--O')
+        
+        states.emit_state_summary(stdout, cluster_runs)
+        self.assertTrue(stdout.lines[0] == '....\n')
+        self.assertTrue(stdout.lines[1] == '\n')
+        self.assertTrue(stdout.lines[2] == 'unittest(4)\tnear complete: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
     # '--B-O'
     def test_assess_run____B_O(self):
@@ -488,6 +591,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == '--B-O')
         
+        states.emit_state_summary(stdout, cluster_runs)
+        self.assertTrue(stdout.lines[0] == '....\n')
+        self.assertTrue(stdout.lines[1] == '\n')
+        self.assertTrue(stdout.lines[2] == 'unittest(4)\tpossible stale results: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        
     # 'S-B-O'
     def test_assess_run__S_B_O(self):
         #pcode = 'l_A_n_1_trials_1'
@@ -507,6 +616,12 @@ class TestStateOfRuns(unittest.TestCase):
         states = state_of_runs.StateOfRuns()
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == 'S-B-O')
+        
+        states.emit_state_summary(stdout, cluster_runs)
+        self.assertTrue(stdout.lines[0] == '....\n')
+        self.assertTrue(stdout.lines[1] == '\n')
+        self.assertTrue(stdout.lines[2] == 'unittest(4)\tpossible stale results: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
     # '-LB-O'
     def test_assess_run___LB_O(self):
@@ -528,6 +643,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == '-LB-O')
         
+        states.emit_state_summary(stdout, cluster_runs)
+        self.assertTrue(stdout.lines[0] == '....\n')
+        self.assertTrue(stdout.lines[1] == '\n')
+        self.assertTrue(stdout.lines[2] == 'unittest(4)\tpossible stale results: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        
     # 'SLB-O'
     def test_assess_run__SLB_O(self):
         #pcode = 'l_A_n_1_trials_1'
@@ -546,7 +667,13 @@ class TestStateOfRuns(unittest.TestCase):
         states = state_of_runs.StateOfRuns()
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == 'SLB-O')
-            
+        
+        states.emit_state_summary(stdout, cluster_runs)
+        self.assertTrue(stdout.lines[0] == '....\n')
+        self.assertTrue(stdout.lines[1] == '\n')
+        self.assertTrue(stdout.lines[2] == 'unittest(4)\trun state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+           
     # '---DO'
     def test_assess_run_____DO(self):
         #pcode = 'l_A_n_1_trials_1'
@@ -566,6 +693,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == '---DO')
         
+        states.emit_state_summary(stdout, cluster_runs)
+        self.assertTrue(stdout.lines[0] == '....\n')
+        self.assertTrue(stdout.lines[1] == '\n')
+        self.assertTrue(stdout.lines[2] == 'unittest(4)\tpossible stale results: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        
     # 'S--DO'
     def test_assess_run__S__DO(self):
         #pcode = 'l_A_n_1_trials_1'
@@ -584,6 +717,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == 'S--DO')
         
+        states.emit_state_summary(stdout, cluster_runs)
+        self.assertTrue(stdout.lines[0] == '....\n')
+        self.assertTrue(stdout.lines[1] == '\n')
+        self.assertTrue(stdout.lines[2] == 'unittest(4)\tpossible stale results: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        
     # '-L-DO'
     def test_assess_run___L_DO(self):
         #pcode = 'l_A_n_1_trials_1'
@@ -601,6 +740,12 @@ class TestStateOfRuns(unittest.TestCase):
         states = state_of_runs.StateOfRuns()
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == '-L-DO')
+        
+        states.emit_state_summary(stdout, cluster_runs)
+        self.assertTrue(stdout.lines[0] == '....\n')
+        self.assertTrue(stdout.lines[1] == '\n')
+        self.assertTrue(stdout.lines[2] == 'unittest(4)\tpossible stale results: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
     # '--BDO'
     def test_assess_run____BDO(self):
@@ -621,6 +766,12 @@ class TestStateOfRuns(unittest.TestCase):
         states = state_of_runs.StateOfRuns()
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == '--BDO')
+        
+        states.emit_state_summary(stdout, cluster_runs)
+        self.assertTrue(stdout.lines[0] == '....\n')
+        self.assertTrue(stdout.lines[1] == '\n')
+        self.assertTrue(stdout.lines[2] == 'unittest(4)\tpossible stale results: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
             
     # 'S-BDO'
     def test_assess_run__S_BDO(self):
@@ -640,6 +791,12 @@ class TestStateOfRuns(unittest.TestCase):
         states = state_of_runs.StateOfRuns()
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == 'S-BDO')
+        
+        states.emit_state_summary(stdout, cluster_runs)
+        self.assertTrue(stdout.lines[0] == '....\n')
+        self.assertTrue(stdout.lines[1] == '\n')
+        self.assertTrue(stdout.lines[2] == 'unittest(4)\tpossible stale results: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
     
     # '-LBDO'
     def test_assess_run___LBDO(self):
@@ -660,6 +817,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == '-LBDO')
         
+        states.emit_state_summary(stdout, cluster_runs)
+        self.assertTrue(stdout.lines[0] == '....\n')
+        self.assertTrue(stdout.lines[1] == '\n')
+        self.assertTrue(stdout.lines[2] == 'unittest(4)\tpossible stale results: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+    
     # 'SLBDO'
     def test_assess_run__SLBDO(self):
         #pcode = 'l_A_n_1_trials_1'
@@ -677,6 +840,12 @@ class TestStateOfRuns(unittest.TestCase):
         states = state_of_runs.StateOfRuns()
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == 'SLBDO')
+        
+        states.emit_state_summary(stdout, cluster_runs)
+        self.assertTrue(stdout.lines[0] == '....\n')
+        self.assertTrue(stdout.lines[1] == '\n')
+        self.assertTrue(stdout.lines[2] == 'unittest(4)\tpossible stale results: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
 
     
     # 'SL-DO'
@@ -695,7 +864,15 @@ class TestStateOfRuns(unittest.TestCase):
         states = state_of_runs.StateOfRuns()
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == 'SL-DO')
-
+        
+        states.emit_state_summary(stdout, cluster_runs)
+        for line in stdout.lines:
+            print line
+        self.assertTrue(stdout.lines[0] == '....\n')
+        self.assertTrue(stdout.lines[1] == '\n')
+        self.assertTrue(stdout.lines[2] == 'unittest(4)\tcomplete: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+       
     # 'SC'
     def test_assess_run__SC(self):
         #pcode = 'l_A_n_1_trials_1'

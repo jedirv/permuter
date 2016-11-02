@@ -62,26 +62,26 @@ class StateOfRuns(object):
         
         self.state_names['-L---'] = 'inconsistent'
         self.state_cause['-L---'] = 'invoke log but no script_file'
-        self.state_todos['-L---'] = 'clean scripts, then gen'
+        self.state_todos['-L---'] = 'retry'
         
-        self.state_names['SL---'] = 'running'
-        self.state_cause['SL---'] = ''
-        self.state_todos['SL---'] = ''
+        self.state_names['SL---'] = 'inconsistent'
+        self.state_cause['SL---'] = 'files suggest system should be running, but not seen in qstat'
+        self.state_todos['SL---'] = 'retry'
         
         self.state_names['--B--'] = 'inconsistent'
         self.state_cause['--B--'] = 'script file missing, evidence of prior permission problem'
-        self.state_todos['--B--'] = 'clean scripts, then gen'
+        self.state_todos['--B--'] = 'retry'
         
         self.state_names['S-B--'] = 'inconsistent'
         self.state_cause['S-B--'] = 'invoke log missing, though evidence of prior permission problem'
-        self.state_todos['S-B--'] = 'retry if other runs running, launch of not'
+        self.state_todos['S-B--'] = 'retry'
         
         self.state_names['-LB--'] = 'inconsistent'
         self.state_cause['-LB--'] = 'script missing, invoke log present'
         self.state_todos['-LB--'] = 'retry'
         
         self.state_names['SLB--'] = 'invoke error'
-        self.state_cause['SLB--'] = 'run permission detected'
+        self.state_cause['SLB--'] = 'run error detected'
         self.state_todos['SLB--'] = 'look into permission problem, then retry'
         
         
@@ -89,49 +89,49 @@ class StateOfRuns(object):
  
         self.state_names['---D-'] = 'inconsistent'
         self.state_cause['---D-'] = 'done marker found, but no script or results found'
-        self.state_todos['---D-'] = 'clean, gen'
+        self.state_todos['---D-'] = 'retry'
         
         self.state_names['S--D-'] = 'inconsistent'
         self.state_cause['S--D-'] = 'done marker found, but no evidence of script being invoked - stale results?'
-        self.state_todos['S--D-'] = 'clean_results, retry'
+        self.state_todos['S--D-'] = 'retry'
         
         self.state_names['-L-D-'] = 'inconsistent'
         self.state_cause['-L-D-'] = 'done marker found, but no script found and no results present'
-        self.state_todos['-L-D-'] = 'clean_results, retry'
+        self.state_todos['-L-D-'] = 'retry'
         
         self.state_names['SL-D-'] = 'results missing'
         self.state_cause['SL-D-'] = 'done marker found, but no results'
-        self.state_todos['SL-D-'] = 'troubleshoot the run'
+        self.state_todos['SL-D-'] = 'troubleshoot in <dir>'
         
         self.state_names['--BD-'] = 'inconsistent'
         self.state_cause['--BD-'] = 'invoke error detected, but done marker present'
-        self.state_todos['--BD-'] = 'clean_results, retry'
+        self.state_todos['--BD-'] = 'troubleshoot, then retry'
         
         self.state_names['S-BD-'] = 'inconsistent'
         self.state_cause['S-BD-'] = 'invoke error detected, but done marker present'
-        self.state_todos['S-BD-'] = 'clean_results, retry'
+        self.state_todos['S-BD-'] = 'troubleshoot, then retry'
         
         self.state_names['-LBD-'] = 'inconsistent'
         self.state_cause['-LBD-'] = 'invoke error detected, but done marker present'
-        self.state_todos['-LBD-'] = 'clean_results, retry'
+        self.state_todos['-LBD-'] = 'troubleshoot, then retry'
         
         self.state_names['SLBD-'] = 'inconsistent'
         self.state_cause['SLBD-'] = 'invoke error detected, but done marker present'
-        self.state_todos['SLBD-'] = 'clean_results, retry'
+        self.state_todos['SLBD-'] = 'retry'
  
  
  
         self.state_names['----O'] = 'stale results?'
         self.state_cause['----O'] = 'output present but no script or done marker'
-        self.state_todos['----O'] = 'clean_results, gen, launch'
+        self.state_todos['----O'] = 'retry if unexpected'
         
         self.state_names['S---O'] = 'stale results?'
         self.state_cause['S---O'] = 'output present but no done marker'
-        self.state_todos['S---O'] = 'clean_results, launch'
+        self.state_todos['S---O'] = 'retry if unexpected'
         
         self.state_names['-L--O'] = 'stale results?'
         self.state_cause['-L--O'] = 'output present but no script or done marker'
-        self.state_todos['-L--O'] = 'clean_all, gen, launch'
+        self.state_todos['-L--O'] = 'retry if unexpected'
         
         self.state_names['SL--O'] = 'run near complete'
         self.state_cause['SL--O'] = ''
@@ -139,64 +139,64 @@ class StateOfRuns(object):
         
         self.state_names['--B-O'] = 'stale results?'
         self.state_cause['--B-O'] = 'output exists but no done marker or script'
-        self.state_todos['--B-O'] = ''
+        self.state_todos['--B-O'] = 'retry if unexpected'
         
         self.state_names['S-B-O'] = 'stale results?'
         self.state_cause['S-B-O'] = 'output exists, done marker and invoke log missing'
-        self.state_todos['S-B-O'] = 'retry'
+        self.state_todos['S-B-O'] = 'retry if unexpected'
         
         self.state_names['-LB-O'] = 'stale results?'
         self.state_cause['-LB-O'] = 'output exists, done marker missing, script missing'
-        self.state_todos['-LB-O'] = 'retry'
+        self.state_todos['-LB-O'] = 'retry if unexpected'
         
         self.state_names['SLB-O'] = 'inconsistent'
         self.state_cause['SLB-O'] = 'output exists, done marker missing and evidence of invoke error'
-        self.state_todos['SLB-O'] = 'retry'
+        self.state_todos['SLB-O'] = 'retry if unexpected'
         
  
  
-        self.state_names['---DO'] = 'run complete?'
+        self.state_names['---DO'] = 'stale results?'
         self.state_cause['---DO'] = 'output exists, script and invoke log missing'
-        self.state_todos['---DO'] = 'retry?'
+        self.state_todos['---DO'] = 'retry if unexpected'
         
-        self.state_names['S--DO'] = 'run complete?'
+        self.state_names['S--DO'] = 'stale results?'
         self.state_cause['S--DO'] = 'output exists, invoke log missing'
-        self.state_todos['S--DO'] = '? retry'
+        self.state_todos['S--DO'] = 'retry if unexpected'
         
-        self.state_names['-L-DO'] = 'run complete?'
+        self.state_names['-L-DO'] = 'stale results?'
         self.state_cause['-L-DO'] = 'output exists, script missing'
-        self.state_todos['-L-DO'] = '? retry'
+        self.state_todos['-L-DO'] = 'retry if unexpected'
         
         self.state_names['SL-DO'] = 'run complete'
         self.state_cause['SL-DO'] = ''
         self.state_todos['SL-DO'] = ''
         
-        self.state_names['--BDO'] = 'run complete?'
-        self.state_cause['--BDO'] = 'script and launch log missing'
-        self.state_todos['--BDO'] = '? clean, gen, launch'
+        self.state_names['--BDO'] = 'stale results?'
+        self.state_cause['--BDO'] = 'script and invoke log missing'
+        self.state_todos['--BDO'] = 'retry if unexpected'
         
-        self.state_names['S-BDO'] = 'run complete?'
+        self.state_names['S-BDO'] = 'stale results?'
         self.state_cause['S-BDO'] = 'output exists, invoke error detected'
-        self.state_todos['S-BDO'] = '? retry'
+        self.state_todos['S-BDO'] = 'retry if unexpected'
         
-        self.state_names['-LBDO'] = 'run complete'
-        self.state_cause['-LBDO'] = 'warning: output exists, run was blocked, script missing'
-        self.state_todos['-LBDO'] = 'redo?'
+        self.state_names['-LBDO'] = 'stale results?'
+        self.state_cause['-LBDO'] = 'results present but script missing and evidence of invoke error'
+        self.state_todos['-LBDO'] = 'retry if unexpected'
         
-        self.state_names['SLBDO'] = 'run complete'
-        self.state_cause['SLBDO'] = 'warning: permission problem should have prevented run'
-        self.state_todos['SLBDO'] = 'redo?'
+        self.state_names['SLBDO'] = 'stale results?'
+        self.state_cause['SLBDO'] = 'results present but evidence of invoke error'
+        self.state_todos['SLBDO'] = 'retry if unexpected'
        
         # se ile ilc   stand for 
         # run_script_exists,invoke_log_corrupt
-        self.state_names['-C-XX'] = 'run_state_error'
-        self.state_cause['-C-XX'] = "invoke log corrupt, cluster run number isn't known, launch may have failed"
-        self.state_todos['-C-XX'] = 'clean_all, gen, launch'
+        self.state_names['-C-XX'] = 'possible error'
+        self.state_cause['-C-XX'] = "invoke log corrupt, launch may have failed"
+        self.state_todos['-C-XX'] = 'retry'
     
         
-        self.state_names['SC-XX'] = 'run_state_error'
-        self.state_cause['SC-XX'] = "invoke log corrupt, cluster run number isn't known, launch may have failed"
-        self.state_todos['SC-XX'] = 'retry if other runs going, launch if not'
+        self.state_names['SC-XX'] = 'possible error'
+        self.state_cause['SC-XX'] = "invoke log corrupt, launch may have failed"
+        self.state_todos['SC-XX'] = 'retry'
 
         self.state_names['running'] = 'running'
         self.state_cause['running'] = ""
@@ -270,7 +270,6 @@ class StateOfRuns(object):
         output_missing_count = 0
         run_near_complete_count = 0
         run_complete_count = 0
-        run_complete_warning_count = 0
         unknown_run_state_count = 0
         stale_results_count = 0
         total_count = len(cluster_runs.run_perm_codes_list)
@@ -291,14 +290,12 @@ class StateOfRuns(object):
                     waiting_count = waiting_count + 1
                 elif state_name == 'invoke error':
                     invoke_error_count = invoke_error_count + 1
-                elif state_name == 'results_missing':
+                elif state_name == 'results missing':
                     output_missing_count = output_missing_count + 1
                 elif state_name == 'run near complete':
                     run_near_complete_count = run_near_complete_count + 1
                 elif state_name == 'run complete':
                     run_complete_count = run_complete_count + 1
-                elif state_name == 'run complete?':
-                    run_complete_warning_count = run_complete_warning_count + 1
                 elif state_name == 'stale results?':
                     stale_results_count = stale_results_count + 1
                 else:
@@ -324,12 +321,10 @@ class StateOfRuns(object):
             message = "{0}complete: {1}\n".format(message, run_complete_count)
         if output_missing_count != 0:
             message = "{0}output files missing: {1}\n".format(message, output_missing_count)
-        if run_complete_warning_count != 0:
-            message = "{0}complete but inconsistent: {1}\n".format(message, run_complete_warning_count)
         if stale_results_count != 0:
             message = "{0}possible stale results: {1}\n".format(message, stale_results_count)
         if invoke_error_count != 0:
-            message = "{0}run permission error: {1}\n".format(message, invoke_error_count)
+            message = "{0}invoke error: {1}\n".format(message, invoke_error_count)
         if run_state_inconsistent_count != 0:
             message = "{0}run state inconsistent: {1}\n".format(message, run_state_inconsistent_count)
         if unknown_run_state_count != 0:

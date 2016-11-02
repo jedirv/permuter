@@ -101,7 +101,7 @@ def validate_args(permute_command, cspec_path, flags):
         exit()
   
 def usage():
-    print "usage:  python permuter.py  some_command <path of cluster_spec>  [-debug]"
+    print "usage:  python permuter.py  some_command <path of cluster_spec>  [-debug]"  # TODOadd [scope]
     print ""
     print "   where some_command can be..."
     print"        ...for generating a template cspec file" 
@@ -127,7 +127,7 @@ def usage():
     print""                
     print"        ...for actions to run after permutations have launched"               
     print"               stop                   # call qdel on any runs that are unfinished to abort them"                    
-    print"               clean_scripts          # clean the launch scripts and associated .out, .err, and .qil files"                   
+    print"               clean_scripts          # clean the launch scripts and associated .out, .err, and .qil files"      # TODO - change to just clean_for_relaunch, clean_for_new_script             
     print"               clean_results          # clean only the contents of <permutation_results_dir>" 
     print"               clean_pooled_results   # clean only the pooled results"           
     print"               clean_all              # clean scripts, results, pooled results, and stop running jobs" 
