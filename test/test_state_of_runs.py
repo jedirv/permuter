@@ -57,7 +57,10 @@ class TestStateOfRuns(unittest.TestCase):
         self.assertTrue(stdout.lines[1] == '\n')
         self.assertTrue(stdout.lines[2] == 'unittest(4)\tscripts missing: 1\n')
         self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
-    
+        
+        stdout.lines = []
+        states.emit_run_state_full(stdout, pcode)
+        self.assertTrue(stdout.lines[0] == 'NA\tl_A_n_1_trials_1\tscript missing\t-> launch\n')
     # '-----'
     def test_assess_run_______after_cleanup(self):
         #pcode = 'l_A_n_1_trials_1'
@@ -105,6 +108,10 @@ class TestStateOfRuns(unittest.TestCase):
         self.assertTrue(stdout.lines[2] == 'unittest(4)\tscripts ready to run: 1\n')
         self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
+        stdout.lines = []
+        states.emit_run_state_full(stdout, pcode)
+        self.assertTrue(stdout.lines[0] == '1\tl_A_n_1_trials_1\tscript ready\t-> launch\n')
+        
     # '-L---'
     def test_assess_run___L___(self):
         #pcode = 'l_A_n_1_trials_1'
@@ -131,6 +138,10 @@ class TestStateOfRuns(unittest.TestCase):
         self.assertTrue(stdout.lines[2] == 'unittest(4)\trun state inconsistent: 1\n')
         self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
+        stdout.lines = []
+        states.emit_run_state_full(stdout, pcode)
+        self.assertTrue(stdout.lines[0] == '1\tl_A_n_1_trials_1\tinconsistent\t(invoke log present but no script_file)\t-> retry\n')
+        
     # 'SL---'
     def test_assess_run__SL___(self):
         #pcode = 'l_A_n_1_trials_1'
@@ -155,6 +166,11 @@ class TestStateOfRuns(unittest.TestCase):
         self.assertTrue(stdout.lines[1] == '\n')
         self.assertTrue(stdout.lines[2] == 'unittest(4)\trun state inconsistent: 1\n')
         self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        
+        stdout.lines = []
+        states.emit_run_state_full(stdout, pcode)
+        self.assertTrue(stdout.lines[0] == '1\tl_A_n_1_trials_1\tinconsistent\t(files suggest system should be running, but not seen in qstat)\t-> retry\n')
+
         
     # '--B--'
     def test_assess_run____B__(self):
@@ -184,6 +200,11 @@ class TestStateOfRuns(unittest.TestCase):
         self.assertTrue(stdout.lines[2] == 'unittest(4)\trun state inconsistent: 1\n')
         self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
+        stdout.lines = []
+        states.emit_run_state_full(stdout, pcode)
+        self.assertTrue(stdout.lines[0] == '1\tl_A_n_1_trials_1\tinconsistent\t(script file missing, evidence of prior invoke error)\t-> retry\n')
+
+        
     # 'S-B--'
     def test_assess_run__S_B__(self):
         #pcode = 'l_A_n_1_trials_1'
@@ -210,6 +231,11 @@ class TestStateOfRuns(unittest.TestCase):
         self.assertTrue(stdout.lines[1] == '\n')
         self.assertTrue(stdout.lines[2] == 'unittest(4)\trun state inconsistent: 1\n')
         self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        
+        stdout.lines = []
+        states.emit_run_state_full(stdout, pcode)
+        self.assertTrue(stdout.lines[0] == '1\tl_A_n_1_trials_1\tinconsistent\t(invoke log missing, though evidence of invoke error)\t-> retry\n')
+
         
     #'-LB--'
     def test_assess_run___LB__(self):
@@ -238,6 +264,11 @@ class TestStateOfRuns(unittest.TestCase):
         self.assertTrue(stdout.lines[2] == 'unittest(4)\trun state inconsistent: 1\n')
         self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
+        stdout.lines = []
+        states.emit_run_state_full(stdout, pcode)
+        self.assertTrue(stdout.lines[0] == '1\tl_A_n_1_trials_1\tinconsistent\t(script missing, invoke log present)\t-> retry\n')
+
+        
     # 'SLB--'
     def test_assess_run__SLB__(self):
         #pcode = 'l_A_n_1_trials_1'
@@ -264,6 +295,11 @@ class TestStateOfRuns(unittest.TestCase):
         self.assertTrue(stdout.lines[2] == 'unittest(4)\tinvoke error: 1\n')
         self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
+        stdout.lines = []
+        states.emit_run_state_full(stdout, pcode)
+        self.assertTrue(stdout.lines[0] == '1\tl_A_n_1_trials_1\tinvoke error\t(run error detected)\t-> look into error, then retry\n')
+
+        
     # '---D-'
     def test_assess_run_____D_(self):
         #pcode = 'l_A_n_1_trials_1'
@@ -289,6 +325,11 @@ class TestStateOfRuns(unittest.TestCase):
         self.assertTrue(stdout.lines[1] == '\n')
         self.assertTrue(stdout.lines[2] == 'unittest(4)\trun state inconsistent: 1\n')
         self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        
+        stdout.lines = []
+        states.emit_run_state_full(stdout, pcode)
+        self.assertTrue(stdout.lines[0] == '1\tl_A_n_1_trials_1\tinconsistent\t(done marker found, but no script or results found)\t-> retry\n')
+
             
     # 'S--D-'
     def test_assess_run__S__D_(self):
@@ -315,6 +356,11 @@ class TestStateOfRuns(unittest.TestCase):
         self.assertTrue(stdout.lines[2] == 'unittest(4)\trun state inconsistent: 1\n')
         self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
+        stdout.lines = []
+        states.emit_run_state_full(stdout, pcode)
+        self.assertTrue(stdout.lines[0] == '1\tl_A_n_1_trials_1\tinconsistent\t(done marker found, but no evidence of script being invoked - stale results?)\t-> retry\n')
+
+        
     # '-L-D-'
     def test_assess_run___L_D_(self):
         #pcode = 'l_A_n_1_trials_1'
@@ -340,6 +386,11 @@ class TestStateOfRuns(unittest.TestCase):
         self.assertTrue(stdout.lines[2] == 'unittest(4)\trun state inconsistent: 1\n')
         self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
+        stdout.lines = []
+        states.emit_run_state_full(stdout, pcode)
+        self.assertTrue(stdout.lines[0] == '1\tl_A_n_1_trials_1\tinconsistent\t(done marker found, but no script found and no results present)\t-> retry\n')
+
+        
     # 'SL-D-'
     def test_assess_run__SL_D_(self):
         #pcode = 'l_A_n_1_trials_1'
@@ -363,6 +414,11 @@ class TestStateOfRuns(unittest.TestCase):
         self.assertTrue(stdout.lines[1] == '\n')
         self.assertTrue(stdout.lines[2] == 'unittest(4)\toutput files missing: 1\n')
         self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        
+        stdout.lines = []
+        states.emit_run_state_full(stdout, pcode)
+        self.assertTrue(stdout.lines[0] == '1\tl_A_n_1_trials_1\tresults missing\t(done marker found, but no results)\t-> troubleshoot in <dir>\n')
+
         
     # '--BD-'
     def test_assess_run____BD_(self):
@@ -390,6 +446,11 @@ class TestStateOfRuns(unittest.TestCase):
         self.assertTrue(stdout.lines[1] == '\n')
         self.assertTrue(stdout.lines[2] == 'unittest(4)\trun state inconsistent: 1\n')
         self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        
+        stdout.lines = []
+        states.emit_run_state_full(stdout, pcode)
+        self.assertTrue(stdout.lines[0] == '1\tl_A_n_1_trials_1\tinconsistent\t(invoke error detected, but done marker present)\t-> troubleshoot, then retry\n')
+
 
     # 'S-BD-'
     def test_assess_run__S_BD_(self):
@@ -416,6 +477,11 @@ class TestStateOfRuns(unittest.TestCase):
         self.assertTrue(stdout.lines[1] == '\n')
         self.assertTrue(stdout.lines[2] == 'unittest(4)\trun state inconsistent: 1\n')
         self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        
+        stdout.lines = []
+        states.emit_run_state_full(stdout, pcode)
+        self.assertTrue(stdout.lines[0] == '1\tl_A_n_1_trials_1\tinconsistent\t(invoke error detected, but done marker present)\t-> troubleshoot, then retry\n')
+
 
     # '-LBD-'
     def test_assess_run___LBD_(self):
@@ -442,6 +508,11 @@ class TestStateOfRuns(unittest.TestCase):
         self.assertTrue(stdout.lines[1] == '\n')
         self.assertTrue(stdout.lines[2] == 'unittest(4)\trun state inconsistent: 1\n')
         self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        
+        stdout.lines = []
+        states.emit_run_state_full(stdout, pcode)
+        self.assertTrue(stdout.lines[0] == '1\tl_A_n_1_trials_1\tinconsistent\t(invoke error detected, but done marker present)\t-> troubleshoot, then retry\n')
+
 
 
     # 'SLBD-'
@@ -468,6 +539,11 @@ class TestStateOfRuns(unittest.TestCase):
         self.assertTrue(stdout.lines[1] == '\n')
         self.assertTrue(stdout.lines[2] == 'unittest(4)\trun state inconsistent: 1\n')
         self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        
+        stdout.lines = []
+        states.emit_run_state_full(stdout, pcode)
+        self.assertTrue(stdout.lines[0] == '1\tl_A_n_1_trials_1\tinconsistent\t(invoke error detected, but done marker present)\t-> retry\n')
+
 
 
     # '----O'
@@ -496,6 +572,11 @@ class TestStateOfRuns(unittest.TestCase):
         self.assertTrue(stdout.lines[2] == 'unittest(4)\tpossible stale results: 1\n')
         self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
+        stdout.lines = []
+        states.emit_run_state_full(stdout, pcode)
+        self.assertTrue(stdout.lines[0] == '1\tl_A_n_1_trials_1\tstale results?\t(output present but no script or done marker)\t-> retry if unexpected\n')
+
+        
     # 'S---O'
     def test_assess_run__S___O(self):
         #pcode = 'l_A_n_1_trials_1'
@@ -521,6 +602,11 @@ class TestStateOfRuns(unittest.TestCase):
         self.assertTrue(stdout.lines[2] == 'unittest(4)\tpossible stale results: 1\n')
         self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
+        stdout.lines = []
+        states.emit_run_state_full(stdout, pcode)
+        self.assertTrue(stdout.lines[0] == '1\tl_A_n_1_trials_1\tstale results?\t(output present but no done marker)\t-> retry if unexpected\n')
+
+        
     # '-L--O'
     def test_assess_run___L__O(self):
         #pcode = 'l_A_n_1_trials_1'
@@ -545,6 +631,11 @@ class TestStateOfRuns(unittest.TestCase):
         self.assertTrue(stdout.lines[1] == '\n')
         self.assertTrue(stdout.lines[2] == 'unittest(4)\tpossible stale results: 1\n')
         self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        
+        stdout.lines = []
+        states.emit_run_state_full(stdout, pcode)
+        self.assertTrue(stdout.lines[0] == '1\tl_A_n_1_trials_1\tstale results?\t(output present but no script or done marker)\t-> retry if unexpected\n')
+
       
     # 'SL--O'
     def test_assess_run__SL__O(self):
@@ -569,6 +660,11 @@ class TestStateOfRuns(unittest.TestCase):
         self.assertTrue(stdout.lines[1] == '\n')
         self.assertTrue(stdout.lines[2] == 'unittest(4)\tnear complete: 1\n')
         self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        
+        stdout.lines = []
+        states.emit_run_state_full(stdout, pcode)
+        self.assertTrue(stdout.lines[0] == '1\tl_A_n_1_trials_1\trun near complete\n')
+
         
     # '--B-O'
     def test_assess_run____B_O(self):
@@ -597,6 +693,11 @@ class TestStateOfRuns(unittest.TestCase):
         self.assertTrue(stdout.lines[2] == 'unittest(4)\tpossible stale results: 1\n')
         self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
+        stdout.lines = []
+        states.emit_run_state_full(stdout, pcode)
+        self.assertTrue(stdout.lines[0] == '1\tl_A_n_1_trials_1\tstale results?\t(output exists but no done marker or script)\t-> retry if unexpected\n')
+
+        
     # 'S-B-O'
     def test_assess_run__S_B_O(self):
         #pcode = 'l_A_n_1_trials_1'
@@ -622,6 +723,11 @@ class TestStateOfRuns(unittest.TestCase):
         self.assertTrue(stdout.lines[1] == '\n')
         self.assertTrue(stdout.lines[2] == 'unittest(4)\tpossible stale results: 1\n')
         self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        
+        stdout.lines = []
+        states.emit_run_state_full(stdout, pcode)
+        self.assertTrue(stdout.lines[0] == '1\tl_A_n_1_trials_1\tstale results?\t(output exists, done marker and invoke log missing)\t-> retry if unexpected\n')
+
         
     # '-LB-O'
     def test_assess_run___LB_O(self):
@@ -649,6 +755,11 @@ class TestStateOfRuns(unittest.TestCase):
         self.assertTrue(stdout.lines[2] == 'unittest(4)\tpossible stale results: 1\n')
         self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
+        stdout.lines = []
+        states.emit_run_state_full(stdout, pcode)
+        self.assertTrue(stdout.lines[0] == '1\tl_A_n_1_trials_1\tstale results?\t(output exists, done marker missing, script missing)\t-> retry if unexpected\n')
+
+        
     # 'SLB-O'
     def test_assess_run__SLB_O(self):
         #pcode = 'l_A_n_1_trials_1'
@@ -673,6 +784,11 @@ class TestStateOfRuns(unittest.TestCase):
         self.assertTrue(stdout.lines[1] == '\n')
         self.assertTrue(stdout.lines[2] == 'unittest(4)\trun state inconsistent: 1\n')
         self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        
+        stdout.lines = []
+        states.emit_run_state_full(stdout, pcode)
+        self.assertTrue(stdout.lines[0] == '1\tl_A_n_1_trials_1\tinconsistent\t(output exists, done marker missing and evidence of invoke error)\t-> retry if unexpected\n')
+
            
     # '---DO'
     def test_assess_run_____DO(self):
@@ -699,6 +815,11 @@ class TestStateOfRuns(unittest.TestCase):
         self.assertTrue(stdout.lines[2] == 'unittest(4)\tpossible stale results: 1\n')
         self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
+        stdout.lines = []
+        states.emit_run_state_full(stdout, pcode)
+        self.assertTrue(stdout.lines[0] == '1\tl_A_n_1_trials_1\tstale results?\t(output exists, script and invoke log missing)\t-> retry if unexpected\n')
+
+        
     # 'S--DO'
     def test_assess_run__S__DO(self):
         #pcode = 'l_A_n_1_trials_1'
@@ -723,6 +844,11 @@ class TestStateOfRuns(unittest.TestCase):
         self.assertTrue(stdout.lines[2] == 'unittest(4)\tpossible stale results: 1\n')
         self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
+        stdout.lines = []
+        states.emit_run_state_full(stdout, pcode)
+        self.assertTrue(stdout.lines[0] == '1\tl_A_n_1_trials_1\tstale results?\t(output exists, invoke log missing)\t-> retry if unexpected\n')
+
+        
     # '-L-DO'
     def test_assess_run___L_DO(self):
         #pcode = 'l_A_n_1_trials_1'
@@ -746,6 +872,11 @@ class TestStateOfRuns(unittest.TestCase):
         self.assertTrue(stdout.lines[1] == '\n')
         self.assertTrue(stdout.lines[2] == 'unittest(4)\tpossible stale results: 1\n')
         self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        
+        stdout.lines = []
+        states.emit_run_state_full(stdout, pcode)
+        self.assertTrue(stdout.lines[0] == '1\tl_A_n_1_trials_1\tstale results?\t(output exists, script missing)\t-> retry if unexpected\n')
+
         
     # '--BDO'
     def test_assess_run____BDO(self):
@@ -772,6 +903,11 @@ class TestStateOfRuns(unittest.TestCase):
         self.assertTrue(stdout.lines[1] == '\n')
         self.assertTrue(stdout.lines[2] == 'unittest(4)\tpossible stale results: 1\n')
         self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        
+        stdout.lines = []
+        states.emit_run_state_full(stdout, pcode)
+        self.assertTrue(stdout.lines[0] == '1\tl_A_n_1_trials_1\tstale results?\t(script and invoke log missing)\t-> retry if unexpected\n')
+
             
     # 'S-BDO'
     def test_assess_run__S_BDO(self):
@@ -797,6 +933,11 @@ class TestStateOfRuns(unittest.TestCase):
         self.assertTrue(stdout.lines[1] == '\n')
         self.assertTrue(stdout.lines[2] == 'unittest(4)\tpossible stale results: 1\n')
         self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        
+        stdout.lines = []
+        states.emit_run_state_full(stdout, pcode)
+        self.assertTrue(stdout.lines[0] == '1\tl_A_n_1_trials_1\tstale results?\t(output exists, invoke error detected)\t-> retry if unexpected\n')
+
     
     # '-LBDO'
     def test_assess_run___LBDO(self):
@@ -822,6 +963,11 @@ class TestStateOfRuns(unittest.TestCase):
         self.assertTrue(stdout.lines[1] == '\n')
         self.assertTrue(stdout.lines[2] == 'unittest(4)\tpossible stale results: 1\n')
         self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        
+        stdout.lines = []
+        states.emit_run_state_full(stdout, pcode)
+        self.assertTrue(stdout.lines[0] == '1\tl_A_n_1_trials_1\tstale results?\t(results present but script missing and evidence of invoke error)\t-> retry if unexpected\n')
+
     
     # 'SLBDO'
     def test_assess_run__SLBDO(self):
@@ -846,6 +992,11 @@ class TestStateOfRuns(unittest.TestCase):
         self.assertTrue(stdout.lines[1] == '\n')
         self.assertTrue(stdout.lines[2] == 'unittest(4)\tpossible stale results: 1\n')
         self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        
+        stdout.lines = []
+        states.emit_run_state_full(stdout, pcode)
+        self.assertTrue(stdout.lines[0] == '1\tl_A_n_1_trials_1\tstale results?\t(results present but evidence of invoke error)\t-> retry if unexpected\n')
+
 
     
     # 'SL-DO'
@@ -866,12 +1017,15 @@ class TestStateOfRuns(unittest.TestCase):
         self.assertTrue(states.run_states[pcode] == 'SL-DO')
         
         states.emit_state_summary(stdout, cluster_runs)
-        for line in stdout.lines:
-            print line
         self.assertTrue(stdout.lines[0] == '....\n')
         self.assertTrue(stdout.lines[1] == '\n')
         self.assertTrue(stdout.lines[2] == 'unittest(4)\tcomplete: 1\n')
         self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        
+        stdout.lines = []
+        states.emit_run_state_full(stdout, pcode)
+        self.assertTrue(stdout.lines[0] == '1\tl_A_n_1_trials_1\trun complete\n')
+
        
     # 'SC'
     def test_assess_run__SC(self):
@@ -889,6 +1043,11 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == 'SC-XX')
         
+        stdout.lines = []
+        states.emit_run_state_full(stdout, pcode)
+        self.assertTrue(stdout.lines[0] == '1\tl_A_n_1_trials_1\tpossible error\t(invoke log corrupt, launch may have failed)\t-> retry\n')
+
+        
     # '-C'
     def test_assess_run___C(self):
         #pcode = 'l_A_n_1_trials_1'
@@ -905,6 +1064,13 @@ class TestStateOfRuns(unittest.TestCase):
         states = state_of_runs.StateOfRuns()
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == '-C-XX')
+        
+        stdout.lines = []
+        states.emit_run_state_full(stdout, pcode)
+        for line in stdout.lines:
+            print line
+        self.assertTrue(stdout.lines[0] == '1\tl_A_n_1_trials_1\tpossible error\t(invoke log corrupt, launch may have failed)\t-> retry\n')
+
 if __name__ == '__main__':
     unittest.main()
     

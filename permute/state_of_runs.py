@@ -54,14 +54,14 @@ class StateOfRuns(object):
         # S    L   B    D    O  
         self.state_names['-----'] = 'script missing'
         self.state_cause['-----'] = ''
-        self.state_todos['-----'] = ''
+        self.state_todos['-----'] = 'launch'
         
         self.state_names['S----'] = 'script ready'
         self.state_cause['S----'] = ''
-        self.state_todos['S----'] = ''
+        self.state_todos['S----'] = 'launch'
         
         self.state_names['-L---'] = 'inconsistent'
-        self.state_cause['-L---'] = 'invoke log but no script_file'
+        self.state_cause['-L---'] = 'invoke log present but no script_file'
         self.state_todos['-L---'] = 'retry'
         
         self.state_names['SL---'] = 'inconsistent'
@@ -69,11 +69,11 @@ class StateOfRuns(object):
         self.state_todos['SL---'] = 'retry'
         
         self.state_names['--B--'] = 'inconsistent'
-        self.state_cause['--B--'] = 'script file missing, evidence of prior permission problem'
+        self.state_cause['--B--'] = 'script file missing, evidence of prior invoke error'
         self.state_todos['--B--'] = 'retry'
         
         self.state_names['S-B--'] = 'inconsistent'
-        self.state_cause['S-B--'] = 'invoke log missing, though evidence of prior permission problem'
+        self.state_cause['S-B--'] = 'invoke log missing, though evidence of invoke error'
         self.state_todos['S-B--'] = 'retry'
         
         self.state_names['-LB--'] = 'inconsistent'
@@ -82,7 +82,7 @@ class StateOfRuns(object):
         
         self.state_names['SLB--'] = 'invoke error'
         self.state_cause['SLB--'] = 'run error detected'
-        self.state_todos['SLB--'] = 'look into permission problem, then retry'
+        self.state_todos['SLB--'] = 'look into error, then retry'
         
         
 
@@ -256,9 +256,17 @@ class StateOfRuns(object):
             self.emit_run_state_full(stdout, pcode)
             
     def emit_run_state_full(self, stdout, pcode):
-        run_state = self.run_states[pcode]
+        state = self.run_states[pcode]
         cluster_job_number = self.cluster_job_numbers[pcode]
-        stdout.println('{0} {1}  {2}'.format(cluster_job_number, pcode ,run_state))
+        if self.state_cause[state] == '':
+            cause = ''
+        else:
+            cause = "\t({0})".format(self.state_cause[state])
+        if self.state_todos[state] == '':
+            todos = ''
+        else:
+            todos = "\t-> {0}".format(self.state_todos[state])
+        stdout.println('{0}\t{1}\t{2}{3}{4}'.format(cluster_job_number, pcode ,self.state_names[state], cause, todos))
                     
     def emit_state_summary(self, stdout, cluster_runs):
         script_missing_count = 0

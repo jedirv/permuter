@@ -198,7 +198,7 @@ class MockCluster(object):
     def get_cluster_job_number(self, pcode):
         if self.cluster_job_numbers.has_key(pcode):
             return self.cluster_job_numbers[pcode]
-        return 0
+        return 'NA'
     
     def __init__(self, cluster_runs):
         '''
