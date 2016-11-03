@@ -258,6 +258,20 @@ class StateOfRuns(object):
     def emit_run_state_full(self, stdout, pcode):
         state = self.run_states[pcode]
         cluster_job_number = self.cluster_job_numbers[pcode]
+        self.emit_state(stdout, cluster_job_number, pcode, state)
+     
+            
+    def emit_run_states_pending(self, stdout, cluster_runs):
+        for pcode in cluster_runs.run_perm_codes_list:     
+            self.emit_run_state_pending(stdout, pcode)
+                
+    def emit_run_state_pending(self, stdout, pcode):
+        state = self.run_states[pcode]
+        cluster_job_number = self.cluster_job_numbers[pcode]
+        if state != 'run complete':
+            self.emit_state(stdout, cluster_job_number, pcode, state)
+    
+    def emit_state(self, stdout, cluster_job_number, pcode, state):
         if self.state_cause[state] == '':
             cause = ''
         else:
@@ -267,7 +281,7 @@ class StateOfRuns(object):
         else:
             todos = "\t-> {0}".format(self.state_todos[state])
         stdout.println('{0}\t{1}\t{2}{3}{4}'.format(cluster_job_number, pcode ,self.state_names[state], cause, todos))
-                    
+                           
     def emit_state_summary(self, stdout, cluster_runs):
         script_missing_count = 0
         script_ready_count = 0
@@ -339,16 +353,7 @@ class StateOfRuns(object):
             message = "{0}state undefined: {1}\n".format(message, unknown_run_state_count)
         #message = "{0}\n".format(message)
         stdout.println(message)
-        
-    def emit_run_states_pending(self, stdout, cluster_runs):
-        for pcode in cluster_runs.run_perm_codes_list:     
-            self.emit_run_state_pending(stdout, pcode)
-                
-    def emit_run_state_pending(self, stdout, pcode):
-        run_state = self.run_states[pcode]
-        cluster_job_number = self.cluster_job_numbers[pcode]
-        if run_state != 'run complete':
-            stdout.println('{0} {1}  {2}'.format(cluster_job_number, pcode, run_state))
+
    
 
     def derive_state_of_runs(self,cluster_runs, cluster):
