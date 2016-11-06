@@ -121,7 +121,7 @@ class TestClusterSpec(unittest.TestCase):
         self.assertTrue(cspec.permuters['letter'][1] == 'BBB')
         
         # generate_results_dir_for_permutation:
-        self.assertTrue(cspec.generate_results_dir_for_permutation('3','xyz') == './sample_results/unittest/trial3/xyz')
+        self.assertTrue(cspec.generate_results_dir_for_permutation('xyz_trial3') == './sample_results/unittest/xyz_trial3')
         
         #concise_print_map:
         self.assertTrue(cspec.concise_print_map['letter'] == 'l')
@@ -263,7 +263,7 @@ class TestClusterSpec(unittest.TestCase):
         self.assertTrue(cspec.permuters['letter'][1] == 'BBB')
         
         # generate_results_dir_for_permutation:
-        self.assertTrue(cspec.generate_results_dir_for_permutation('3','xyz') == './sample_results/unittest/trial3/xyz')
+        self.assertTrue(cspec.generate_results_dir_for_permutation('xyz_trial3') == './sample_results/unittest/xyz_trial_3')
         
         #concise_print_map:
         self.assertTrue(cspec.concise_print_map['letter'] == 'l')

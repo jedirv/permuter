@@ -13,11 +13,10 @@ class PooledResultsDeltaFile(object):
     '''
 
 
-    def __init__(self,resultsFile, cluster_system):
+    def __init__(self,resultsFile):
         '''
         Constructor
         '''
-        self.cluster_system = cluster_system
         self.resultsFile = resultsFile
         self.dirname = resultsFile.target_dir
         self.filename_code = resultsFile.perm_code_for_filename
@@ -29,8 +28,8 @@ class PooledResultsDeltaFile(object):
             self.target_file_path = "{0}/pooled_results_{1}_deltas.csv".format(self.dirname, self.filename_code)
         
     def generate(self):
-        f_source = self.cluster_system.open_file(self.source_file_path,'r')
-        f_target = self.cluster_system.open_file(self.target_file_path,'w')
+        f_source = open(self.source_file_path,'r')
+        f_target = open(self.target_file_path,'w')
         lines = f_source.readlines()
         f_target.write(lines[0])
         for i in range(1,len(lines)):

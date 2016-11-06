@@ -32,9 +32,9 @@ class ClusterScript(PermutationDriverFile):
         if (self.key_val_map.has_key('tag')):
             tag = self.key_val_map['tag']
         if (tag != ""):
-            f.write("#$ -N {0}-j{1}_{2}_{3}{4}\n".format(self.cspec.master_job_name, self.user_job_number, self.trial, self.permute_code_sans_trial, tag))
+            f.write("#$ -N {0}-j{1}_{2}{3}\n".format(self.cspec.master_job_name, self.user_job_number, self.pcode, tag))
         else:
-            f.write("#$ -N {0}-j{1}_{2}_{3}\n".format(self.cspec.master_job_name, self.user_job_number, self.trial, self.permute_code_sans_trial))
+            f.write("#$ -N {0}-j{1}_{2}\n".format(self.cspec.master_job_name, self.user_job_number, self.pcode))
             
         f.write("#\n")
         
@@ -50,34 +50,6 @@ class ClusterScript(PermutationDriverFile):
         f.write("touch {0}/{1}\n".format(self.resolved_results_dir, done_file))
         f.close()  
     
-    def generateOld(self):
-        print("  generating script file: {0}".format(self.pathname))
-        f = self.cluster_system.open_file(self.pathname, 'w')
-        f.write("#!/bin/csh\n")
-        f.write("#\n")
-        for qsub_command in self.qsub_commands:
-            f.write("#$ {0}\n".format(qsub_command))
-        tag = ""
-        if (self.key_val_map.has_key('tag')):
-            tag = self.key_val_map['tag']
-        if (tag != ""):
-            f.write("#$ -N {0}-j{1}_{2}_{3}{4}\n".format(self.cspec.master_job_name, self.user_job_number, self.trial, self.permute_code_sans_trial, tag))
-        else:
-            f.write("#$ -N {0}-j{1}_{2}_{3}\n".format(self.cspec.master_job_name, self.user_job_number, self.trial, self.permute_code_sans_trial))
-            
-        f.write("#\n")
-        
-        f.write("# send stdout and stderror to this file\n")
-        f.write("#$ -o {0}.out\n".format(self.get_job_file_name()))
-        f.write("#$ -e {0}.err\n".format(self.get_job_file_name()))
-        f.write("#\n")
-        f.write("#see where the job is being run\n")
-        f.write("hostname\n")
-        for cur_command in self.commands_for_this_permutation:
-            f.write("{0}\n".format(cur_command))
-        done_file = get_done_marker_filename()
-        f.write("touch {0}/{1}\n".format(self.resolved_results_dir, done_file))
-        f.close()  
     def exists(self):
         if (self.cluster_system.exists(self.pathname)):
             return True

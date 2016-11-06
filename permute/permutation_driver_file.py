@@ -19,7 +19,7 @@ class PermutationDriverFile(object):
         self.cspec = cspec
         self.trial = trial
         self.permutation_info = permutation_info
-        self.permute_code_sans_trial = permutations.generate_permutation_code(permutation_info, cspec.concise_print_map, False)
+        self.pcode = permutations.generate_permutation_code(permutation_info, cspec.concise_print_map, permutations.INCLUDE_TRIALS)
         self.key_val_map = {}
         for key, val in cspec.key_val_map.items():
             self.key_val_map[key] = val
@@ -42,9 +42,9 @@ class PermutationDriverFile(object):
         job_filename = ""
         if (self.key_val_map.has_key('tag')):
             tag = self.key_val_map['tag']
-            job_filename = "j{0}_{1}_{2}{3}".format(self.user_job_number, self.trial, self.permute_code_sans_trial, tag)
+            job_filename = "j{0}_{1}{2}".format(self.user_job_number, self.pcode, tag)
         else:
-            job_filename = "j{0}_{1}_{2}".format(self.user_job_number, self.trial, self.permute_code_sans_trial)
+            job_filename = "j{0}_{1}".format(self.user_job_number, self.pcode)
         # replace any commas (like the ones in gmm args) with dashes
         job_filename = job_filename.replace(",","-")
         return job_filename   

@@ -14,14 +14,13 @@ class RankedResultsFile(object):
     '''
 
 
-    def __init__(self,filename_permutation_info, cluster_runs,cluster_system):
+    def __init__(self,filename_permutation_info, cluster_runs):
         '''
         Constructor
         '''
-        self.cluster_system = cluster_system
         self.cluster_runs = cluster_runs
         self.cspec = cluster_runs.cspec
-        self.target_dir = pooled_results_file.generate_target_dirname(self.cspec, cluster_system)
+        self.target_dir = pooled_results_file.generate_target_dirname(self.cspec)
         self.perm_code_for_filename  = pooled_results_file.build_code_using_dictionary(filename_permutation_info, self.cspec)
         if (self.perm_code_for_filename == ""):
             self.target_path = "{0}/pooled_results_ranked.txt".format(self.target_dir)
@@ -34,8 +33,8 @@ class RankedResultsFile(object):
         
        
     def persist(self):
-        f_scores = self.cluster_system.open_file(self.scores_source_path, 'r')
-        f_timings = self.cluster_system.open_file(self.timings_source_path, 'r')
+        f_scores = open(self.scores_source_path, 'r')
+        f_timings = open(self.timings_source_path, 'r')
         print "writing {0}".format(self.target_path)
         lines_scores = f_scores.readlines()
         lines_timings = f_timings.readlines()
@@ -86,7 +85,7 @@ class RankedResultsFile(object):
             
         
         sorted_perm_tuples = sort_by_higher_score_then_lower_timing(perm_tuples)
-        f = self.cluster_system.open_file(self.target_path, 'w')
+        f = open(self.target_path, 'w')
         f.write("score\tcpu time(min)\tpermutation\tx=missing run\n")
         for perm_tuple in sorted_perm_tuples:
             minutes = int(int(perm_tuple[3]) / 60)

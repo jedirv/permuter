@@ -28,7 +28,7 @@ class ClusterRunsInfo(object):
         if cspec.one_up_basis != '':
             user_job_number = int(cspec.one_up_basis)
         for perm_info in self.permutation_info_list_full:
-            perm_code = permutations.generate_permutation_code(perm_info, cspec.concise_print_map, True)
+            perm_code = permutations.generate_permutation_code(perm_info, cspec.concise_print_map, permutations.INCLUDE_TRIALS)
             self.run_perm_codes_list.append(perm_code)
             
             user_job_number_as_string = get_formatted_user_job_number(user_job_number, self.job_num_width)
@@ -75,7 +75,7 @@ class ClusterRunsInfo(object):
         
         
     def get_job_number_string_for_permutation_info(self, permutation_info):
-        permutation_code = permutations.generate_permutation_code(permutation_info, self.cspec.concise_print_map, True)
+        permutation_code = permutations.generate_permutation_code(permutation_info, self.cspec.concise_print_map, permutations.INCLUDE_TRIALS)
         result = self.job_number_for_perm_code_map[permutation_code]
         return result
         
@@ -136,12 +136,12 @@ def create_source_file_map(cspec):
     for key, val in cspec.permuters.items():
         permuters_with_trials[key] = val
     permuters_with_trials['trials'] = trials_list
-     
+    
     permutation_list = permutations.expand_permutations(permuters_with_trials)
     for permutation_info in permutation_list:
-        permutation_code = permutations.generate_permutation_code(permutation_info, cspec.concise_print_map, permutations.IGNORE_TRIALS)
+        pcode = permutations.generate_permutation_code(permutation_info, cspec.concise_print_map, permutations.INCLUDE_TRIALS)
         #print "permutation_code {0}".format(permutation_code)
-        permutation_results_dir = cspec.generate_results_dir_for_permutation(permutation_info['trials'], permutation_code) 
+        permutation_results_dir = cspec.generate_results_dir_for_permutation(pcode) 
         from_file_path_with_results_dir_resolved = cspec.scores_from_filepath.replace('<permutation_results_dir>',permutation_results_dir)
         #print "from_file_path_with_results_dir_resolved {0}".format(from_file_path_with_results_dir_resolved)
         scores_permutations_list = permutations.expand_permutations(cspec.scores_permuters)

@@ -159,8 +159,8 @@ def resolve_list_for_permutation(permutation_info, commands, keyValMap):
     return commands_for_this_permutation
 
 def get_resolved_results_dir_for_permutation(permutation_info, cspec):
-    permute_code_sans_trial = generate_permutation_code(permutation_info, cspec.concise_print_map, False)
-    interim_results_dir = cspec.generate_results_dir_for_permutation(permutation_info['trials'], permute_code_sans_trial)
+    pcode = generate_permutation_code(permutation_info, cspec.concise_print_map, True)
+    interim_results_dir = cspec.generate_results_dir_for_permutation(pcode)
     dir_list = [interim_results_dir]
     resolved_results_dir =  resolve_list_for_permutation(permutation_info, dir_list, cspec.key_val_map)[0]
     logging.info("  resolved_results_dir: {0}".format(resolved_results_dir))

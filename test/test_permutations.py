@@ -60,9 +60,9 @@ class TestPermuter(unittest.TestCase):
     def test_generate_permutation_code(self):
         permutation_info = {'number': '1', 'letter': 'AAA', 'trials': '1'}
         concisePrintMap = { 'number': 'n', 'AAA':'A'}
-        code = permutations.generate_permutation_code(permutation_info, concisePrintMap, False)
+        code = permutations.generate_permutation_code(permutation_info, concisePrintMap, permutations.IGNORE_TRIALS)
         self.assertTrue(code == 'letter_A_n_1')     
-        code = permutations.generate_permutation_code(permutation_info, concisePrintMap, True)
+        code = permutations.generate_permutation_code(permutation_info, concisePrintMap, permutations.INCLUDE_TRIALS)
         self.assertTrue(code == 'letter_A_n_1_trials_1')      
         
 if __name__ == '__main__':

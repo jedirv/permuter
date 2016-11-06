@@ -7,14 +7,13 @@ class PooledTimingsFile(object):
     '''
     classdocs
     '''
-    def __init__(self,filename_permutation_info, cluster_runs, cluster_system):
+    def __init__(self,filename_permutation_info, cluster_runs):
         '''
         Constructor
         '''
-        self.cluster_system = cluster_system
         self.cluster_runs = cluster_runs
         self.cspec = cluster_runs.cspec
-        self.target_dir = pooled_results_file.generate_target_dirname(self.cspec, self.cluster_system)
+        self.target_dir = pooled_results_file.generate_target_dirname(self.cspec)
         self.perm_code_for_filename  = pooled_results_file.build_code_using_dictionary(filename_permutation_info, self.cspec)
         if (self.perm_code_for_filename == ""):
             self.target_timings_path = "{0}/pooled_results_timings.csv".format(self.target_dir)
@@ -25,7 +24,7 @@ class PooledTimingsFile(object):
     def persist(self):
         cspec = self.cspec
         # generate the column names
-        ft = self.cluster_system.open_file(self.target_timings_path, 'w')
+        ft = open(self.target_timings_path, 'w')
         print "persisting {0}".format(self.target_timings_path)
         
         # scores_y_axis:letter
@@ -42,35 +41,31 @@ class PooledTimingsFile(object):
         # make a list of x permutation codes for use later
         x_perm_codes = []
         for x_permutation in x_permutations:
-            x_perm_codes.append(permutations.generate_permutation_code(x_permutation, cspec.concise_print_map, False))
+            x_perm_codes.append(permutations.generate_permutation_code(x_permutation, cspec.concise_print_map, permutations.IGNORE_TRIALS))
         medians = {}    
         # write the x_axis column names
         header = "{0},".format(pooled_results_file.beautify_header("{0}".format(cspec.scores_y_axis)))
         for x_permutation in x_permutations:
-            concise_x_permutation = permutations.generate_permutation_code(x_permutation, cspec.concise_print_map, False)
+            concise_x_permutation = permutations.generate_permutation_code(x_permutation, cspec.concise_print_map, permutations.IGNORE_TRIALS)
             header = "{0}{1},".format(header, concise_x_permutation)
         header = header.rstrip(',')
         ft.write("{0}\n".format(header))
         
         for y_permutation in y_permutations:
-            concise_y_permutation = permutations.generate_permutation_code(y_permutation, cspec.concise_print_map, False)
+            concise_y_permutation = permutations.generate_permutation_code(y_permutation, cspec.concise_print_map, permutations.IGNORE_TRIALS)
             timings_line = "{0},".format(concise_y_permutation)
             for x_permutation in x_permutations:
                 trials_list = cspec.get_trials_list()
                 trial_timing_values = []
                 for trial in trials_list:
                     cluster_job_perm_code = gen_cluster_job_perm_code_from_pieces(y_permutation, x_permutation, self.filename_permutation_info, cspec, trial)
-                    
-                    #permutation_info = pooled_results_file.gen_perm_code_from_pieces(y_axis_val, x_axis_val, self.filename_permutation_info, cspec, trial)
-                    #cluster_job_perm_code = permutations.generate_permutation_code(permutation_info_with_trial,cspec.concise_print_map,True)
-                    #print "cluster_job_perm_code {0}".format(cluster_job_perm_code)
-                    timing_value = get_timing_value_for_run(cluster_job_perm_code,self.cluster_runs,self.cluster_system)
+                    timing_value = get_timing_value_for_run(cluster_job_perm_code,self.cluster_runs)
                     #print 'timing_value : {0}'.format(timing_value)
                     trial_timing_values.append(timing_value)
                 median_timing = pooled_results_file.get_median(trial_timing_values, True)
                 #print 'median_timing {0}'.format(median_timing)
                 timings_line = "{0}{1},".format(timings_line, median_timing)
-                x_perm_code = permutations.generate_permutation_code(x_permutation, cspec.concise_print_map, False)
+                x_perm_code = permutations.generate_permutation_code(x_permutation, cspec.concise_print_map, permutations.IGNORE_TRIALS)
                 pooled_results_file.record_median(x_perm_code, medians, median_timing)
             timings_line.rstrip(',')
             ft.write("{0}\n".format(timings_line))
@@ -114,18 +109,18 @@ def gen_cluster_job_perm_code_from_pieces(y_axis_permutation, x_axis_permutation
         #odd number in list
 #        return sorted_int_series[(size-1)/2]
 
-def get_timing_value_for_run(perm_code, cluster_runs, cluster_system): 
+def get_timing_value_for_run(perm_code, cluster_runs): 
     user_job_number_as_string = cluster_runs.get_job_number_string_for_run_permutation_code(perm_code)
     #print "user_job_number_as_string {0}".format(user_job_number_as_string)
     permutation_info = cluster_runs.get_permutation_info_for_permutation_code(perm_code)
     #print "permutation_info {0}".format(permutation_info)
-    qil = qsub_invoke_log.QsubInvokeLog(user_job_number_as_string, permutation_info, cluster_runs.cspec, permutation_info['trials'], cluster_system)
+    qil = qsub_invoke_log.QsubInvokeLog(user_job_number_as_string, permutation_info, cluster_runs.cspec, permutation_info['trials'])
     cluster_job_number = qil.cluster_job_number
     if (cluster_job_number == "NA"):
         return "missing"
     else:
         #print  "cluster_job_number {0}".format(cluster_job_number)
-        qacctlog = qacct_log.QacctLog(user_job_number_as_string, permutation_info, cluster_runs.cspec, permutation_info['trials'], cluster_system)
+        qacctlog = qacct_log.QacctLog(user_job_number_as_string, permutation_info, cluster_runs.cspec, permutation_info['trials'])
         qacctlog.ingest(cluster_job_number)
         if (qacctlog.run_failed()):
             return "missing"

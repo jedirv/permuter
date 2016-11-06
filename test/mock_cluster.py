@@ -75,7 +75,76 @@ class MockCluster(object):
         if self.output_files.has_key(pcode):
             self.output_files.pop(pcode)
             self.output_files_mod_time.pop(pcode)
+         
+    def delete_all_but_script(self,pcode):
+        self.delete_invoke_log(pcode)
+        self.delete_qacct_log(pcode)
+        self.delete_qstat_log()
+        self.delete_done_marker(pcode)
+        self.delete_pooled_results_file(pcode)
+        self.delete_pooled_delta_file(pcode)
+        self.delete_pooled_timings_file(pcode)
+        self.delete_ranked_results_file(pcode)
+        self.delete_results(pcode)
+        
+    def delete_pooled_results(self, pcode):
+        
+    def delete_pooled_results_delta_file(self,pcode):
+        
+    def delete_pooled_results_timings_file(self,pcode):
+        
+    def delete_ranked_results_file(self,pcode):  
+        
+        
+    def create_pooled_results_delta_files(self,resultsFiles):
+        for resultsFile in resultsFiles:
             
+    def create_pooled_timings_files(self,cluster_runs): redo this
+        logging.info('CREATING timings files')
+        permuters_for_filename = pooled_timings_file.gather_file_permuters(cluster_runs.cspec)
+        #print "permuters_for_filename {0}".format(permuters_for_filename)
+        filename_permutations = permutations.expand_permutations(permuters_for_filename)
+        #print "filename_permutations {0}".format(filename_permutations)
+        if (len(filename_permutations) == 0):
+            timingsFile = pooled_timings_file.PooledTimingsFile({}, cluster_runs)
+            timingsFile.persist()
+        else: 
+            for filename_permutation_info in filename_permutations:
+                timingsFile = pooled_timings_file.PooledTimingsFile(filename_permutation_info, cluster_runs)
+                timingsFile.persist()
+                           
+    def create_ranked_results_files(cluster_runs): redo this
+        logging.info('CREATING ranked results file')
+        permuters_for_filename = pooled_results_file.gather_file_permuters(cluster_runs.cspec)
+        filename_permutations = permutations.expand_permutations(permuters_for_filename)
+        if (len(filename_permutations) == 0):
+            rankFile = ranked_results_file.RankedResultsFile({}, cluster_runs)
+            rankFile.persist()
+        else:
+            for filename_permutation_info in filename_permutations:
+                rankFile = ranked_results_file.RankedResultsFile(filename_permutation_info, cluster_runs)
+                rankFile.persist()
+                
+    def create_pooled_results_files(self,cluster_runs, stdout):redo this
+        logging.info("CREATING pooled results files")
+        source_file_map = cluster_runs.create_source_file_map(cluster_runs.cspec)
+        logging.debug("...source_file_map : {0}".format(source_file_map))
+        permuters_for_filename = pooled_results_file.gather_file_permuters(cluster_runs.cspec)
+        logging.debug("...permuters_for_filename : {0}".format(permuters_for_filename))
+        filename_permutations = permutations.expand_permutations(permuters_for_filename)
+        logging.debug("...filename permutations : {0}".format(filename_permutations))
+        resultsFiles = []
+        if (len(filename_permutations) == 0):
+            resultsFile = pooled_results_file.PooledResultsFile(source_file_map, {}, cluster_runs, stdout)
+            resultsFile.persist()
+            resultsFiles.append(resultsFile)
+        else:
+            for filename_permutation_info in filename_permutations:
+                resultsFile = pooled_results_file.PooledResultsFile(source_file_map, filename_permutation_info, cluster_runs, stdout)
+                resultsFile.persist()
+                resultsFiles.append(resultsFile)
+        logging.info("...resultsFiles : {0}".format(resultsFiles))    
+        return resultsFiles        
     def delete_done_marker(self, pcode):
         if self.done_markers.has_key(pcode):
             self.done_markers.pop(pcode)
@@ -92,7 +161,7 @@ class MockCluster(object):
     
     def test_helper_set_ok_to_run(self, pcode):
         if self.running_state[pcode] == "waiting":
-            if self.is_permission_blocked(pcode):
+            if self.get_invoke_error(pcode) != '':
                 pass
             else:
                 self.running_state[pcode] = "running"    
@@ -157,14 +226,14 @@ class MockCluster(object):
                 return True
         return False
 
-    def test_helper_set_permission_blocked(self,pcode):
-        self.permission_blocked[pcode] = 'permissionBlocked'
+    def test_helper_set_invoke_error(self,pcode):
+        self.invoke_errors[pcode] = 'permissionBlocked'
         
     #TESTED
-    def is_permission_blocked(self, pcode):
-        if self.permission_blocked.has_key(pcode):
-            return True
-        return False
+    def get_invoke_error(self, pcode):
+        if self.invoke_errors.has_key(pcode):
+            return self.invoke_errors[pcode]
+        return ''
 
     #TESTED
     def is_done_marker_present(self, pcode):
@@ -200,6 +269,12 @@ class MockCluster(object):
             return self.cluster_job_numbers[pcode]
         return 'NA'
     
+    ####################
+    #  Stubs
+    ####################
+    def clean_out_dir(self,dirpath):
+        pass
+    
     def __init__(self, cluster_runs):
         '''
         Constructor
@@ -218,7 +293,7 @@ class MockCluster(object):
         self.output_files_mod_time = {}
         self.done_markers =     {}
         self.done_markers_mod_time = {}
-        self.permission_blocked = {}
+        self.invoke_errors = {}
         self.run_number = 1;
         self.cluster_job_numbers= {}
         

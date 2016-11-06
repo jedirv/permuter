@@ -246,8 +246,8 @@ class TestCluster(unittest.TestCase):
         cluster = mock_cluster.MockCluster(cluster_runs)
         cluster.create_script(pcode)
         cluster.launch(pcode)
-        cluster.test_helper_set_permission_blocked(pcode)
-        self.assertTrue(cluster.is_permission_blocked(pcode))
+        cluster.test_helper_set_invoke_error(pcode)
+        self.assertTrue(cluster.get_invoke_error(pcode) != '')
         
     
     def testIsDoneMarkerPresentRunComplete(self):

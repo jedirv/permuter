@@ -3,10 +3,9 @@ Created on Nov 22, 2013
 
 @author: admin-jed
 '''
-import qsub_invoke_log
-import qacct_log
 import permutations
 import logging
+import os
 
 
 class PooledResultsFile(object):
@@ -15,14 +14,14 @@ class PooledResultsFile(object):
     '''
 
 
-    def __init__(self,source_file_map, filename_permutation_info, cluster_runs, cluster_system):
+    def __init__(self,source_file_map, filename_permutation_info, cluster_runs, stdout):
         '''
         Constructor
         '''
-        self.cluster_system = cluster_system
+        self.stdout = stdout
         self.cluster_runs = cluster_runs
         self.cspec = cluster_runs.cspec
-        self.target_dir = generate_target_dirname(self.cspec, self.cluster_system)
+        self.target_dir = generate_target_dirname(self.cspec)
         self.perm_code_for_filename  = build_code_using_dictionary(filename_permutation_info, self.cspec)
         #print "self.perm_code_for_filename : {0}".format(self.perm_code_for_filename)
         if (self.perm_code_for_filename == ""):
@@ -34,15 +33,15 @@ class PooledResultsFile(object):
 
     def get_last_modification_time(self):
         if (self.exists()):
-            return self.cluster_system.get_last_modification_time(self.target_path)
+            return os.path.getmtime(self.target_path)
         else:
             return 'NA'  
                
     def persist(self):
         cspec = self.cspec
         # generate the column names
-        f = self.cluster_system.open_file(self.target_path, 'w')
-        self.cluster_system.println("persisting {0}".format(self.target_path))
+        f = open(self.target_path, 'w')
+        self.stdout.println("persisting {0}".format(self.target_path))
         
         # scores_y_axis:letter
         # scores_x_axis:number,animal
@@ -58,7 +57,7 @@ class PooledResultsFile(object):
         # write the x_axis column names
         header = "{0},".format(beautify_header("{0}".format(cspec.scores_y_axis)))
         for x_permutation in x_permutations:
-            concise_x_permutation = permutations.generate_permutation_code(x_permutation, cspec.concise_print_map, False)
+            concise_x_permutation = permutations.generate_permutation_code(x_permutation, cspec.concise_print_map, permutations.IGNORE_TRIALS)
             header = "{0}{1},".format(header, concise_x_permutation)
         header = header.rstrip(',')
         f.write("{0}\n".format(header))
@@ -66,11 +65,11 @@ class PooledResultsFile(object):
         # make a list of x permutation codes for use later
         x_perm_codes = []
         for x_permutation in x_permutations:
-            x_perm_codes.append(permutations.generate_permutation_code(x_permutation, cspec.concise_print_map, False))
+            x_perm_codes.append(permutations.generate_permutation_code(x_permutation, cspec.concise_print_map, permutations.IGNORE_TRIALS))
         # the main loop    
         for y_permutation in y_permutations:
-            concise_y_permutation = permutations.generate_permutation_code(y_permutation, cspec.concise_print_map, False)
-            self.cluster_system.println('y axis: {0}'.format(concise_y_permutation))
+            concise_y_permutation = permutations.generate_permutation_code(y_permutation, cspec.concise_print_map, permutations.IGNORE_TRIALS)
+            self.stdout.println('y axis: {0}'.format(concise_y_permutation))
             line = "{0},".format(concise_y_permutation)
             for x_permutation in x_permutations:
                 trials_list = cspec.get_trials_list()
@@ -80,12 +79,12 @@ class PooledResultsFile(object):
                     #print "self.source_file_map {0}".format(self.source_file_map)
                     source_file_path = self.source_file_map[result_file_perm_code]
                     #print "SOURCE_FILE_PATH : {0}".format(source_file_path)
-                    value = get_result_from_file(source_file_path, cspec.scores_from_colname, cspec.scores_from_rownum, self.cluster_system)
+                    value = get_result_from_file(source_file_path, cspec.scores_from_colname, cspec.scores_from_rownum)
                     trial_values.append(value)
                     
                 median_value = get_median(trial_values, False)
                 line = "{0}{1},".format(line, median_value)
-                x_perm_code = permutations.generate_permutation_code(x_permutation, cspec.concise_print_map, False)
+                x_perm_code = permutations.generate_permutation_code(x_permutation, cspec.concise_print_map, permutations.IGNORE_TRIALS)
                 record_median(x_perm_code, medians, median_value)
             line = line.rstrip(',')
             f.write("{0}\n".format(line))
@@ -203,10 +202,10 @@ def get_median(string_series, as_integer):
         result_string = '{0}x'.format(result_string)
     return result_string
         
-def generate_target_dirname(cspec, cluster_system):
+def generate_target_dirname(cspec):
     dirname = "{0}/{1}".format(cspec.scores_to, cspec.master_job_name)
-    if (not(cluster_system.isdir(dirname))):
-        cluster_system.make_dirs(dirname)
+    if (not(os.path.isdir(dirname))):
+        os.makedirs(dirname)
     return dirname
     
 def gen_result_perm_code_from_pieces(y_axis_permutation, x_axis_permutation, filename_perm_dict, cspec, trial):
@@ -223,12 +222,12 @@ def gen_result_perm_code_from_pieces(y_axis_permutation, x_axis_permutation, fil
     result = build_code_using_dictionary(full_perm_dict, cspec)
     return result
     
-def get_result_from_file(source_file_path, colname, rownum, cluster_system):
+def get_result_from_file(source_file_path, colname, rownum):
     try:
-        if (not(cluster_system.exists(source_file_path))):
+        if (not(os.path.exists(source_file_path))):
             print 'MISSING {0}'.format(source_file_path)
             return 'missing'
-        f = cluster_system.open_file(source_file_path, 'r')
+        f = open(source_file_path, 'r')
         # determine columne number of colname
         lines = f.readlines()
         header = lines[0]
@@ -243,6 +242,7 @@ def get_result_from_file(source_file_path, colname, rownum, cluster_system):
         value = value_parts[index]
         float_value = float(value)
         value_rounded = "%.3f" % float_value
+        f.close()
         #print "value found for {0} is {1}".format(source_file_path, value)
         return value_rounded
     except Exception as detail:

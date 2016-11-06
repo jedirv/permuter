@@ -5,6 +5,7 @@ Created on Feb 23, 2014
 '''
 
 import logging
+from __builtin__ import False
 
 class StateOfRuns(object):
     '''
@@ -35,7 +36,7 @@ class StateOfRuns(object):
         self.done_marker_mtime =      {}
         self.output_files_exist =     {}
         self.output_files_mtime =     {}
-        self.run_permission_blocked = {}
+        self.run_invoke_error = {}
         
         # file objects
         #self.qil_files =              {}
@@ -49,7 +50,7 @@ class StateOfRuns(object):
         self.state_cause = {}
         self.state_todos = {}
         # se  ile rpb dme ofe stand for:
-        # run_script_exists,invoke_log_exists,run_permission_blocked,done_marker_exists,output_files_exist
+        # run_script_exists,invoke_log_exists,run_invoke_error,done_marker_exists,output_files_exist
         # se  ile  rpb  dme  ofe
         # S    L   B    D    O  
         self.state_names['-----'] = 'script missing'
@@ -217,12 +218,12 @@ class StateOfRuns(object):
         self.not_yet_launched_count = 0
         self.unknown_count = 0
     
-    def assess_all_runs(self, cluster_runs_info, cluster):
+    def assess_all_runs(self, cluster_runs, cluster):
         # get qstat output in case it has relevant info for later
-        for pcode in cluster_runs_info.run_perm_codes_list:
-            self.assess_run(pcode, cluster_runs_info, cluster)
+        for pcode in cluster_runs.run_perm_codes_list:
+            self.assess_run(pcode, cluster_runs, cluster)
             
-    def assess_run(self, pcode, cluster_runs_info, cluster):
+    def assess_run(self, pcode, cluster_runs, cluster):
         # script status
         self.run_script_exists[pcode]   = cluster.is_script_present(pcode)
         self.script_mtime[pcode]        = cluster.get_script_mod_time(pcode)        
@@ -242,14 +243,14 @@ class StateOfRuns(object):
             self.qstat_state_info[pcode] = 'NA'
                 
         # check file system evidence
-        self.run_permission_blocked[pcode] = cluster.is_permission_blocked(pcode)
+        self.run_invoke_error[pcode] = cluster.get_invoke_error(pcode)
         
         self.done_marker_exists[pcode] = cluster.is_done_marker_present(pcode)
         self.done_marker_mtime[pcode] = cluster.get_done_marker_mod_time(pcode)
         
         self.output_files_exist[pcode] = cluster.is_output_files_present(pcode)
         self.output_files_mtime[pcode] = cluster.get_output_file_mod_time(pcode)
-        self.derive_state_of_run(cluster_runs_info,pcode, cluster)
+        self.derive_state_of_run(cluster_runs,pcode, cluster)
     
     def emit_run_states_full(self, stdout, cluster_runs):
         for pcode in cluster_runs.run_perm_codes_list:
@@ -281,6 +282,10 @@ class StateOfRuns(object):
         else:
             todos = "\t-> {0}".format(self.state_todos[state])
         stdout.println('{0}\t{1}\t{2}{3}{4}'.format(cluster_job_number, pcode ,self.state_names[state], cause, todos))
+        if self.state_names[state] == 'invoke_error':
+            if self.run_invoke_error.has_key(pcode):
+                error_message = self.run_invoke_error[pcode]
+                stdout.println("...{0}".format(error_message))
                            
     def emit_state_summary(self, stdout, cluster_runs):
         script_missing_count = 0
@@ -354,11 +359,21 @@ class StateOfRuns(object):
         #message = "{0}\n".format(message)
         stdout.println(message)
 
-   
+    def is_ok_to_launch_all(self,cluster_runs, cluster):
+        result = True
+        for pcode in cluster_runs.run_perm_code_list:
+            if not(self.is_ok_to_launch_run(pcode, cluster)):
+                result = False
+        return result
 
+    def is_ok_to_launch_run(self, pcode, cluster):
+        if cluster.is_waiting(pcode) or cluster.is_running(pcode):
+            return False
+        return True
+        
     def derive_state_of_runs(self,cluster_runs, cluster):
-        for run_permutation_code in cluster_runs.run_perm_codes_list:
-            self.derive_state_of_run(cluster_runs,run_permutation_code, cluster)    
+        for pcode in cluster_runs.run_perm_codes_list:
+            self.derive_state_of_run(cluster_runs,pcode, cluster)    
             
     def derive_state_of_run(self,cluster_runs,pcode, cluster):
         if self.invoke_log_corrupt[pcode] == True:
@@ -387,7 +402,7 @@ class StateOfRuns(object):
             self.run_states[pcode] = 'waiting'
         else:
             # se  ile rpb dme ofe stand for:
-            # run_script_exists,invoke_log_exists,run_permission_blocked,done_marker_exists,output_files_exist
+            # run_script_exists,invoke_log_exists,run_invoke_error,done_marker_exists,output_files_exist
             # build a string that looks like this: 'se 0 ile 0 rpb 0 dme 0 ofe 0'
             se = '-'
             ile = '-'
@@ -399,7 +414,7 @@ class StateOfRuns(object):
                 se = 'S'
             if self.invoke_log_exists[pcode] == True:
                 ile = 'L'
-            if self.run_permission_blocked[pcode] == True:
+            if self.run_invoke_error[pcode] != '':
                 rpb = 'B'
         
             if self.done_marker_exists[pcode] == True:

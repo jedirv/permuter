@@ -25,19 +25,17 @@ class QsubInvokeLog(PermutationDriverFile):
         else:
             return 'NA'  
             
-    def is_first_error_permission_problem(self):
+    def get_invoke_error(self):
         error_file = self.qsub_invoke_log_fullpath.replace('.qil','.err')
         if not(os.path.exists(error_file)):
-            return False
+            return ''
         f = open(error_file,'r')
         lines = f.readlines()
         f.close()
         if (len(lines) == 0):
-            return False
+            return ''
         first_line = lines[0]
-        if (first_line.count('Permission denied') > 0):
-            return True
-        return False
+        return first_line
        
     def is_corrupt(self):
         starting_dir = os.getcwd()

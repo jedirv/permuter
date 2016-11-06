@@ -75,8 +75,8 @@ class ClusterSpec(object):
         permuters_with_trials['trials'] = self.get_trials_list()
         return permuters_with_trials
     
-    def generate_results_dir_for_permutation(self, trial, permuation_code):
-        return "{0}/trial{1}/{2}".format(self.job_results_dir, trial, permuation_code)
+    def generate_results_dir_for_permutation(self, pcode):
+        return "{0}/{2}".format(self.job_results_dir, pcode)
     
     def get_trials_list(self):
         result = []
