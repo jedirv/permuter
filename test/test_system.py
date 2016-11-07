@@ -77,7 +77,7 @@ class TestSystem(unittest.TestCase):
         touch_string = "touch ./sample_results/unittest/trial1/an_cat_l_aa_number_1_s_300/{0}\n".format(done_file)
         self.assertTrue(stdout.stdout[14] == touch_string)
 
-        
+'''        
     def test_generate(self):
         cluster_system = mock_cluster_system.MockClusterSystem()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, cluster_system)
@@ -466,6 +466,7 @@ class TestSystem(unittest.TestCase):
         self.assertTrue(stdout.stdout[1] == "2 trials_1_x_2  run complete\n")
         self.assertTrue(stdout.stdout[2] == "6 trials_1_x_3  run complete\n")
         self.assertTrue(stdout.stdout[3] == "4 trials_1_x_4  run complete\n")
+'''
         
 '''       
     def test_stat_after_(self):

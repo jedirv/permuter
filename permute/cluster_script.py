@@ -23,7 +23,7 @@ class ClusterScript(PermutationDriverFile):
         if (not(os.path.isdir(self.script_dir))):
             os.makedirs(self.script_dir)
         print("  generating script file: {0}".format(self.pathname))
-        f = os.open(self.pathname, 'w')
+        f = open(self.pathname, 'w')
         f.write("#!/bin/csh\n")
         f.write("#\n")
         for qsub_command in self.qsub_commands:
@@ -64,7 +64,7 @@ class ClusterScript(PermutationDriverFile):
     def preview(self):
         self.pathname = "junk.sh"
         self.generate()
-        f = self.cluster_system.open_file(self.pathname, 'r')
+        f = open(self.pathname, 'r')
         lines = f.readlines()
         for line in lines:
             self.cluster_system.print_without_newline(line)
