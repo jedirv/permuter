@@ -14,7 +14,6 @@ class TestCluster(unittest.TestCase):
     def setUp(self):
         lines = []
         lines.append("#cspec\n")
-        lines.append("master_job_name:unittest\n")
         lines.append("trials:1\n")
         lines.append("tag=_myTag\n")
         lines.append("permute:number=range(1,3)\n")
@@ -46,7 +45,7 @@ class TestCluster(unittest.TestCase):
         lines.append("<replace>:outfile_root=<pretty[(number)]>__TEST\n")
 
         lines.append("root_results_dir:./sample_results\n")
-        lines.append("script_dir:./scripts_<master_job_name>\n")
+        lines.append("script_dir:./scripts\n")
 
         lines.append("qsub_command:-q eecs,eecs1,eecs,share\n")
         lines.append("qsub_command:-M someone@gmail.com\n")

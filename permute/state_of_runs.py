@@ -335,8 +335,8 @@ class StateOfRuns(object):
                 unknown_run_state_count = unknown_run_state_count + 1 
         
         stdout.println("")          
-        master_job_name = cluster_runs.cspec.master_job_name
-        message = "{0}({1})\t".format(master_job_name, total_count)
+        cspec_name = cluster_runs.cspec.cspec_name
+        message = "{0}({1})\t".format(cspec_name, total_count)
         
         if script_missing_count != 0:
             message = "{0}scripts missing: {1}\n".format(message, script_missing_count)

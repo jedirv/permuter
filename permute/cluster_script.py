@@ -32,9 +32,9 @@ class ClusterScript(PermutationDriverFile):
         if (self.key_val_map.has_key('tag')):
             tag = self.key_val_map['tag']
         if (tag != ""):
-            f.write("#$ -N {0}-j{1}_{2}{3}\n".format(self.cspec.master_job_name, self.user_job_number, self.pcode, tag))
+            f.write("#$ -N {0}-j{1}_{2}{3}\n".format(self.cspec.cspec_name, self.user_job_number, self.pcode, tag))
         else:
-            f.write("#$ -N {0}-j{1}_{2}\n".format(self.cspec.master_job_name, self.user_job_number, self.pcode))
+            f.write("#$ -N {0}-j{1}_{2}\n".format(self.cspec.cspec_name, self.user_job_number, self.pcode))
             
         f.write("#\n")
         

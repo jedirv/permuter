@@ -21,7 +21,6 @@ class NewSpec(object):
         f = open(self.cspec_path, 'w')
         f.write("#cspec\n")
         f.write("trials:1\n")
-        f.write("master_job_name:somename\n");
         f.write("\n")
         f.write("<replace>:project_root=/nfs/guille/myproject\n");
         f.write("script_dir:<project_root>/scripts\n");

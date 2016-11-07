@@ -5,13 +5,13 @@ Created on Mar 14, 2014
 '''
 import unittest
 import getpass
+import os
 
 from permute import user_usage
 
 class TestUserUsage(unittest.TestCase):
 
     
-        
     def test_append(self):
         uu = user_usage.UserUsage()
         uu.clear()

@@ -34,20 +34,20 @@ class ClusterSpec(object):
                 self.stdout.println("cspec file must have this header:  '#cspec', {0} does not. Exiting.".format(path))
                 exit()
             
-            
-            self.master_job_name = self.load_special_value(self.lines, 'master_job_name:')
+            cspec_filename = os.path.basename(self.path)
+            self.cspec_name, file_ext  = cspec_filename.split('.')
             self.trials = self.load_special_value(self.lines, 'trials:')
             self.permuters = load_permuters(self.lines, 'permute:', '(permute):')
             self.concise_print_map = self.load_concise_print_map(self.lines)
             
             self.key_val_map = self.load_replaces(self.lines)
             self.root_results_dir = self.load_dir(self.lines, "root_results_dir:")
-            self.job_results_dir = "{0}/{1}".format(self.root_results_dir, self.master_job_name)
+            self.job_results_dir = "{0}/{1}".format(self.root_results_dir, self.cspec_name)
             # put the results_dir into the kvm so that permutation calculation wil find it
             self.key_val_map['root_results_dir'] = self.root_results_dir
             self.key_val_map['job_results_dir'] = self.job_results_dir
             # and the master_job_name
-            self.key_val_map['master_job_name'] = self.master_job_name
+            self.key_val_map['cspec_name'] = self.cspec_name
             
             self.qsub_commands = self.load_qsub_commands(self.lines)
             self.commands = self.load_commands(self.lines)
@@ -317,10 +317,6 @@ def validate(lines, stdout):
     if not(result_root_results_dir):
         stdout.println("problem found in root_results_dir statement")
         
-    result_master_job_name = validate_statement_present(lines,"master_job_name:","some_name", stdout)
-    if not(result_master_job_name):
-        stdout.println("problem found in master_job_name statement")
-        
     result_trials = validate_statement_present(lines,"trials:","some_integer", stdout)
     if not(result_trials):
         stdout.println("problem found in trials statement")
@@ -329,7 +325,7 @@ def validate(lines, stdout):
     if not(result_scores_info):
         stdout.println("problem found in scores gathering info entries")
         
-    return result_permute and result_replace and result_script_dir and result_root_results_dir and result_master_job_name and result_trials and result_scores_info
+    return result_permute and result_replace and result_script_dir and result_root_results_dir and result_trials and result_scores_info
 
 
 def validate_statement_present(lines, statement, val, stdout):

@@ -65,7 +65,6 @@ class TestPooledResultsFile(unittest.TestCase):
     def test_gen_cluster_job_perm_code_from_pieces(self):
         lines = []
         lines.append("#cspec\n")
-        lines.append("master_job_name:unittest\n")
         lines.append("trials:2\n")
         lines.append("permute:number=1-3\n")
         lines.append("permute:letter=AAA,BBB\n")
@@ -96,7 +95,6 @@ class TestPooledResultsFile(unittest.TestCase):
     def test_generate_target_dirname(self):
         lines = []
         lines.append("#cspec\n")
-        lines.append("master_job_name:unittest\n")
         lines.append("permute:number=1-3\n")
         lines.append("permute:letter=AAA,BBB\n")
         lines.append("permute:singleton_val=300\n")
@@ -118,7 +116,7 @@ class TestPooledResultsFile(unittest.TestCase):
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout)
         dirname = pooled_results_file.generate_target_dirname(cspec)
         #print "DIR IS : {0}".format(dirname)
-        self.assertTrue(dirname == './collected_results/unittest')
+        self.assertTrue(dirname == './collected_results/baz')
         
     def test_get_median(self):
         x = ['0.1']

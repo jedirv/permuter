@@ -350,14 +350,14 @@ class Cluster(object):
 
     def is_running(self, pcode):
         cscript = self.scripts[pcode]
-        runs_name = cscript.cspec.master_job_name
+        runs_name = cscript.cspec.cspec_name
         job_name = "{0}-{1}".format(runs_name, cscript.get_job_file_name())
         qstatlog= self.get_stat_log()
         return qstatlog.is_running(job_name)
 
     def is_waiting(self, pcode):
         cscript = self.scripts[pcode]
-        runs_name = cscript.cspec.master_job_name
+        runs_name = cscript.cspec.cspec_name
         job_name = "{0}-{1}".format(runs_name, cscript.get_job_file_name())
         qstatlog= self.get_stat_log()
         return qstatlog.is_waiting(job_name)

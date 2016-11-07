@@ -33,7 +33,6 @@ class TestClusterSpec(unittest.TestCase):
     def test_load_cspec(self):
         lines = []
         lines.append("#cspec\n")
-        lines.append("master_job_name:unittest\n")
         lines.append("trials:2\n")
         lines.append("tag=_myTag\n")
         lines.append("(permute):number=range(1,4)\n") # new form
@@ -67,7 +66,7 @@ class TestClusterSpec(unittest.TestCase):
         lines.append("<replace>:outfile_root=<pretty[(number)]>__TEST\n")
 
         lines.append("root_results_dir:./sample_results\n")
-        lines.append("script_dir:./scripts_<master_job_name>\n")
+        lines.append("script_dir:./scripts\n")
 
         lines.append("qsub_command:-q eecs,eecs1,eecs,share\n")
         lines.append("qsub_command:-M someone@gmail.com\n")
@@ -98,13 +97,13 @@ class TestClusterSpec(unittest.TestCase):
         self.assertTrue(cspec.scores_y_axis==['letter'])
 
         #script_dir
-        self.assertTrue(cspec.script_dir=='./scripts_unittest')
+        self.assertTrue(cspec.script_dir=='./scripts')
         
         #trials:
         self.assertTrue(cspec.trials=='2')
     
         #master_job_name:
-        self.assertTrue(cspec.master_job_name=='unittest')
+        self.assertTrue(cspec.cspec_name=='baz')
             
         #one_up_basis:
         self.assertTrue(cspec.one_up_basis == '100')
@@ -121,7 +120,7 @@ class TestClusterSpec(unittest.TestCase):
         self.assertTrue(cspec.permuters['letter'][1] == 'BBB')
         
         # generate_results_dir_for_permutation:
-        self.assertTrue(cspec.generate_results_dir_for_permutation('xyz_trial3') == './sample_results/unittest/xyz_trial3')
+        self.assertTrue(cspec.generate_results_dir_for_permutation('xyz_trial3') == './sample_results/baz/xyz_trial3')
         
         #concise_print_map:
         self.assertTrue(cspec.concise_print_map['letter'] == 'l')
@@ -134,7 +133,7 @@ class TestClusterSpec(unittest.TestCase):
         self.assertTrue(kvm['pretty[1]']=='one')
         self.assertTrue(kvm['pretty[2]']=='two')
         self.assertTrue(kvm['pretty[3]']=='three')
-        self.assertTrue(kvm['master_job_name']=='unittest')
+        self.assertTrue(kvm['cspec_name']=='baz')
         self.assertTrue(kvm['root']=='/nfs/foo/bar')
         self.assertTrue(kvm['x_dir']=='/nfs/foo/bar/(letter)/<config[(letter)]>/(number)')
         self.assertTrue(kvm['algs_dir']=='/nfs/algs')
@@ -175,7 +174,6 @@ class TestClusterSpec(unittest.TestCase):
     def test_load_cspec_with_white_spaces(self):
         lines = []
         lines.append("#cspec \n")
-        lines.append("master_job_name:unittest \n")
         lines.append("trials:\t2\n")
         lines.append("tag=_myTag \n")
         lines.append("(permute):number=range(1   , 4)\n") # new form
@@ -209,7 +207,7 @@ class TestClusterSpec(unittest.TestCase):
         lines.append("<replace>:    outfile_root =     <pretty[(number)]>__TEST\n")
 
         lines.append("root_results_dir:./sample_results\n")
-        lines.append("script_dir:./scripts_<master_job_name>\n")
+        lines.append("script_dir:./scripts\n")
 
         lines.append("qsub_command:-q eecs,eecs1,eecs,share\n")
         lines.append("qsub_command:-M someone@gmail.com\n")
@@ -240,13 +238,13 @@ class TestClusterSpec(unittest.TestCase):
         self.assertTrue(cspec.scores_y_axis==['letter'])
 
         #script_dir
-        self.assertTrue(cspec.script_dir=='./scripts_unittest')
+        self.assertTrue(cspec.script_dir=='./scripts')
         
         #trials:
         self.assertTrue(cspec.trials=='2')
     
-        #master_job_name:
-        self.assertTrue(cspec.master_job_name=='unittest')
+        #cspec_name:
+        self.assertTrue(cspec.cspec_name=='baz')
             
         #one_up_basis:
         self.assertTrue(cspec.one_up_basis == '100')
@@ -263,7 +261,7 @@ class TestClusterSpec(unittest.TestCase):
         self.assertTrue(cspec.permuters['letter'][1] == 'BBB')
         
         # generate_results_dir_for_permutation:
-        self.assertTrue(cspec.generate_results_dir_for_permutation('xyz_trial_3') == './sample_results/unittest/xyz_trial_3')
+        self.assertTrue(cspec.generate_results_dir_for_permutation('xyz_trial_3') == './sample_results/baz/xyz_trial_3')
         
         #concise_print_map:
         self.assertTrue(cspec.concise_print_map['letter'] == 'l')
@@ -276,7 +274,7 @@ class TestClusterSpec(unittest.TestCase):
         self.assertTrue(kvm['pretty[1]']=='one')
         self.assertTrue(kvm['pretty[2]']=='two')
         self.assertTrue(kvm['pretty[3]']=='three')
-        self.assertTrue(kvm['master_job_name']=='unittest')
+        self.assertTrue(kvm['cspec_name']=='baz')
         self.assertTrue(kvm['root']=='/nfs/foo/bar')
         self.assertTrue(kvm['x_dir']=='/nfs/foo/bar/(letter)/<config[(letter)]>/(number)')
         self.assertTrue(kvm['algs_dir']=='/nfs/algs')

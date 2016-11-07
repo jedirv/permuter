@@ -203,7 +203,7 @@ def get_median(string_series, as_integer):
     return result_string
         
 def generate_target_dirname(cspec):
-    dirname = "{0}/{1}".format(cspec.scores_to, cspec.master_job_name)
+    dirname = "{0}/{1}".format(cspec.scores_to, cspec.cspec_name)
     if (not(os.path.isdir(dirname))):
         os.makedirs(dirname)
     return dirname
