@@ -15,6 +15,7 @@ import pooled_results_delta_file
 import pooled_timings_file
 import ranked_results_file
 import pooled_results_file
+import logging
 
 class Cluster(object):
     '''
@@ -58,7 +59,7 @@ class Cluster(object):
         if self.invoke_logs.has_key(pcode):
             return self.invoke_logs[pcode]
         perm_info = self.cluster_runs.run_permutation_info_for_run_permutation_code_map[pcode]
-        trial = perm_info['trials']
+        trial = perm_info['trial']
         user_job_number_as_string = self.cluster_runs.get_job_number_string_for_run_permutation_code(pcode)
         cspec = self.cluster_runs.cspec
         qil = qsub_invoke_log.QsubInvokeLog(user_job_number_as_string, perm_info, cspec, trial)
@@ -98,7 +99,7 @@ class Cluster(object):
         else:
             #print "opening {0}".format(self.qstat_log)
             
-            qacctlog = qacct_log.QacctLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trials'])
+            qacctlog = qacct_log.QacctLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trial'])
             command = "qacct -j {0} > {1}".format(cluster_job_number, qacctlog.qacct_log_path)
             self.execute_command(command) 
             qacctlog.ingest(cluster_job_number)
@@ -242,13 +243,17 @@ class Cluster(object):
         logging.info("...resultsFiles : {0}".format(resultsFiles))    
         return resultsFiles
             
-    def delete_pooled_results(self, pcode):
+    def delete_pooled_results(self):
+        pass
         
-    def delete_pooled_results_delta_file(self,pcode):
+    def delete_pooled_results_delta_file(self):
+        pass
         
     def delete_pooled_results_timings_file(self,pcode):
+        pass
         
     def delete_ranked_results_file(self,pcode):
+        pass
      
           
     #
@@ -362,7 +367,7 @@ class Cluster(object):
         if not(self.is_running(pcode) and not(self.is_waiting(pcode)) and not(self.is_done_marker_present(pcode))):
             if self.is_invoke_log_present(pcode):
                 qil = self.get_invoke_log(pcode)
-                return qil.get_invoke_error():
+                return qil.get_invoke_error()
         return ''
 
     def get_failure_reason(self,pcode):

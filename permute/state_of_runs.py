@@ -102,7 +102,7 @@ class StateOfRuns(object):
         
         self.state_names['SL-D-'] = 'results missing'
         self.state_cause['SL-D-'] = 'done marker found, but no results'
-        self.state_todos['SL-D-'] = 'troubleshoot in <dir>'
+        self.state_todos['SL-D-'] = 'troubleshoot, then retry'
         
         self.state_names['--BD-'] = 'inconsistent'
         self.state_cause['--BD-'] = 'invoke error detected, but done marker present'

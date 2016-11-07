@@ -39,7 +39,7 @@ class ClusterRunsInfo(object):
             resolved_results_dir =  permutations.get_resolved_results_dir_for_permutation(perm_info, cspec)
             self.result_dir_for_perm_code_map[perm_code] = resolved_results_dir
             
-            cscript = cluster_script.ClusterScript(user_job_number_as_string, perm_info, cspec, perm_info['trials'])
+            cscript = cluster_script.ClusterScript(user_job_number_as_string, perm_info, cspec, perm_info['trial'])
             self.cluster_script_for_perm_code_map[perm_code] = cscript
             user_job_number = user_job_number + 1
             
@@ -135,7 +135,7 @@ def create_source_file_map(cspec):
     permuters_with_trials = {}
     for key, val in cspec.permuters.items():
         permuters_with_trials[key] = val
-    permuters_with_trials['trials'] = trials_list
+    permuters_with_trials['trial'] = trials_list
     
     permutation_list = permutations.expand_permutations(permuters_with_trials)
     for permutation_info in permutation_list:

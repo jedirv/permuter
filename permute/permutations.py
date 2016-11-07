@@ -46,7 +46,7 @@ def generate_permutation_code(permutation_info, concisePrintMap, include_trials)
     keys = permutation_info.keys()
     sorted_keys = sorted(keys)
     for key in sorted_keys:
-        if (include_trials == IGNORE_TRIALS and key == 'trials'):
+        if (include_trials == IGNORE_TRIALS and key == 'trial'):
             pass
         else:
             val = permutation_info[key]
@@ -111,7 +111,7 @@ def resolve_list_for_permutation(permutation_info, commands, keyValMap):
     
     # now use the copy to resolve permutations in the values
     for permKey, permVal in permutation_info.iteritems():
-        if (permKey != 'trials'):
+        if (permKey != 'trial'):
             logging.debug("  key, val in permute step 1 : {0},{1}".format(permKey, permVal))
             keyValMap_permutation_specific_for_this_pass = {}
             match_string = "({0})".format(permKey)
@@ -133,7 +133,7 @@ def resolve_list_for_permutation(permutation_info, commands, keyValMap):
     commands_for_this_permutation = []
     for key, val in permutation_info.iteritems():
         logging.debug("  key, val in permute step 1 : {0},{1}".format(key, val))
-        if (key != 'trials'):
+        if (key != 'trial'):
             commands_for_this_permutation = []
             match_string = "({0})".format(key)
             logging.debug("  perm match_string : {0}".format(match_string))

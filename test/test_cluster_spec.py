@@ -263,7 +263,7 @@ class TestClusterSpec(unittest.TestCase):
         self.assertTrue(cspec.permuters['letter'][1] == 'BBB')
         
         # generate_results_dir_for_permutation:
-        self.assertTrue(cspec.generate_results_dir_for_permutation('xyz_trial3') == './sample_results/unittest/xyz_trial_3')
+        self.assertTrue(cspec.generate_results_dir_for_permutation('xyz_trial_3') == './sample_results/unittest/xyz_trial_3')
         
         #concise_print_map:
         self.assertTrue(cspec.concise_print_map['letter'] == 'l')
@@ -292,18 +292,18 @@ class TestClusterSpec(unittest.TestCase):
         self.assertTrue(qsub_commands_as_string == "['-q eecs,eecs1,eecs,share', '-M someone@gmail.com', '-m beas']")
 
     def test_validate_statement_present_in_lines(self):
+        stdout = mock_stdout.MockStdout()
         lines = []
-        mc_system = mock_cluster_system.MockClusterSystem()
         lines.append("root_results_dir\n")
-        self.assertFalse(cluster_spec.validate_statement_present(lines,"root_results_dir:","some_dir",mc_system))
+        self.assertFalse(cluster_spec.validate_statement_present(lines,"root_results_dir:","some_dir", stdout))
         lines.append("root_results_dir:\n")
-        self.assertFalse(cluster_spec.validate_statement_present(lines,"root_results_dir:","some_dir",mc_system))
+        self.assertFalse(cluster_spec.validate_statement_present(lines,"root_results_dir:","some_dir", stdout))
         lines.append("root_results_dir:/foo/bar\n")
-        self.assertTrue(cluster_spec.validate_statement_present(lines,"root_results_dir:","some_dir",mc_system))
+        self.assertTrue(cluster_spec.validate_statement_present(lines,"root_results_dir:","some_dir", stdout))
         # with spaces
         lines = []
         lines.append("root_results_dir: /foo/bar \n")
-        self.assertTrue(cluster_spec.validate_statement_present(lines,"root_results_dir:","some_dir",mc_system))
+        self.assertTrue(cluster_spec.validate_statement_present(lines,"root_results_dir:","some_dir", stdout))
         
                 
     def test_validate_permutes(self):
@@ -461,19 +461,17 @@ class TestClusterSpec(unittest.TestCase):
         self.assertTrue(cluster_spec.validate_axis_list(lines,'scores_x_axis'))
         
     def test_validate_scores_to(self):
-        mc_system = mock_cluster_system.MockClusterSystem()
         lines = []
         lines.append('scores_to:./junk\n')
         lines.append('scores_to:./junk2\n')
-        self.assertFalse(cluster_spec.validate_scores_to(lines, mc_system))
-        mc_system.mkdir('./junk')
+        self.assertFalse(cluster_spec.validate_scores_to(lines))
         lines = []
         lines.append('scores_to:./junk\n')
-        self.assertTrue(cluster_spec.validate_scores_to(lines, mc_system))
+        self.assertTrue(cluster_spec.validate_scores_to(lines))
         
         lines = []
         lines.append('scores_to: ./junk\n')  #with spaces
-        self.assertTrue(cluster_spec.validate_scores_to(lines, mc_system))
+        self.assertTrue(cluster_spec.validate_scores_to(lines))
         
     def test_validate_scores_from(self):
         #scores_from:file=<permutation_results_dir>/(resolution).csv,column_name=auc,row_number=1
@@ -531,49 +529,49 @@ class TestClusterSpec(unittest.TestCase):
 
 
     def test_validate_scores_gathering_info(self):
-        mc_system = mock_cluster_system.MockClusterSystem()
+        stdout = mock_stdout.MockStdout()
         # none present is ok
         lines = []
         lines.append("foo\n")
-        self.assertTrue(cluster_spec.validate_scores_gathering_info(lines, mc_system))
+        self.assertTrue(cluster_spec.validate_scores_gathering_info(lines, stdout))
         
         #if any present, then 4 need to be present
         
         #missing from
-        mc_system = mock_cluster_system.MockClusterSystem()
+        stdout = mock_stdout.MockStdout()
         lines = []
         lines.append('scores_to:./collected_results')
         lines.append('scores_y_axis:letter')
         lines.append('scores_x_axis:number,animal')
-        self.assertFalse(cluster_spec.validate_scores_gathering_info(lines, mc_system))
+        self.assertFalse(cluster_spec.validate_scores_gathering_info(lines, stdout))
         
         #missing to
-        mc_system = mock_cluster_system.MockClusterSystem()
+        stdout = mock_stdout.MockStdout()
         lines = []
         lines.append('scores_from:file=<permutation_results_dir>/foo.csv,column_name=auc,row_number=1')
         lines.append('scores_y_axis:letter')
         lines.append('scores_x_axis:number,animal')
-        self.assertFalse(cluster_spec.validate_scores_gathering_info(lines, mc_system))
+        self.assertFalse(cluster_spec.validate_scores_gathering_info(lines, stdout))
         
         #missing x axis
-        mc_system = mock_cluster_system.MockClusterSystem()
+        stdout = mock_stdout.MockStdout()
         lines = []
         lines.append('scores_from:file=<permutation_results_dir>/foo.csv,column_name=auc,row_number=1')
         lines.append('scores_to:./collected_results')
         lines.append('scores_y_axis:letter')
-        self.assertFalse(cluster_spec.validate_scores_gathering_info(lines, mc_system))
+        self.assertFalse(cluster_spec.validate_scores_gathering_info(lines, stdout))
         
         #missing y axis
-        mc_system = mock_cluster_system.MockClusterSystem()
+        stdout = mock_stdout.MockStdout()
         lines = []
         lines.append('scores_from:file=<permutation_results_dir>/foo.csv,column_name=auc,row_number=1')
         lines.append('scores_to:./collected_results')
         lines.append('scores_x_axis:number,animal')
-        self.assertFalse(cluster_spec.validate_scores_gathering_info(lines, mc_system))
+        self.assertFalse(cluster_spec.validate_scores_gathering_info(lines, stdout))
         
         
         #all present
-        mc_system = mock_cluster_system.MockClusterSystem()
+        stdout = mock_stdout.MockStdout()
         lines = []
         lines.append('(permute):number=range(1,3)\n')
         lines.append('(permute):animal=cat,dog\n')
@@ -582,11 +580,11 @@ class TestClusterSpec(unittest.TestCase):
         lines.append('scores_to:./collected_results')
         lines.append('scores_x_axis:number,animal')
         lines.append('scores_y_axis:letter')
-        self.assertTrue(cluster_spec.validate_scores_gathering_info(lines, mc_system))
+        self.assertTrue(cluster_spec.validate_scores_gathering_info(lines, stdout))
         
 
         #all present with spaces
-        mc_system = mock_cluster_system.MockClusterSystem()
+        stdout = mock_stdout.MockStdout()
         lines = []
         lines.append('(permute):number=range(1,3)\n')
         lines.append('(permute):animal=cat,dog\n')
@@ -595,7 +593,7 @@ class TestClusterSpec(unittest.TestCase):
         lines.append('scores_to:./collected_results ')
         lines.append('scores_x_axis:number, animal')
         lines.append('scores_y_axis: letter')
-        self.assertTrue(cluster_spec.validate_scores_gathering_info(lines, mc_system))
+        self.assertTrue(cluster_spec.validate_scores_gathering_info(lines, stdout))
         
     def test_lines_contains_prefix(self):
         lines = []
@@ -606,10 +604,11 @@ class TestClusterSpec(unittest.TestCase):
         self.assertTrue(cluster_spec.lines_contains_prefix(lines,'prefix3'))
     
     def test_generate_new_spec(self):
-        mc_system = mock_cluster_system.MockClusterSystem()
-        cluster_spec.generate_new_spec(mc_system, "/foo/test.cspec")
-        mock_file = mc_system.files["/foo/test.cspec"]
-        self.assertTrue(mock_file.lines[0] == "#cspec\n")
+        cluster_spec.generate_new_spec("./xyz.cspec")
+        f = open("./xyz.cspec", 'r')
+        lines = f.readlines()
+        f.close()
+        self.assertTrue(lines[0] == "#cspec\n")
     
 if __name__ == '__main__':
     unittest.main()

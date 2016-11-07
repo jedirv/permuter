@@ -10,17 +10,15 @@ class NewSpec(object):
     '''
 
 
-    def __init__(self, clsystem, cspec_path):
+    def __init__(self, cspec_path):
         '''
         Constructor
         '''
-        self.clsystem = clsystem
         self.cspec_path = cspec_path
         
     def persist(self):
-        clsystem = self.clsystem
         print "path : {0}".format( self.cspec_path)
-        f = clsystem.open_file(self.cspec_path, 'w')
+        f = open(self.cspec_path, 'w')
         f.write("#cspec\n")
         f.write("trials:1\n")
         f.write("master_job_name:somename\n");

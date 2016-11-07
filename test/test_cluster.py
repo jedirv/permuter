@@ -57,7 +57,7 @@ class TestCluster(unittest.TestCase):
         self.lines = lines
         
     def testCreateScript(self):
-        pcode = 'l_a_n_1_trials_1'
+        pcode = 'l_a_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
@@ -67,7 +67,7 @@ class TestCluster(unittest.TestCase):
         self.assertTrue(cluster.scripts[pcode] == cscript)
         
     def testDeleteScript(self):
-        pcode = 'l_a_n_1_trials_1'
+        pcode = 'l_a_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
@@ -84,7 +84,7 @@ class TestCluster(unittest.TestCase):
     def testGetDoneMarkerModTime(self):
     '''
     def testDeleteInvokeLog(self):
-        pcode = 'l_a_n_1_trials_1'
+        pcode = 'l_a_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
@@ -98,7 +98,7 @@ class TestCluster(unittest.TestCase):
 
 
     def testDeleteQacctLog(self):
-        pcode = 'l_a_n_1_trials_1'
+        pcode = 'l_a_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
@@ -110,7 +110,7 @@ class TestCluster(unittest.TestCase):
         self.assertFalse(cluster.is_qacct_log_present(pcode))
          
     def testDeleteQstatLog(self):
-        pcode = 'l_a_n_1_trials_1'
+        pcode = 'l_a_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
@@ -122,7 +122,7 @@ class TestCluster(unittest.TestCase):
         self.assertFalse(cluster.is_qstat_log_present())
     
     def testDeleteResults(self):
-        pcode = 'l_a_n_1_trials_1'
+        pcode = 'l_a_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
@@ -137,7 +137,7 @@ class TestCluster(unittest.TestCase):
     
         
     def testLaunch(self):
-        pcode = 'l_a_n_1_trials_1'
+        pcode = 'l_a_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
@@ -149,7 +149,7 @@ class TestCluster(unittest.TestCase):
         self.assertTrue(cluster.running_state[pcode] == 'running')
  
     def testStopRunningRun(self):
-        pcode = 'l_a_n_1_trials_1'
+        pcode = 'l_a_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
@@ -161,7 +161,7 @@ class TestCluster(unittest.TestCase):
         self.assertTrue(not(cluster.running_state.has_key(pcode)))
         
     def testStopWaitingRun(self):
-        pcode = 'l_a_n_1_trials_1'
+        pcode = 'l_a_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
@@ -172,7 +172,7 @@ class TestCluster(unittest.TestCase):
         self.assertTrue(not(cluster.running_state.has_key(pcode)))
       
     def testIsScriptPresent(self):
-        pcode = 'l_a_n_1_trials_1'
+        pcode = 'l_a_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
@@ -182,7 +182,7 @@ class TestCluster(unittest.TestCase):
         self.assertTrue(cluster.is_script_present(pcode))
     
     def testIsInvokeLogPresent(self):
-        pcode = 'l_a_n_1_trials_1'
+        pcode = 'l_a_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
@@ -195,7 +195,7 @@ class TestCluster(unittest.TestCase):
         self.assertTrue(cluster.is_invoke_log_present(pcode))
 
     def testIsInvokeLogCorrupt(self):
-        pcode = 'l_a_n_1_trials_1'
+        pcode = 'l_a_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
@@ -209,7 +209,7 @@ class TestCluster(unittest.TestCase):
 
     
     def testIsRunning(self):
-        pcode = 'l_a_n_1_trials_1'
+        pcode = 'l_a_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
@@ -223,7 +223,7 @@ class TestCluster(unittest.TestCase):
         self.assertFalse(cluster.is_running(pcode))
         
     def testIsWaiting(self):
-        pcode = 'l_a_n_1_trials_1'
+        pcode = 'l_a_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
@@ -239,7 +239,7 @@ class TestCluster(unittest.TestCase):
         
     
     def testIsPermissionBlocked(self):
-        pcode = 'l_a_n_1_trials_1'
+        pcode = 'l_a_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
@@ -251,7 +251,7 @@ class TestCluster(unittest.TestCase):
         
     
     def testIsDoneMarkerPresentRunComplete(self):
-        pcode = 'l_a_n_1_trials_1'
+        pcode = 'l_a_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
@@ -266,7 +266,7 @@ class TestCluster(unittest.TestCase):
         self.assertTrue(cluster.is_done_marker_present(pcode))
         
     def testIsDoneMarkerPresentRunIncomplete(self):
-        pcode = 'l_a_n_1_trials_1'
+        pcode = 'l_a_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
@@ -281,7 +281,7 @@ class TestCluster(unittest.TestCase):
         self.assertTrue(cluster.is_done_marker_present(pcode))
 
     def testIsOutputFilePresentRunComplete(self):
-        pcode = 'l_a_n_1_trials_1'
+        pcode = 'l_a_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
@@ -296,7 +296,7 @@ class TestCluster(unittest.TestCase):
         self.assertTrue(cluster.is_output_files_present(pcode))
         
     def testIsOutputFilePresentRunIncomplete(self):
-        pcode = 'l_a_n_1_trials_1'
+        pcode = 'l_a_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
@@ -311,7 +311,7 @@ class TestCluster(unittest.TestCase):
         self.assertFalse(cluster.is_output_files_present(pcode))
     
     def testGetModTimeOutputFileRunComplete(self):
-        pcode = 'l_a_n_1_trials_1'
+        pcode = 'l_a_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)
@@ -324,7 +324,7 @@ class TestCluster(unittest.TestCase):
         
     
     def testGetModTimeOutputFileRunIncomplete(self):
-        pcode = 'l_a_n_1_trials_1'
+        pcode = 'l_a_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec)

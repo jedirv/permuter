@@ -6,11 +6,11 @@ Created on Nov 19, 2013
 import sys, os
 import cluster_spec
 import logging
-import cluster_system
 import permutation_driver
 import spec_help
 import user_usage
 import stdout
+import cluster
 
 def main():
     if (len(sys.argv) == 2 and sys.argv[1] == "spec_help"):
@@ -26,9 +26,9 @@ def main():
     permute_command = sys.argv[1]
     cspec_path = sys.argv[2]
         
-    real_cluster_system = cluster_system.ClusterSystem()
+    #real_cluster_system = cluster_system.ClusterSystem()
     if (permute_command == "new_spec"):
-        cluster_spec.generate_new_spec(real_cluster_system, cspec_path)
+        cluster_spec.generate_new_spec(cspec_path)
         uu = user_usage.UserUsage()
         uu.log_command(permute_command)
         exit()
@@ -52,10 +52,11 @@ def main():
     cspec_lines = f.readlines()
     f.close()
     stdout = stdout.Stdout()
-    if (not(cluster_spec.validate(cspec_lines, stdout, real_cluster_system))):
+    if (not(cluster_spec.validate(cspec_lines, stdout))):
         exit()
-        
-    pdriver = permutation_driver.PermutationDriver(cspec_lines, cspec_path, real_cluster_system)
+    stdout = stdout.Stdout()
+    cluster = cluster.Cluster()
+    pdriver = permutation_driver.PermutationDriver(cspec_lines, cspec_path, stdout, cluster)
     uu = user_usage.UserUsage()
     uu.log_command(permute_command)
     pdriver.run_command(permute_command)

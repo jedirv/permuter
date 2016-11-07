@@ -210,11 +210,10 @@ def clean_results(cluster_runs, cluster):
         cluster.delete_results(pcode)
     
 def clean_pooled_results(cluster_runs, cluster):
-    for pcode in cluster_runs.run_perm_code_list:
-        cluster.delete_pooled_results(pcode)
-        cluster.delete_pooled_results_delta_file(pcode)
-        cluster.delete_pooled_results_timings_file(pcode)
-        cluster.delete_ranked_results_file(pcode)
+    cluster.delete_pooled_results()
+    cluster.delete_pooled_results_delta_file()
+    cluster.delete_pooled_results_timings_file()
+    cluster.delete_ranked_results_file()
     
     
     

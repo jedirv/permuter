@@ -91,7 +91,7 @@ def gen_cluster_job_perm_code_from_pieces(y_axis_permutation, x_axis_permutation
         full_perm_dict[key] = val
     for key, val in x_axis_permutation.items():
         full_perm_dict[key] = val
-    full_perm_dict['trials'] = trial
+    full_perm_dict['trial'] = trial
     # remove the scores_permute entries
     for key, vals in cspec.scores_permuters.items():
         if full_perm_dict.has_key(key):
@@ -114,13 +114,13 @@ def get_timing_value_for_run(perm_code, cluster_runs):
     #print "user_job_number_as_string {0}".format(user_job_number_as_string)
     permutation_info = cluster_runs.get_permutation_info_for_permutation_code(perm_code)
     #print "permutation_info {0}".format(permutation_info)
-    qil = qsub_invoke_log.QsubInvokeLog(user_job_number_as_string, permutation_info, cluster_runs.cspec, permutation_info['trials'])
+    qil = qsub_invoke_log.QsubInvokeLog(user_job_number_as_string, permutation_info, cluster_runs.cspec, permutation_info['trial'])
     cluster_job_number = qil.cluster_job_number
     if (cluster_job_number == "NA"):
         return "missing"
     else:
         #print  "cluster_job_number {0}".format(cluster_job_number)
-        qacctlog = qacct_log.QacctLog(user_job_number_as_string, permutation_info, cluster_runs.cspec, permutation_info['trials'])
+        qacctlog = qacct_log.QacctLog(user_job_number_as_string, permutation_info, cluster_runs.cspec, permutation_info['trial'])
         qacctlog.ingest(cluster_job_number)
         if (qacctlog.run_failed()):
             return "missing"

@@ -1,4 +1,4 @@
-
+import os
 import logging
 import new_spec
 
@@ -72,11 +72,11 @@ class ClusterSpec(object):
         permuters_with_trials = {}
         for key, val in self.permuters.items():
             permuters_with_trials[key] = val
-        permuters_with_trials['trials'] = self.get_trials_list()
+        permuters_with_trials['trial'] = self.get_trials_list()
         return permuters_with_trials
     
     def generate_results_dir_for_permutation(self, pcode):
-        return "{0}/{2}".format(self.job_results_dir, pcode)
+        return "{0}/{1}".format(self.job_results_dir, pcode)
     
     def get_trials_list(self):
         result = []
@@ -246,9 +246,9 @@ def load_permuters(lines, flag1, flag2):
         logging.debug("  permuters : {0}".format(permuters))
     return permuters     
    
-def convert_escaped_commas(list):
+def convert_escaped_commas(list_with_comma_maybe_):
     newList = []
-    for val in list:
+    for val in list_with_comma_maybe_:
         newVal = val.replace("_comma_",",")
         newList.append(newVal)
     return newList
@@ -258,7 +258,7 @@ def zero_pad_to_widest(permute_values):
     # if any of the entries are not numbers, just return the list
     for val in permute_values:
         if (not(is_string_an_int(val))) and (not(is_string_a_float(val))):
-             return result
+            return result
                                      
     # they are all numbers, find the highest integral width
     max_width = 0
@@ -300,7 +300,7 @@ def is_string_a_float(val):
     except ValueError:
         return False
                
-def validate(lines, stdout, cluster_system):
+def validate(lines, stdout):
     result_permute = validate_permute_entries(lines)
     if not(result_permute):
         stdout.println("problem found in permute statements")
@@ -325,7 +325,7 @@ def validate(lines, stdout, cluster_system):
     if not(result_trials):
         stdout.println("problem found in trials statement")
     
-    result_scores_info = validate_scores_gathering_info(lines, stdout, cluster_system)
+    result_scores_info = validate_scores_gathering_info(lines, stdout)
     if not(result_scores_info):
         stdout.println("problem found in scores gathering info entries")
         
@@ -448,7 +448,7 @@ def lines_contains_prefix(lines, prefix):
             return True
     return False
 
-def validate_scores_gathering_info(lines, stdout, cluster_system):
+def validate_scores_gathering_info(lines, stdout):
     x_axis_info_present = lines_contains_prefix(lines, 'scores_x_axis')
     y_axis_info_present = lines_contains_prefix(lines, 'scores_y_axis')
     permute_info_present = lines_contains_prefix(lines, 'scores_permute')
@@ -487,7 +487,7 @@ def validate_scores_gathering_info(lines, stdout, cluster_system):
         print 'problem in scores_y_axis: declaration'
         return False
     
-    if (not(validate_scores_to(lines, cluster_system))):
+    if (not(validate_scores_to(lines))):
         print 'problem in scores_to: declaration'
         return False
     
@@ -543,7 +543,7 @@ def validate_scores_from(lines):
                 return False
     return True
         
-def validate_scores_to(lines,cluster_system):
+def validate_scores_to(lines):
     if (not(single_entry_present(lines, 'scores_to:'))):
         print 'more than one entry for scores_to:  Should be one entry'
         return False
@@ -552,11 +552,11 @@ def validate_scores_to(lines,cluster_system):
         if (line.startswith('scores_to:')):
             line = "".join(line.split()) # remove white spaces
             flag, dir = line.split(':')
-            if (cluster_system.exists(dir)):
+            if (os.path.exists(dir)):
                 return True
             else:
-                cluster_system.make_dirs(dir)
-                if (cluster_system.exists(dir)):
+                os.makedirs(dir)
+                if (os.path.exists(dir)):
                     return True
                 else:
                     print 'Could not create directory specified in scores_to:'
@@ -591,8 +591,8 @@ def is_valid_permuter(name, lines):
     return False
 
 
-def generate_new_spec(cluster_system, cspec_path):
-    new_cspec = new_spec.NewSpec(cluster_system, cspec_path)
+def generate_new_spec(cspec_path):
+    new_cspec = new_spec.NewSpec(cspec_path)
     new_cspec.persist()
     
             

@@ -218,7 +218,7 @@ def gen_result_perm_code_from_pieces(y_axis_permutation, x_axis_permutation, fil
         full_perm_dict[key] = val
     for key, val in x_axis_permutation.items():
         full_perm_dict[key] = val
-    full_perm_dict['trials'] = trial
+    full_perm_dict['trial'] = trial
     result = build_code_using_dictionary(full_perm_dict, cspec)
     return result
     

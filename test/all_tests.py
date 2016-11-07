@@ -7,6 +7,7 @@ import test_system
 import test_ranked_results_file
 import test_mock_cluster_system
 import test_user_usage
+import test_state_of_runs
 
 def main():
     mySuite = suite()
@@ -23,6 +24,7 @@ def suite():
     test_suite.addTest(unittest.TestLoader().loadTestsFromTestCase(test_ranked_results_file.TestRankedResultsFile))
     test_suite.addTest(unittest.TestLoader().loadTestsFromTestCase(test_mock_cluster_system.TestMockClusterSystem))
     test_suite.addTest(unittest.TestLoader().loadTestsFromTestCase(test_user_usage.TestUserUsage))
+    test_suite.addTest(unittest.TestLoader().loadTestsFromTestCase(test_state_of_runs.TestStateOfRuns))
     return test_suite
     
 if __name__ == '__main__':
