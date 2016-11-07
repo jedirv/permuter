@@ -102,7 +102,7 @@ def validate_args(permute_command, cspec_path, flags):
         exit()
   
 def usage():
-    print "usage:  python permuter.py  some_command <path of cluster_spec>  [-debug]"  # TODOadd [scope]
+    print "usage:  python permuter.py <path of cluster_spec> <command> [scope]  [-debug]"  # TODOadd [scope]
     print ""
     print "   where some_command can be..."
     print"        ...for generating a template cspec file" 
@@ -112,14 +112,14 @@ def usage():
     print"        ...for actions to launch permutations"              
     print"               count                  # show the number of permutations that will be generated"                   
     print"               preview                # print to stdout what the first script generated will look like"     
-    print"               gen                    # generate cluster scripts"              
+    print"               gen                    # generate cluster scripts"                 
     print"               test_launch            # launch the first script to see if it runs successfully"            
-    print"               launch                 # launch all the generated cluster scripts"                   
-    print"               auto                   # runs gen and then launch in sequence - only use if very confident"                   
-    print"               retry                  # launch any jobs that have not generated all output files (calls stop first)" 
+    print"               launch all             # launch all the generated cluster scripts"
+    print"               launch j<job_number>   # launch job by number"
+    print"               retry                  # retry any jobs that have not run cleanly" 
     print""
     print"         ...for assessing the status of permutation runs that have been launched:"                      
-    print"               stat                   # show the summary counts of status of runs"                   
+    print"               stat ????????                  # show the summary counts of status of runs"                   
     print"               stat_full              # show the status of each permutation run"                   
     print"               stat_pending           # show the status of each permutation run that is not finished"                    
     print"               stat_all               # show the summary status of all specs."                                     

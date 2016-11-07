@@ -36,13 +36,13 @@ class PermutationDriver(object):
                 self.stdout.println("Permutation jobs still running.  Use 'stop' to stop them before 'launch' to avoid replicated jobs")
             else:
                 launch_scripts(cluster_runs, self.cluster)
-        elif (permute_command == "auto"):
-            run_states.assess_all_runs(self.cluster_runs, self.cluster)
-            if (run_states.is_ok_to_launch_all(cluster_runs, self.cluster)):
-                self.stdout.println("Permutation jobs still running.  Use 'stop' to stop them before 'auto' to avoid replicated jobs")
-            else:
-                generate_scripts(cluster_runs)
-                launch_scripts(cluster_runs, self.cluster)
+        #elif (permute_command == "auto"):
+        #    run_states.assess_all_runs(self.cluster_runs, self.cluster)
+        #    if (run_states.is_ok_to_launch_all(cluster_runs, self.cluster)):
+        #       self.stdout.println("Permutation jobs still running.  Use 'stop' to stop them before 'auto' to avoid replicated jobs")
+        #    else:
+        #        generate_scripts(cluster_runs)
+        #        launch_scripts(cluster_runs, self.cluster)
         elif (permute_command == "retry failed"):
             run_states.assess_all_runs(self.cluster_runs, self.cluster)
             retry_failed_runs(cluster_runs, self.cluster, run_states, self.stdout)
