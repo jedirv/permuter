@@ -20,11 +20,25 @@ def main():
         uu.log_command("spec_help")
         exit()
         
-    if (len(sys.argv) < 3):
+    if (len(sys.argv) < 3 or len(sys.argv) > 5):
         usage()
         exit()
-    permute_command = sys.argv[1]
-    cspec_path = sys.argv[2]
+    cspec_path = sys.argv[1]
+    permute_command = sys.argv[2]
+    scope = ''
+    debug = False
+    if (len(sys.argv) == 4):
+        if sys.argv[3] == '-debug':
+            debug = True
+        else:
+            scope = sys.argv[3]
+    else: #length is 5
+        scope = sys.argv[3]
+        if sys.argv[4] != '-debug':
+            usage()
+            exit()
+        else:
+            debug = True
         
     #real_cluster_system = cluster_system.ClusterSystem()
     if (permute_command == "new_spec"):
@@ -33,20 +47,18 @@ def main():
         uu.log_command(permute_command)
         exit()
         
-    flags = ""
-    if (len(sys.argv) == 4):
-        flags = sys.argv[3]
-        
+   
     # set up logging 
     home_dir_permuter = os.path.expanduser('~/permuter')
     logging_level = logging.INFO
-    if (flags == '-debug'):
+    if (debug):
         logging_level = logging.DEBUG
     if (not(os.path.isdir(home_dir_permuter))):
         os.makedirs(home_dir_permuter)
     logging.basicConfig(filename='{0}/permuter.log'.format(home_dir_permuter), filemode='w', level=logging_level)
     
-    validate_args(permute_command, cspec_path, flags)
+    validate_args(permute_command, scope)
+    validate_cspec_is_cspec(cspec_path)
     
     f = open(cspec_path, 'r')
     cspec_lines = f.readlines()
@@ -58,32 +70,37 @@ def main():
     cluster = cluster.Cluster()
     pdriver = permutation_driver.PermutationDriver(cspec_lines, cspec_path, stdout, cluster)
     uu = user_usage.UserUsage()
-    uu.log_command(permute_command)
-    pdriver.run_command(permute_command)
+    uu.log_command(permute_command, scope)
+    pdriver.run_command(permute_command, scope)
 
+def is_plausible_job_number(s):
+    if not(s.startswith('j')):
+        return False
+    s = s.replace('j','')
+    return s.isdigit() 
  
-def validate_args(permute_command, cspec_path, flags):
-    if (not(permute_command == "collect" or 
-            permute_command == "count" or 
-            permute_command == "stat" or 
-            permute_command == "stat_full" or 
-            permute_command == "stat_pending" or 
-            permute_command == "stat_all" or 
-            permute_command == "stat_full_all" or 
-            permute_command == "stat_pending_all" or 
-            permute_command == "gen" or 
-            permute_command == "launch" or 
-            permute_command == "auto" or 
-            permute_command == "preview" or 
-            permute_command == "retry" or 
-            permute_command == "stop" or 
-            permute_command == "clean_scripts" or 
-            permute_command == "clean_results" or 
-            permute_command == "clean_pooled_results" or 
-            permute_command == "clean_all" or 
-            permute_command == "test_launch")):
-        usage()
-        exit()
+def validate_args(command, scope):
+    if (command == 'count' or command == 'preview' or command == 'gen'):
+        return
+    if (command == 'test_launch' or command == 'launch' or command == 'retry'):
+        return
+    if (command == 'summary' or command == 'stat' or command == 'pending' or command == 'errors'):
+        return
+    if (command == 'stop' or command == 'clean'):
+        return
+    if (command == 'launch_job' or command == 'stat_job' or command == 'stop_job' or command == 'clean_job'):
+        if is_plausible_job_number(scope):
+            return
+        else:
+            print "scope must be a job number of the form 'j123'"
+            usage()
+            exit()
+    if (command == 'clean_scripts' or command == 'clean_results'):
+        return
+    usage()
+    exit()
+    
+def validate_cspec_is_cspec(cspec_path):
     # verify spec path exists
     try:
         f = open(cspec_path, 'r')
@@ -97,9 +114,6 @@ def validate_args(permute_command, cspec_path, flags):
     except IOError:
         print "An error occurred trying to open {0}".format(cspec_path)
         exit()
-    if (flags != "-debug" and flags != ""):
-        print "Invalid flag {0}. -debug is only flag supported".format(flags)
-        exit()
   
 def usage():
     print "usage:  python permuter.py <path of cluster_spec> <command> [scope]  [-debug]"  # TODOadd [scope]
@@ -110,32 +124,38 @@ def usage():
     print"               spec_help              # prints documentation for the cspec file contents."  
     print""            
     print"        ...for actions to launch permutations"              
-    print"               count                  # show the number of permutations that will be generated"                   
+    print"               count                  # show the number of scripts that will be generated"                   
     print"               preview                # print to stdout what the first script generated will look like"     
     print"               gen                    # generate cluster scripts"                 
-    print"               test_launch            # launch the first script to see if it runs successfully"            
-    print"               launch all             # launch all the generated cluster scripts"
-    print"               launch j<job_number>   # launch job by number"
-    print"               retry                  # retry any jobs that have not run cleanly" 
+    print"               test_launch            # launch the first script to see if it runs successfully (cleans downstream files first)"            
+    print"               launch                 # launch all the generated cluster scripts that aren't already running (cleans downstream files first)"
+    print"               retry                  # retry any jobs that have not run cleanly (clean downstream files first)" 
     print""
     print"         ...for assessing the status of permutation runs that have been launched:"                      
-    print"               stat ????????                  # show the summary counts of status of runs"                   
-    print"               stat_full              # show the status of each permutation run"                   
-    print"               stat_pending           # show the status of each permutation run that is not finished"                    
-    print"               stat_all               # show the summary status of all specs."                                     
-    print"               stat_full_all          # show the status of each permutation run for all specs."                                     
-    print"               stat_pending_all       # show the status of each permutation run that is not finished for all specs"   
+    print"               summary                # show the summary counts of status of runs"                   
+    print"               stat                   # show the status of each permutation run"                    
+    print"               pending                # show the status of each permutation run that is still running"                
+    print"               errors                 # show the runs that have issues"
     print""                
     print"        ...for actions to run after permutations have launched"               
-    print"               stop                   # call qdel on any runs that are unfinished to abort them"                    
-    print"               clean_scripts          # clean the launch scripts and associated .out, .err, and .qil files"      # TODO - change to just clean_for_relaunch, clean_for_new_script             
+    print"               stop                   # call qdel on any runs that are unfinished to abort them"   
+    print"               clean                  # stop running jobs, clean scripts, results" 
+    #print"               collect                # created pooled results from results"  
+    print""      
+    print"        ...surgical commands that are normally handled in aggregate"
+    print"               launch_job j<#>        # launch job by number"                    
+    print"               stat_job j<#>          # show the status of desired permutation run"
+    print"               stop_job j<#>          # call qdel on any runs that are unfinished to abort them"
+    print"               clean_job j<#>         # clean downstream files for job"                    
+    print"               clean_scripts          # clean the launch scripts and associated .out, .err, and .qil files"          
     print"               clean_results          # clean only the contents of <permutation_results_dir>" 
-    print"               clean_pooled_results   # clean only the pooled results"           
-    print"               clean_all              # clean scripts, results, pooled results, and stop running jobs" 
-    print"               collect                # created pooled results from results"  
+    #print"               clean_pooled_results   # clean only the pooled results"           
     print""
     print""
-    print"  -debug will enable DEBUG level logging which is 'INFO' level by default.  Log sent to ~/permuter/permuter.log"  
+    print"  -debug will enable DEBUG level logging which is 'INFO' level by default.  Log sent to ~/permuter/permuter.log"                      
+    #print"               stat_all               # show the summary status of all specs."                                     
+    #print"               stat_full_all          # show the status of each permutation run for all specs."                                     
+    #print"               stat_pending_all       # show the status of each permutation run that is not finished for all specs"   
 
     
 if __name__ == '__main__':

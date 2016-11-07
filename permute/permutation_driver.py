@@ -24,7 +24,7 @@ class PermutationDriver(object):
         self.cspec_path = cspec_path
         self.stdout = stdout
         
-    def run_command(self, permute_command):
+    def run_command(self, permute_command, scope):
         run_states = state_of_runs.StateOfRuns()
         cluster_runs = self.cluster_runs
         cspec_path = self.cspec_path
@@ -43,7 +43,7 @@ class PermutationDriver(object):
         #    else:
         #        generate_scripts(cluster_runs)
         #        launch_scripts(cluster_runs, self.cluster)
-        elif (permute_command == "retry failed"):
+        elif (permute_command == "retry"):
             run_states.assess_all_runs(self.cluster_runs, self.cluster)
             retry_failed_runs(cluster_runs, self.cluster, run_states, self.stdout)
         elif (permute_command == "preview"):
@@ -57,32 +57,36 @@ class PermutationDriver(object):
             run_states.assess_run(pcode, self.cluster_runs, self.cluster)
             if run_states.is_ok_to_launch(pcode):
                 self.cluster.launch(pcode)
+          
+        #elif (permute_command == "collect"):
+        #    run_states.assess_all_runs(self.cluster_runs, self.cluster)
+        #    collect(cluster_runs, self.cluster, self.stdout)
             
-        elif (permute_command == "collect"):
+        elif (permute_command == "summary"):
             run_states.assess_all_runs(self.cluster_runs, self.cluster)
-            collect(cluster_runs, self.cluster, self.stdout)
-        
+            run_states.emit_state_summary()
+            
         elif (permute_command == "stat"):
             run_states.assess_all_runs(self.cluster_runs, self.cluster)
-            emit_run_states("summary", run_states)
+            run_states.emit_state_full()
             
-        elif (permute_command == "stat_full"):
+        elif (permute_command == "pending"):
             run_states.assess_all_runs(self.cluster_runs, self.cluster)
-            emit_run_states("full", run_states)
-            
-        elif (permute_command == "stat_pending"):
+            run_states.emit_state_pending()
+          
+        elif (permute_command == "errors"):
             run_states.assess_all_runs(self.cluster_runs, self.cluster)
-            emit_run_states("pending", run_states)
+            run_states.emit_state_errors()
+    
+        #elif (permute_command == "stat_all"):
+        #    run_command_on_all_specs(cspec_path,"stat",self.cluster)
             
-        elif (permute_command == "stat_all"):
-            run_command_on_all_specs(cspec_path,"stat",self.cluster)
+        #elif (permute_command == "stat_full_all"):
+        #    run_command_on_all_specs(cspec_path,"stat_full",self.cluster)
             
-        elif (permute_command == "stat_full_all"):
-            run_command_on_all_specs(cspec_path,"stat_full",self.cluster)
-            
-        elif (permute_command == "stat_pending_all"):
-            run_command_on_all_specs(cspec_path,"stat_pending",self.cluster)
-        
+        #elif (permute_command == "stat_pending_all"):
+        #    run_command_on_all_specs(cspec_path,"stat_pending",self.cluster)
+
         elif (permute_command == "stop"):
             stop_runs(cluster_runs, self.cluster)
             
@@ -92,15 +96,34 @@ class PermutationDriver(object):
         elif (permute_command == "clean_results"):
             clean_results(cluster_runs, self.cluster)
             
-        elif (permute_command == "clean_pooled_results"):
-            clean_pooled_results(cluster_runs, self.cluster)
+        #elif (permute_command == "clean_pooled_results"):
+        #    clean_pooled_results(cluster_runs, self.cluster)
             
-        elif (permute_command == "clean_all"):
+        elif (permute_command == "clean"):
             for pcode in cluster_runs.run_perm_code_list:
                 self.cluster.stop_run(pcode)
                 self.cluster.delete_script()
                 self.cluster.delete_all_but_script(pcode)
-        
+        elif (permute_command == 'launch_job'):
+            user_job_number = scope.replace('j','')
+            pcode = cluster_runs.perm_code_for_job_number_map[user_job_number]
+            launch_script(pcode)
+            
+        elif (permute_command == 'stat_job'):
+            user_job_number = scope.replace('j','')
+            pcode = cluster_runs.perm_code_for_job_number_map[user_job_number]
+            run_states.emit_run_state_full(self.stdout, pcode)
+            
+        elif (permute_command == 'stop_job'):
+            user_job_number = scope.replace('j','')
+            pcode = cluster_runs.perm_code_for_job_number_map[user_job_number]
+            self.cluster.stop_run(pcode)
+            
+        elif (permute_command == 'clean_job'):
+            user_job_number = scope.replace('j','')
+            pcode = cluster_runs.perm_code_for_job_number_map[user_job_number]
+            self.cluster.delete_all_but_script(pcode)
+            
         else:
             pass
         
@@ -161,17 +184,6 @@ def retry_failed_runs(cluster_runs, cluster, run_states, stdout):
             cluster.delete_all_but_script(pcode)
             cluster.launch(pcode)
             time.sleep(cluster.get_time_delay())
-            
-    
-def emit_run_states(output_style, run_states):
-    if output_style == 'summary':
-        run_states.emit_state_summary()
-    elif output_style == 'full':
-        run_states.emit_state_full()
-    elif output_style == 'pending':
-        run_states.emit_state_pending()
-    else:
-        pass
 
 def launch_scripts(cluster_runs, cluster):
     logging.info('LAUNCHING scripts')

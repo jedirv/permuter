@@ -20,7 +20,7 @@ def suite():
     test_suite.addTest(unittest.TestLoader().loadTestsFromTestCase(test_permutations.TestPermuter))
     test_suite.addTest(unittest.TestLoader().loadTestsFromTestCase(test_pooled_results.TestPooledResultsFile))
     test_suite.addTest(unittest.TestLoader().loadTestsFromTestCase(test_permuter.TestPermuter))
-    test_suite.addTest(unittest.TestLoader().loadTestsFromTestCase(test_system.TestSystem))
+    #test_suite.addTest(unittest.TestLoader().loadTestsFromTestCase(test_system.TestSystem))
     test_suite.addTest(unittest.TestLoader().loadTestsFromTestCase(test_ranked_results_file.TestRankedResultsFile))
     test_suite.addTest(unittest.TestLoader().loadTestsFromTestCase(test_mock_cluster_system.TestMockClusterSystem))
     test_suite.addTest(unittest.TestLoader().loadTestsFromTestCase(test_user_usage.TestUserUsage))

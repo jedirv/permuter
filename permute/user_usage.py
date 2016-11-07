@@ -29,9 +29,9 @@ class UserUsage(object):
                 os.remove(logfilename)
                 
     # override this
-    def log_command(self, command):
+    def log_command(self, command, scope):
         timestamp = strftime("%Y-%m-%d %H:%M:%S")
-        logline = "{0} {1}\n".format(timestamp, command)
+        logline = "{0} {1} {2}\n".format(timestamp, command, scope)
         username = getpass.getuser()
         log_dir = "user_usage"
         if (not os.path.exists(log_dir)):

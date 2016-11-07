@@ -261,7 +261,11 @@ class StateOfRuns(object):
         cluster_job_number = self.cluster_job_numbers[pcode]
         self.emit_state(stdout, cluster_job_number, pcode, state)
      
-            
+    def emit_state_errors(self, stdout, cluster_runs):
+        for pcode in cluster_runs.run_perm_codes_list:
+            if self.is_run_in_error_state(pcode):
+                self.emit_run_state_full(stdout, pcode)
+                   
     def emit_run_states_pending(self, stdout, cluster_runs):
         for pcode in cluster_runs.run_perm_codes_list:     
             self.emit_run_state_pending(stdout, pcode)
@@ -366,6 +370,21 @@ class StateOfRuns(object):
                 result = False
         return result
 
+    def is_run_in_error_state(self, pcode):
+        state_code = self.run_states[pcode]
+        state_name = self.state_names[state_code]
+        if state_name == 'inconsistent':
+            return True
+        if state_name == 'results missing':
+            return True
+        if state_name == 'invoke error':
+            return True
+        if state_name == 'stale results?':
+            return True
+        if state_name == 'possible error':
+            return True
+        
+        
     def is_ok_to_launch_run(self, pcode, cluster):
         if cluster.is_waiting(pcode) or cluster.is_running(pcode):
             return False

@@ -13,6 +13,7 @@ class ClusterRunsInfo(object):
         self.cspec = cspec
         
         self.job_number_for_perm_code_map = {}
+        self.perm_code_for_job_number_map = {}
         self.cluster_script_for_perm_code_map = {}
         self.perm_info_for_perm_code_map = {}
         self.perm_code_for_perm_info_map = {}
@@ -33,6 +34,7 @@ class ClusterRunsInfo(object):
             
             user_job_number_as_string = get_formatted_user_job_number(user_job_number, self.job_num_width)
             self.job_number_for_perm_code_map[perm_code] = user_job_number_as_string
+            self.perm_code_for_job_number_map[user_job_number_as_string] = perm_code
             self.perm_info_for_perm_code_map[perm_code] = perm_info
             perm_info_string = "{0}".format(perm_info)
             self.perm_code_for_perm_info_map[perm_info_string] = perm_code
