@@ -100,6 +100,7 @@ class SpecHelp(object):
         print("concise_print:AlUdCoUq,CoUq")
         print("  ")
         print("  ")
+        '''
         print("############################################################################")
         print("# scores_permute - scores_permute is an optional special permuter.  It is used")
         print("#       when a single permutation run generates multiple output files. In other")
@@ -159,6 +160,7 @@ class SpecHelp(object):
         print("scores_x_axis:f_val,t_val")
         print("  ")
         print("  ")
+        '''
         print("############################################################################")
         print("# replace:   (version 0.3)")
         print("# <replace>: (version 1.0)")

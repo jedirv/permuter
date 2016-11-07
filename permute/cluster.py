@@ -148,7 +148,8 @@ class Cluster(object):
     #
     # RESULTS
     #
-    
+    '''
+    Once we again have a way of knowing all the output files of a run, we can change back to this
     def get_missing_output_files(self, pcode, cluster_system):
         missing_output_files = []
         permutation_info = self.cluster_runs_info.get_permutation_info_for_permutation_code(pcode)
@@ -157,10 +158,29 @@ class Cluster(object):
             if (not(os.path.exists(output_file_path))):
                 missing_output_files.append(output_file_path)
         return missing_output_files
-
+    '''
     def is_output_files_present(self, pcode):
+        '''
         missing_output_files = self.get_missing_output_files(pcode)
         if len(missing_output_files) == 0:
+            return True
+        return False
+        '''
+        cscript = self.scripts[pcode]
+        results_dir = cscript.resolved_results_dir
+        done_marker_filename = cscript.get_done_marker_filename()
+        filenames = os.listdir(results_dir)
+        count = 0
+        for filename in filenames:
+            if filename == done_marker_filename:
+                pass
+            elif filename == '.':
+                pass 
+            elif filename == '..':
+                pass
+            else:
+                count = count + 1
+        if count > 0 :
             return True
         return False
 

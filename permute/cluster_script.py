@@ -91,5 +91,5 @@ class ClusterScript(PermutationDriverFile):
             print("Return code was {0}".format(subprocess.CalledProcessError.returncode))
         
 def get_done_marker_filename():
-    return "permutation_done_marker.txt"   
+    return "run_done_marker.txt"   
         

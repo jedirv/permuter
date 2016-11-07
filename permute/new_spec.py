@@ -39,6 +39,7 @@ class NewSpec(object):
         f.write("concise_print:t_val,t\n");
         f.write("concise_print:month,m\n");
         f.write("concise_print:year,y\n");
+        '''
         f.write("#\n");
         f.write("scores_permute:post_proc_approach=technique1,techniqu2\n");
         f.write("scores_from:file=<permutation_results_dir>/final_result_(post_proc_approach).csv,column_name=auc,row_number=1\n");
@@ -46,6 +47,7 @@ class NewSpec(object):
         f.write("scores_y_axis:year,month\n");
         f.write("scores_x_axis:t_val\n");
         f.write("#\n");
+        '''
         f.write("qsub_command:-q eecs,eecs1,eecs,share\n");
         f.write("qsub_command:-cwd\n");
         f.close()

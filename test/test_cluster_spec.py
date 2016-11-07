@@ -46,11 +46,11 @@ class TestClusterSpec(unittest.TestCase):
         lines.append("concise_print:AAA,aa\n")
         lines.append("concise_print:BBB,bb\n")
 
-        lines.append("scores_permute:resolution=userDay,userMonth\n")
-        lines.append("scores_from:file=<permutation_results_dir>/(resolution).csv,column_name=auc,row_number=1\n")
-        lines.append("scores_to:./collected_results\n")
-        lines.append("scores_y_axis:letter\n")
-        lines.append("scores_x_axis:number,animal\n")
+        #lines.append("scores_permute:resolution=userDay,userMonth\n")
+        #lines.append("scores_from:file=<permutation_results_dir>/(resolution).csv,column_name=auc,row_number=1\n")
+        #lines.append("scores_to:./collected_results\n")
+        #lines.append("scores_y_axis:letter\n")
+        #lines.append("scores_x_axis:number,animal\n")
         
         lines.append("<replace>:config[AAA]=aaa\n")
         lines.append("<replace>:config[BBB]=bbb\n")
@@ -83,17 +83,17 @@ class TestClusterSpec(unittest.TestCase):
         self.assertTrue(cspec.get_concise_name('resolution') == 'res')
         
         #scores_info
-        self.assertTrue(cspec.scores_permuters['resolution'][0] == 'userDay')
-        self.assertTrue(cspec.scores_permuters['resolution'][1] == 'userMonth')
+        #self.assertTrue(cspec.scores_permuters['resolution'][0] == 'userDay')
+        #self.assertTrue(cspec.scores_permuters['resolution'][1] == 'userMonth')
         
-        self.assertTrue(cspec.scores_from_filepath=='<permutation_results_dir>/(resolution).csv')
-        self.assertTrue(cspec.scores_from_colname=='auc')
-        self.assertTrue(cspec.scores_from_rownum=='1')
+        #self.assertTrue(cspec.scores_from_filepath=='<permutation_results_dir>/(resolution).csv')
+        #self.assertTrue(cspec.scores_from_colname=='auc')
+        #self.assertTrue(cspec.scores_from_rownum=='1')
         #print 'self.cspec.scores_to : {0}'.format(self.cspec.scores_to)
-        self.assertTrue(cspec.scores_to=='./collected_results')
+        #self.assertTrue(cspec.scores_to=='./collected_results')
         
-        self.assertTrue(cspec.scores_x_axis==['number', 'animal'])
-        self.assertTrue(cspec.scores_y_axis==['letter'])
+        #self.assertTrue(cspec.scores_x_axis==['number', 'animal'])
+        #self.assertTrue(cspec.scores_y_axis==['letter'])
 
         #script_dir
         self.assertTrue(cspec.script_dir=='./myRuns/baz/scripts')
@@ -186,11 +186,11 @@ class TestClusterSpec(unittest.TestCase):
         lines.append("concise_print:AAA ,aa\n")
         lines.append("concise_print:BBB, bb\n")
 
-        lines.append("scores_permute:resolution=userDay,userMonth\n")
-        lines.append("scores_from:file= <permutation_results_dir>/(resolution).csv, column_name=auc,row_number=1\n")
-        lines.append("scores_to: ./collected_results\n")
-        lines.append("scores_y_axis: letter \n")
-        lines.append("scores_x_axis:number,\t\t\tanimal\n")
+        #lines.append("scores_permute:resolution=userDay,userMonth\n")
+        #lines.append("scores_from:file= <permutation_results_dir>/(resolution).csv, column_name=auc,row_number=1\n")
+        #lines.append("scores_to: ./collected_results\n")
+        #lines.append("scores_y_axis: letter \n")
+        #lines.append("scores_x_axis:number,\t\t\tanimal\n")
         
         lines.append("<replace>:config[AAA]=aaa \n")
         lines.append("<replace>:config[BBB]= bbb\n")
@@ -223,17 +223,17 @@ class TestClusterSpec(unittest.TestCase):
         self.assertTrue(cspec.get_concise_name('resolution') == 'res')
         
         #scores_info
-        self.assertTrue(cspec.scores_permuters['resolution'][0] == 'userDay')
-        self.assertTrue(cspec.scores_permuters['resolution'][1] == 'userMonth')
+        #self.assertTrue(cspec.scores_permuters['resolution'][0] == 'userDay')
+        #self.assertTrue(cspec.scores_permuters['resolution'][1] == 'userMonth')
         
-        self.assertTrue(cspec.scores_from_filepath=='<permutation_results_dir>/(resolution).csv')
-        self.assertTrue(cspec.scores_from_colname=='auc')
-        self.assertTrue(cspec.scores_from_rownum=='1')
+        #self.assertTrue(cspec.scores_from_filepath=='<permutation_results_dir>/(resolution).csv')
+        #self.assertTrue(cspec.scores_from_colname=='auc')
+        #self.assertTrue(cspec.scores_from_rownum=='1')
         #print 'self.cspec.scores_to : {0}'.format(self.cspec.scores_to)
-        self.assertTrue(cspec.scores_to=='./collected_results')
+        #self.assertTrue(cspec.scores_to=='./collected_results')
         
-        self.assertTrue(cspec.scores_x_axis==['number', 'animal'])
-        self.assertTrue(cspec.scores_y_axis==['letter'])
+        #self.assertTrue(cspec.scores_x_axis==['number', 'animal'])
+        #self.assertTrue(cspec.scores_y_axis==['letter'])
 
         #script_dir
         self.assertTrue(cspec.script_dir=='./myRuns/baz/scripts')
@@ -398,7 +398,7 @@ class TestClusterSpec(unittest.TestCase):
         self.assertTrue(cluster_spec.is_valid_permuter('fop', lines))
         self.assertTrue(cluster_spec.is_valid_permuter('bag', lines))
         
-        
+    '''    
     def test_validate_axis_list(self):
         # more than one entry
         lines = []
@@ -513,7 +513,7 @@ class TestClusterSpec(unittest.TestCase):
         lines.append('scores_from:file= <permutation_results_dir>/(resolution).csv, column_name = auc , row_number = 1')
         self.assertTrue(cluster_spec.validate_scores_from(lines))
         
-        
+    '''    
     def test_single_entry_present(self):
         lines = []
         lines.append('prefixA:foo\n')
@@ -523,7 +523,7 @@ class TestClusterSpec(unittest.TestCase):
         self.assertFalse(cluster_spec.single_entry_present(lines,'prefixB'))
         self.assertFalse(cluster_spec.single_entry_present(lines,'prefixC'))
 
-
+    '''
     def test_validate_scores_gathering_info(self):
         stdout = mock_stdout.MockStdout()
         # none present is ok
@@ -590,7 +590,7 @@ class TestClusterSpec(unittest.TestCase):
         lines.append('scores_x_axis:number, animal')
         lines.append('scores_y_axis: letter')
         self.assertTrue(cluster_spec.validate_scores_gathering_info(lines, stdout))
-        
+    '''    
     def test_lines_contains_prefix(self):
         lines = []
         lines.append('lineA\n')
