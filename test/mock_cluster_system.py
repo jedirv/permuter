@@ -119,8 +119,8 @@ class MockClusterSystem(object):
     '''        
     def persist_answer(self, answer, permcode, trial, cspec, result_permuter, script_name): 
         scores_from_filepath = cspec.scores_from_filepath
-        root_results_dir = cspec.root_results_dir
-        permutation_results_dir = "{0}/{1}/trial{2}/{3}".format(root_results_dir, cspec.cspec_name, trial, permcode)
+        root_dir = cspec.root_dir
+        permutation_results_dir = "{0}/{1}/{2}".format(root_dir, cspec.cspec_name, permcode)
         scores_from_filepath_perm_dir_resolved = scores_from_filepath.replace("<permutation_results_dir>", permutation_results_dir)
         if result_permuter == "":
             # we're done

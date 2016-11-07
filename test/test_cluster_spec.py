@@ -65,8 +65,7 @@ class TestClusterSpec(unittest.TestCase):
         lines.append("<replace>:tools_dir=<algs_dir>/tools\n")
         lines.append("<replace>:outfile_root=<pretty[(number)]>__TEST\n")
 
-        lines.append("root_results_dir:./sample_results\n")
-        lines.append("script_dir:./scripts\n")
+        lines.append("root_dir:./myRuns\n")
 
         lines.append("qsub_command:-q eecs,eecs1,eecs,share\n")
         lines.append("qsub_command:-M someone@gmail.com\n")
@@ -97,7 +96,7 @@ class TestClusterSpec(unittest.TestCase):
         self.assertTrue(cspec.scores_y_axis==['letter'])
 
         #script_dir
-        self.assertTrue(cspec.script_dir=='./scripts')
+        self.assertTrue(cspec.script_dir=='./myRuns/baz/scripts')
         
         #trials:
         self.assertTrue(cspec.trials=='2')
@@ -108,8 +107,8 @@ class TestClusterSpec(unittest.TestCase):
         #one_up_basis:
         self.assertTrue(cspec.one_up_basis == '100')
         
-        #root_results_dir:
-        self.assertTrue(cspec.root_results_dir == './sample_results')
+        #root_dir:
+        self.assertTrue(cspec.root_dir == './myRuns')
 
 
         # permuters:
@@ -120,7 +119,7 @@ class TestClusterSpec(unittest.TestCase):
         self.assertTrue(cspec.permuters['letter'][1] == 'BBB')
         
         # generate_results_dir_for_permutation:
-        self.assertTrue(cspec.generate_results_dir_for_permutation('xyz_trial3') == './sample_results/baz/xyz_trial3')
+        self.assertTrue(cspec.generate_results_dir_for_permutation('xyz_trial3') == './myRuns/baz/results/xyz_trial3')
         
         #concise_print_map:
         self.assertTrue(cspec.concise_print_map['letter'] == 'l')
@@ -206,8 +205,7 @@ class TestClusterSpec(unittest.TestCase):
         lines.append("<replace>:tools_dir=<algs_di r>/tools\n")
         lines.append("<replace>:    outfile_root =     <pretty[(number)]>__TEST\n")
 
-        lines.append("root_results_dir:./sample_results\n")
-        lines.append("script_dir:./scripts\n")
+        lines.append("root_dir:./myRuns\n")
 
         lines.append("qsub_command:-q eecs,eecs1,eecs,share\n")
         lines.append("qsub_command:-M someone@gmail.com\n")
@@ -238,7 +236,7 @@ class TestClusterSpec(unittest.TestCase):
         self.assertTrue(cspec.scores_y_axis==['letter'])
 
         #script_dir
-        self.assertTrue(cspec.script_dir=='./scripts')
+        self.assertTrue(cspec.script_dir=='./myRuns/baz/scripts')
         
         #trials:
         self.assertTrue(cspec.trials=='2')
@@ -249,8 +247,8 @@ class TestClusterSpec(unittest.TestCase):
         #one_up_basis:
         self.assertTrue(cspec.one_up_basis == '100')
         
-        #root_results_dir:
-        self.assertTrue(cspec.root_results_dir == './sample_results')
+        #root_dir:
+        self.assertTrue(cspec.root_dir == './myRuns')
 
 
         # permuters:
@@ -261,7 +259,7 @@ class TestClusterSpec(unittest.TestCase):
         self.assertTrue(cspec.permuters['letter'][1] == 'BBB')
         
         # generate_results_dir_for_permutation:
-        self.assertTrue(cspec.generate_results_dir_for_permutation('xyz_trial_3') == './sample_results/baz/xyz_trial_3')
+        self.assertTrue(cspec.generate_results_dir_for_permutation('xyz_trial_3') == './myRuns/baz/results/xyz_trial_3')
         
         #concise_print_map:
         self.assertTrue(cspec.concise_print_map['letter'] == 'l')
@@ -292,16 +290,16 @@ class TestClusterSpec(unittest.TestCase):
     def test_validate_statement_present_in_lines(self):
         stdout = mock_stdout.MockStdout()
         lines = []
-        lines.append("root_results_dir\n")
-        self.assertFalse(cluster_spec.validate_statement_present(lines,"root_results_dir:","some_dir", stdout))
-        lines.append("root_results_dir:\n")
-        self.assertFalse(cluster_spec.validate_statement_present(lines,"root_results_dir:","some_dir", stdout))
-        lines.append("root_results_dir:/foo/bar\n")
-        self.assertTrue(cluster_spec.validate_statement_present(lines,"root_results_dir:","some_dir", stdout))
+        lines.append("root_dir\n")
+        self.assertFalse(cluster_spec.validate_statement_present(lines,"root_dir:","some_dir", stdout))
+        lines.append("root_dir:\n")
+        self.assertFalse(cluster_spec.validate_statement_present(lines,"root_dir:","some_dir", stdout))
+        lines.append("root_dir:/foo/bar\n")
+        self.assertTrue(cluster_spec.validate_statement_present(lines,"root_dir:","some_dir", stdout))
         # with spaces
         lines = []
-        lines.append("root_results_dir: /foo/bar \n")
-        self.assertTrue(cluster_spec.validate_statement_present(lines,"root_results_dir:","some_dir", stdout))
+        lines.append("root_dir: /foo/bar \n")
+        self.assertTrue(cluster_spec.validate_statement_present(lines,"root_dir:","some_dir", stdout))
         
                 
     def test_validate_permutes(self):

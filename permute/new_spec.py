@@ -23,8 +23,7 @@ class NewSpec(object):
         f.write("trials:1\n")
         f.write("\n")
         f.write("<replace>:project_root=/nfs/guille/myproject\n");
-        f.write("script_dir:<project_root>/scripts\n");
-        f.write("root_results_dir:<project_root>/results_dir\n");
+        f.write("root_dir:<project_root>\n");
         f.write("<replace>:alg_dir=<project_root>/seward/git/framework/algorithms/osu/R-algos\n");
         f.write("<replace>:tools_dir=<alg_dir>/tools\n");
         f.write("#\n");

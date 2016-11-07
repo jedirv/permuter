@@ -44,8 +44,7 @@ class TestCluster(unittest.TestCase):
         lines.append("<replace>:tools_dir=<algs_dir>/tools\n")
         lines.append("<replace>:outfile_root=<pretty[(number)]>__TEST\n")
 
-        lines.append("root_results_dir:./sample_results\n")
-        lines.append("script_dir:./scripts\n")
+        lines.append("root_dir:./myRuns\n")
 
         lines.append("qsub_command:-q eecs,eecs1,eecs,share\n")
         lines.append("qsub_command:-M someone@gmail.com\n")

@@ -28,8 +28,7 @@ class TestStateOfRuns(unittest.TestCase):
         self.lines.append("scores_y_axis:letter\n")
         self.lines.append("scores_x_axis:number\n")
 
-        self.lines.append("root_results_dir:./sample_results\n")
-        self.lines.append("script_dir:./scripts\n")
+        self.lines.append("root_dir:./myRuns\n")
 
         self.lines.append("qsub_command:-q eecs,eecs1,eecs,share\n")
         self.lines.append("qsub_command:-M someone@gmail.com\n")
