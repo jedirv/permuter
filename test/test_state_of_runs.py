@@ -791,6 +791,7 @@ class TestStateOfRuns(unittest.TestCase):
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
         self.assertTrue(stdout.lines[0] == '1\tl_A_n_1_trial_1\tstale results?\t(output exists, script and invoke log missing)\t-> retry if unexpected\n')
+        print "=="
 
         
     # 'S--DO'

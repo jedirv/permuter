@@ -59,19 +59,19 @@ class PermutationDriver(object):
             
         elif (permute_command == "summary"):
             run_states.assess_all_runs(self.cluster_runs, self.cluster)
-            run_states.emit_state_summary()
+            run_states.emit_state_summary(self.stdout, self.cluster_runs)
             
         elif (permute_command == "stat"):
             run_states.assess_all_runs(self.cluster_runs, self.cluster)
-            run_states.emit_state_full()
+            run_states.emit_run_states_full(self.stdout, self.cluster_runs)
             
         elif (permute_command == "pending"):
             run_states.assess_all_runs(self.cluster_runs, self.cluster)
-            run_states.emit_state_pending()
+            run_states.emit_run_states_pending(self.stdout, self.cluster_runs)
           
         elif (permute_command == "errors"):
             run_states.assess_all_runs(self.cluster_runs, self.cluster)
-            run_states.emit_state_errors()
+            run_states.emit_state_errors(self.stdout, self.cluster_runs)
     
         #elif (permute_command == "stat_all"):
         #    run_command_on_all_specs(cspec_path,"stat",self.cluster)

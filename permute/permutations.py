@@ -45,16 +45,23 @@ def generate_permutation_code(permutation_info, concisePrintMap, include_trials)
     code = ""
     keys = permutation_info.keys()
     sorted_keys = sorted(keys)
+    # ensure that 'trial' is the last key
+    deferred_trial_val = ''
     for key in sorted_keys:
         if (include_trials == IGNORE_TRIALS and key == 'trial'):
             pass
         else:
             val = permutation_info[key]
-            if (concisePrintMap.has_key(key)):
-                key = concisePrintMap[key]
-            if (concisePrintMap.has_key(val)):
-                val = concisePrintMap[val]
-            code = "{0}_{1}_{2}".format(code, key, val)
+            if key == 'trial':
+                deferred_trial_val = val
+            else:
+                if (concisePrintMap.has_key(key)):
+                    key = concisePrintMap[key]
+                if (concisePrintMap.has_key(val)):
+                    val = concisePrintMap[val]
+                code = "{0}_{1}_{2}".format(code, key, val)
+    if deferred_trial_val != '':
+        code = "{0}_{1}_{2}".format(code, 'trial', deferred_trial_val)
     code = code.lstrip('_')
     logging.info("   perm code : {0}".format(code))
     # change commas to dashes

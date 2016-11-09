@@ -244,12 +244,40 @@ class TestSystem(unittest.TestCase):
         self.assertTrue(stdout.lines[0] == "4 scripts in play\n")
         self.assertTrue(len(stdout.lines) == 1)
         
-    # preview 
-    
-    # (clean slate) summary 
-    # (clean slate) stat 
-    # (clean slate) pending 
-    # (clean slate) errors 
+   
+    def test_status_commands(self):
+        stdout = mock_stdout.MockStdout()
+        lines = self.get_lines_for_simpleCaseCspec()
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout)
+        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
+        cluster = mock_cluster.MockCluster(cluster_runs)
+        pdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec", stdout, cluster)
+        
+        # (clean slate) summary 
+        pdriver.run_command('summary','')
+        self.assertTrue(stdout.lines[0] == "....\n")
+        self.assertTrue(stdout.lines[1] == "baz(4)\tscripts missing: 4\n")
+        self.assertTrue(len(stdout.lines) == 2)
+        # (clean slate) stat 
+        stdout.lines = []
+        pdriver.run_command('stat','')
+        self.assertTrue(stdout.lines[0] == "NA\tx_1_trial_1\tscript missing\n")
+        self.assertTrue(stdout.lines[1] == "NA\tx_2_trial_1\tscript missing\n")
+        self.assertTrue(stdout.lines[2] == "NA\tx_3_trial_1\tscript missing\n")
+        self.assertTrue(stdout.lines[3] == "NA\tx_4_trial_1\tscript missing\n")
+        self.assertTrue(len(stdout.lines) == 4)
+        # (clean slate) pending 
+        stdout.lines = []
+        pdriver.run_command('pending','')
+        self.assertTrue(stdout.lines[0] == "NA\tx_1_trial_1\tscript missing\n")
+        self.assertTrue(stdout.lines[1] == "NA\tx_2_trial_1\tscript missing\n")
+        self.assertTrue(stdout.lines[2] == "NA\tx_3_trial_1\tscript missing\n")
+        self.assertTrue(stdout.lines[3] == "NA\tx_4_trial_1\tscript missing\n")
+        self.assertTrue(len(stdout.lines) == 4)
+        # (clean slate) errors 
+        stdout.lines = []
+        pdriver.run_command('errors','')
+        self.assertTrue(len(stdout.lines) == 0)
     
     # (after gen) summary 
     # (after gen) stat 
@@ -260,6 +288,28 @@ class TestSystem(unittest.TestCase):
     # (after test_launch) stat 
     # (after test_launch) pending
     # (after test_launch) errors
+    
+    # (after launch) summary 
+    # (after launch) stat 
+    # (after launch) pending
+    # (after launch) errors
+    
+    
+    # (after invoke_log_removed) summary 
+    # (after invoke_log_removed) stat 
+    # (after invoke_log_removed) pending
+    # (after invoke_log_removed) errors
+    
+    # reset
+    # (after run engaged) summary 
+    # (after run engaged) stat 
+    # (after run engaged) pending
+    # (after run engaged) errors
+    
+    # (after results created) summary 
+    # (after results created) stat 
+    # (after results created) pending
+    # (after results created) errors
     
     # test_launch
     # launch
