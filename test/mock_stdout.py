@@ -16,8 +16,9 @@ class MockStdout(object):
             string_with_newline = '{0}{1}'.format(self.line_without_newline, string_with_newline)
         sublines = string_with_newline.split('\n')
         for subline in sublines:
-            subline = "{0}\n".format(subline)
-            self.lines.append(subline)
+            if subline != '':
+                subline = "{0}\n".format(subline)
+                self.lines.append(subline)
         self.line_without_newline = ''
         
     def print_without_newline(self,s):

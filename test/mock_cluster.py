@@ -81,11 +81,10 @@ class MockCluster(object):
         self.delete_qacct_log(pcode)
         self.delete_qstat_log()
         self.delete_done_marker(pcode)
-        self.delete_pooled_results_file(pcode)
-        self.delete_pooled_delta_file(pcode)
-        self.delete_pooled_timings_file(pcode)
-        self.delete_ranked_results_file(pcode)
         self.delete_results(pcode)
+        
+    def delete_pooled_results_file(self):
+        pass
         
     def delete_pooled_results(self):
         pass

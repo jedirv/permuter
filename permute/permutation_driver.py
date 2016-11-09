@@ -14,13 +14,8 @@ class PermutationDriver(object):
     
     def __init__(self,cspec_lines, cspec_path, stdout, cluster):
         self.cluster = cluster
-        stdout.println('initializing cluster_spec...')
         self.cspec = cluster_spec.ClusterSpec(cspec_path, cspec_lines, stdout)
-        stdout.println('initializing cluster_runs_info...')
-        self.cluster_runs = cluster_runs_info.ClusterRunsInfo(self.cspec)
-        result_dirs = self.cluster_runs.get_results_dirs_to_make()
-        for result_dir in result_dirs:
-            os.makedirs(result_dir)
+        self.cluster_runs = cluster_runs_info.ClusterRunsInfo(self.cspec, stdout)
         self.cspec_path = cspec_path
         self.stdout = stdout
         
@@ -144,7 +139,7 @@ def stop_runs(cluster_runs, cluster):
     logging.info('STOPPING runs that are still running or waiting')
     for pcode in cluster_runs.run_perm_codes_list:
         cluster.stop_run(pcode)
-                    
+'''                    
 def run_command_on_all_specs(cspec_path, permuter_command,stdout, cluster):
     spec_dir = os.path.dirname(cspec_path)
     file_or_dirnames = os.listdir(spec_dir)
@@ -162,7 +157,7 @@ def run_command_on_all_specs(cspec_path, permuter_command,stdout, cluster):
         stdout.println("-------------------------------------------------------------------")
         #print command
         cluster.execute_command(command) 
-
+'''
      
 def retry_failed_runs(cluster_runs, cluster, run_states, stdout):
     logging.info('LAUNCHING incomplete runs')
@@ -198,7 +193,7 @@ def launch_script(pcode, cluster):
 def generate_scripts(cluster_runs, cluster):
     logging.info('GENERATING scripts')
     for pcode in cluster_runs.run_perm_codes_list:
-        cluster.create_scrit(pcode)
+        cluster.create_script(pcode)
 
 def clean_scripts(cluster_runs,cluster):
     logging.info('CLEANING scripts')

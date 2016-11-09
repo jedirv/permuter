@@ -67,9 +67,10 @@ class ClusterScript(PermutationDriverFile):
         f = open(self.pathname, 'r')
         lines = f.readlines()
         for line in lines:
-            self.cluster_system.print_without_newline(line)
+            line = line.rstrip()
+            self.stdout.println(line)
         f.close()
-        self.cluster_system.delete_file("remove temp junk.sh", self.pathname)
+        os.unlink(self.pathname)
         
     def launch(self):
         try: 

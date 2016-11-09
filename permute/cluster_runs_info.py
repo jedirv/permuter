@@ -9,7 +9,7 @@ import cluster_script
 
 class ClusterRunsInfo(object):
     
-    def __init__(self,cspec):
+    def __init__(self,cspec, stdout):
         self.cspec = cspec
         
         self.job_number_for_perm_code_map = {}
@@ -41,7 +41,7 @@ class ClusterRunsInfo(object):
             resolved_results_dir =  permutations.get_resolved_results_dir_for_permutation(perm_info, cspec)
             self.result_dir_for_perm_code_map[perm_code] = resolved_results_dir
             
-            cscript = cluster_script.ClusterScript(user_job_number_as_string, perm_info, cspec, perm_info['trial'])
+            cscript = cluster_script.ClusterScript(user_job_number_as_string, perm_info, cspec, perm_info['trial'], stdout)
             self.cluster_script_for_perm_code_map[perm_code] = cscript
             user_job_number = user_job_number + 1
             

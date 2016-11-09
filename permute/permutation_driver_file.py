@@ -4,18 +4,18 @@ Created on Dec 12, 2013
 @author: admin-jed
 '''
 import permutations
-import os
 
 class PermutationDriverFile(object):
     '''
     classdocs
     '''
 
-    def __init__(self, user_job_number, permutation_info, cspec, trial):
+    def __init__(self, user_job_number, permutation_info, cspec, trial, stdout):
         '''
         Constructor
         '''
         #self.cluster_system = cluster_system
+        self.stdout = stdout
         self.cspec = cspec
         self.trial = trial
         self.permutation_info = permutation_info

@@ -50,7 +50,10 @@ class Cluster(object):
     def launch(self, pcode):
         if self.scripts.has_key(pcode):
             cscript = self.scripts[pcode]
-            cscript.launch()   
+            result_dir = self.cluster_runs.result_dir_for_perm_code_map(pcode)
+            if not os.path.exists(result_dir):
+                os.makedirs(result_dir)
+            cscript.launch()
     #
     # INVOKE_LOG
     #
@@ -62,7 +65,7 @@ class Cluster(object):
         trial = perm_info['trial']
         user_job_number_as_string = self.cluster_runs.get_job_number_string_for_run_permutation_code(pcode)
         cspec = self.cluster_runs.cspec
-        qil = qsub_invoke_log.QsubInvokeLog(user_job_number_as_string, perm_info, cspec, trial)
+        qil = qsub_invoke_log.QsubInvokeLog(user_job_number_as_string, perm_info, cspec, trial, self.stdout)
         self.invoke_logs[pcode] = qil
         
     def get_invoke_log_mod_time(self,pcode):
@@ -99,7 +102,7 @@ class Cluster(object):
         else:
             #print "opening {0}".format(self.qstat_log)
             
-            qacctlog = qacct_log.QacctLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trial'])
+            qacctlog = qacct_log.QacctLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trial'], self.stdout)
             command = "qacct -j {0} > {1}".format(cluster_job_number, qacctlog.qacct_log_path)
             self.execute_command(command) 
             qacctlog.ingest(cluster_job_number)
@@ -310,10 +313,6 @@ class Cluster(object):
         self.delete_qacct_log(pcode)
         self.delete_qstat_log()
         self.delete_done_marker(pcode)
-        self.delete_pooled_results_file(pcode)
-        self.delete_pooled_delta_file(pcode)
-        self.delete_pooled_timings_file(pcode)
-        self.delete_ranked_results_file(pcode)
         self.delete_results(pcode)
 
     def clean_out_dir(self,dirpath):
