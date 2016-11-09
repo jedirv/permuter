@@ -300,7 +300,7 @@ class TestSystem(unittest.TestCase):
     # (after invoke_log_removed) pending
     # (after invoke_log_removed) errors
     
-    # reset
+    # clean all but scripts, launch, engage runs
     # (after run engaged) summary 
     # (after run engaged) stat 
     # (after run engaged) pending
@@ -311,21 +311,67 @@ class TestSystem(unittest.TestCase):
     # (after results created) pending
     # (after results created) errors
     
-    # test_launch
-    # launch
+    # cause one run to be broken by missing results
+    # cause one run to have missing done marker
+    # cause one run to have block error
+    # cause one run to have missing script
+    # (after these errors) summary 
+    # (after these errors) stat 
+    # (after these errors) pending
+    # (after these errors) errors
+    
     # retry
-    # summary
-    # stat
-    # pending
-    # errors
+    # (after retry) summary 
+    # (after retry) stat 
+    # (after retry) pending
+    # (after retry) errors
+    
+    # clean all but scripts, launch, engage one run
     # stop
+    # (after stop) summary 
+    # (after stop) stat 
+    # (after stop) pending
+    # (after stop) errors
+    
+    # clean 
+    # (after clean) summary 
+    # (after clean) stat 
+    # (after clean) pending
+    # (after clean) errors
+    
+    # clean all but scripts, launch
     # clean
+    # (after clean that should also stop) summary 
+    # (after clean that should also stop) stat 
+    # (after clean that should also stop) pending
+    # (after clean that should also stop) errors
+
+    # clean all but scripts
     # launch_job
-    # stat_job
+    # (after launch job) stat_job 
+    # (after launch job) pending
     # stop_job
-    # clean_job
-    # clean_scripts
+    # (after stop job) stat_job
+    # clean job
+    # (after clean job) stat_job
+    # (after stop job) errors
+    
+    # clean all but scripts, launch, engage, complete
+    # (after this) summary 
+    # (after this) stat 
+    # (after this) pending
+    # (after this) errors
     # clean_results
+    # (after clean_results) summary 
+    # (after clean_results) stat 
+    # (after clean_results) pending
+    # (after clean_results) errors
+    # clean_scripts
+    
+    # (after clean_scripts) summary 
+    # (after clean_scripts) stat 
+    # (after clean_scripts) pending
+    # (after clean_scripts) errors
     '''             
     def test_stat_before_gen(self):
         #self.state_codes['se 0 ile 0 rpb 0 dme 0 ofe 0'] = 'script missing'
