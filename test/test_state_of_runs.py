@@ -52,9 +52,8 @@ class TestStateOfRuns(unittest.TestCase):
         
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == '\n')
-        self.assertTrue(stdout.lines[2] == 'baz(4)\tscripts missing: 1\n')
-        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz(4)\tscripts missing: 1\n')
+        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -102,9 +101,8 @@ class TestStateOfRuns(unittest.TestCase):
         
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == '\n')
-        self.assertTrue(stdout.lines[2] == 'baz(4)\tscripts ready to run: 1\n')
-        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz(4)\tscripts ready to run: 1\n')
+        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -132,9 +130,8 @@ class TestStateOfRuns(unittest.TestCase):
         
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == '\n')
-        self.assertTrue(stdout.lines[2] == 'baz(4)\trun state inconsistent: 1\n')
-        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz(4)\trun state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -161,9 +158,8 @@ class TestStateOfRuns(unittest.TestCase):
         
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == '\n')
-        self.assertTrue(stdout.lines[2] == 'baz(4)\trun state inconsistent: 1\n')
-        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz(4)\trun state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -194,9 +190,8 @@ class TestStateOfRuns(unittest.TestCase):
         
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == '\n')
-        self.assertTrue(stdout.lines[2] == 'baz(4)\trun state inconsistent: 1\n')
-        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz(4)\trun state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -226,9 +221,8 @@ class TestStateOfRuns(unittest.TestCase):
         
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == '\n')
-        self.assertTrue(stdout.lines[2] == 'baz(4)\trun state inconsistent: 1\n')
-        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz(4)\trun state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -258,9 +252,8 @@ class TestStateOfRuns(unittest.TestCase):
         
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == '\n')
-        self.assertTrue(stdout.lines[2] == 'baz(4)\trun state inconsistent: 1\n')
-        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz(4)\trun state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -289,9 +282,8 @@ class TestStateOfRuns(unittest.TestCase):
         
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == '\n')
-        self.assertTrue(stdout.lines[2] == 'baz(4)\tinvoke error: 1\n')
-        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz(4)\tinvoke error: 1\n')
+        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -320,9 +312,8 @@ class TestStateOfRuns(unittest.TestCase):
         
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == '\n')
-        self.assertTrue(stdout.lines[2] == 'baz(4)\trun state inconsistent: 1\n')
-        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz(4)\trun state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -350,9 +341,8 @@ class TestStateOfRuns(unittest.TestCase):
         
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == '\n')
-        self.assertTrue(stdout.lines[2] == 'baz(4)\trun state inconsistent: 1\n')
-        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz(4)\trun state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -380,9 +370,8 @@ class TestStateOfRuns(unittest.TestCase):
         
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == '\n')
-        self.assertTrue(stdout.lines[2] == 'baz(4)\trun state inconsistent: 1\n')
-        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz(4)\trun state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -409,9 +398,8 @@ class TestStateOfRuns(unittest.TestCase):
         
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == '\n')
-        self.assertTrue(stdout.lines[2] == 'baz(4)\toutput files missing: 1\n')
-        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz(4)\toutput files missing: 1\n')
+        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -441,9 +429,8 @@ class TestStateOfRuns(unittest.TestCase):
         
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == '\n')
-        self.assertTrue(stdout.lines[2] == 'baz(4)\trun state inconsistent: 1\n')
-        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz(4)\trun state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -472,9 +459,8 @@ class TestStateOfRuns(unittest.TestCase):
         
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == '\n')
-        self.assertTrue(stdout.lines[2] == 'baz(4)\trun state inconsistent: 1\n')
-        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz(4)\trun state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -503,9 +489,8 @@ class TestStateOfRuns(unittest.TestCase):
         
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == '\n')
-        self.assertTrue(stdout.lines[2] == 'baz(4)\trun state inconsistent: 1\n')
-        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz(4)\trun state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -534,9 +519,8 @@ class TestStateOfRuns(unittest.TestCase):
         
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == '\n')
-        self.assertTrue(stdout.lines[2] == 'baz(4)\trun state inconsistent: 1\n')
-        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz(4)\trun state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -566,9 +550,8 @@ class TestStateOfRuns(unittest.TestCase):
         
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == '\n')
-        self.assertTrue(stdout.lines[2] == 'baz(4)\tpossible stale results: 1\n')
-        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz(4)\tpossible stale results: 1\n')
+        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -596,9 +579,8 @@ class TestStateOfRuns(unittest.TestCase):
         
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == '\n')
-        self.assertTrue(stdout.lines[2] == 'baz(4)\tpossible stale results: 1\n')
-        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz(4)\tpossible stale results: 1\n')
+        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -626,9 +608,8 @@ class TestStateOfRuns(unittest.TestCase):
         
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == '\n')
-        self.assertTrue(stdout.lines[2] == 'baz(4)\tpossible stale results: 1\n')
-        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz(4)\tpossible stale results: 1\n')
+        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -655,9 +636,8 @@ class TestStateOfRuns(unittest.TestCase):
         
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == '\n')
-        self.assertTrue(stdout.lines[2] == 'baz(4)\tnear complete: 1\n')
-        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz(4)\tnear complete: 1\n')
+        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -687,9 +667,8 @@ class TestStateOfRuns(unittest.TestCase):
         
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == '\n')
-        self.assertTrue(stdout.lines[2] == 'baz(4)\tpossible stale results: 1\n')
-        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz(4)\tpossible stale results: 1\n')
+        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -718,9 +697,8 @@ class TestStateOfRuns(unittest.TestCase):
         
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == '\n')
-        self.assertTrue(stdout.lines[2] == 'baz(4)\tpossible stale results: 1\n')
-        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz(4)\tpossible stale results: 1\n')
+        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -749,9 +727,8 @@ class TestStateOfRuns(unittest.TestCase):
         
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == '\n')
-        self.assertTrue(stdout.lines[2] == 'baz(4)\tpossible stale results: 1\n')
-        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz(4)\tpossible stale results: 1\n')
+        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -779,9 +756,8 @@ class TestStateOfRuns(unittest.TestCase):
         
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == '\n')
-        self.assertTrue(stdout.lines[2] == 'baz(4)\trun state inconsistent: 1\n')
-        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz(4)\trun state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -809,9 +785,8 @@ class TestStateOfRuns(unittest.TestCase):
         
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == '\n')
-        self.assertTrue(stdout.lines[2] == 'baz(4)\tpossible stale results: 1\n')
-        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz(4)\tpossible stale results: 1\n')
+        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -838,9 +813,8 @@ class TestStateOfRuns(unittest.TestCase):
         
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == '\n')
-        self.assertTrue(stdout.lines[2] == 'baz(4)\tpossible stale results: 1\n')
-        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz(4)\tpossible stale results: 1\n')
+        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -867,9 +841,8 @@ class TestStateOfRuns(unittest.TestCase):
         
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == '\n')
-        self.assertTrue(stdout.lines[2] == 'baz(4)\tpossible stale results: 1\n')
-        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz(4)\tpossible stale results: 1\n')
+        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -898,9 +871,8 @@ class TestStateOfRuns(unittest.TestCase):
         
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == '\n')
-        self.assertTrue(stdout.lines[2] == 'baz(4)\tpossible stale results: 1\n')
-        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz(4)\tpossible stale results: 1\n')
+        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -928,9 +900,8 @@ class TestStateOfRuns(unittest.TestCase):
         
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == '\n')
-        self.assertTrue(stdout.lines[2] == 'baz(4)\tpossible stale results: 1\n')
-        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz(4)\tpossible stale results: 1\n')
+        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -958,9 +929,8 @@ class TestStateOfRuns(unittest.TestCase):
         
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == '\n')
-        self.assertTrue(stdout.lines[2] == 'baz(4)\tpossible stale results: 1\n')
-        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz(4)\tpossible stale results: 1\n')
+        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -987,9 +957,8 @@ class TestStateOfRuns(unittest.TestCase):
         
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == '\n')
-        self.assertTrue(stdout.lines[2] == 'baz(4)\tpossible stale results: 1\n')
-        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz(4)\tpossible stale results: 1\n')
+        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -1016,9 +985,8 @@ class TestStateOfRuns(unittest.TestCase):
         
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == '\n')
-        self.assertTrue(stdout.lines[2] == 'baz(4)\tcomplete: 1\n')
-        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz(4)\tcomplete: 1\n')
+        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
