@@ -279,10 +279,12 @@ class TestSystem(unittest.TestCase):
         pdriver.run_command('errors','')
         self.assertTrue(len(stdout.lines) == 0)
     
-    # (after gen) summary 
-    # (after gen) stat 
-    # (after gen) pending
-    # (after gen) errors
+        pdriver.run_command('gen','')
+        # (after gen) summary 
+        
+        # (after gen) stat 
+        # (after gen) pending
+        # (after gen) errors
     
     # (after test_launch) summary 
     # (after test_launch) stat 
