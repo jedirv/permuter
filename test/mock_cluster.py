@@ -70,6 +70,13 @@ class MockCluster(object):
                 self.done_markers_mod_time[pcode] = get_time()
                 self.running_state.pop(pcode)
     
+    def test_helper_set_run_results_without_done_marker(self, pcode):
+        if self.running_state.has_key(pcode):
+            if self.running_state[pcode] =='running':
+                self.output_files[pcode] ='results'
+                self.output_files_mod_time[pcode] = get_time()
+                self.running_state.pop(pcode)
+                
     #TESTED    
     def delete_results(self, pcode):
         if self.output_files.has_key(pcode):
@@ -280,6 +287,8 @@ class MockCluster(object):
             return self.cluster_job_numbers[pcode]
         return 'NA'
     
+    def get_time_delay(self):
+        return 0.01
     ####################
     #  Stubs
     ####################

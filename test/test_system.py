@@ -58,8 +58,9 @@ class TestSystem(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        #permdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec",cluster_system)
-        permutation_driver.preview_scripts(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs)
+        perm_driver = permutation_driver.PermutationDriver(self.lines, "/foo/bar/baz.cspec", stdout, cluster)
+        perm_driver.preview_scripts(cluster_runs)
         self.assertTrue(stdout.lines[0] == "#!/bin/csh\n")
         self.assertTrue(stdout.lines[1] == "#\n")
         self.assertTrue(stdout.lines[2] == "#$ -q eecs,eecs1,eecs,share\n")
@@ -84,8 +85,9 @@ class TestSystem(unittest.TestCase):
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs)
-        #permdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec",cluster_system)
-        permutation_driver.generate_scripts(cluster_runs, cluster)
+        cluster = mock_cluster.MockCluster(cluster_runs)
+        perm_driver = permutation_driver.PermutationDriver(self.lines, "/foo/bar/baz.cspec",stdout, cluster)
+        perm_driver.generate_scripts(cluster_runs, cluster)
         pcodes = cluster_runs.run_perm_codes_list
         self.assertTrue(cluster.is_script_present(pcodes[0]))
         self.assertTrue(cluster.is_script_present(pcodes[1]))
@@ -164,7 +166,8 @@ class TestSystem(unittest.TestCase):
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs)
-        permutation_driver.generate_scripts(cluster_runs, cluster)
+        perm_driver = permutation_driver.PermutationDriver(self.lines, "/foo/bar/baz.cspec",stdout, cluster)
+        perm_driver.generate_scripts(cluster_runs, cluster)
         pcodes = cluster_runs.run_perm_codes_list
         self.assertTrue(self.is_code_present('an_cat_l_A-A-A_number_1_s_300_trial_1', pcodes))
         self.assertTrue(self.is_code_present('an_cat_l_A-A-A_number_1_s_300_trial_2', pcodes))
@@ -253,11 +256,15 @@ class TestSystem(unittest.TestCase):
         cluster = mock_cluster.MockCluster(cluster_runs)
         pdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec", stdout, cluster)
         
+        
+        
+        
         # (clean slate) summary 
         pdriver.run_command('summary','')
         self.assertTrue(stdout.lines[0] == "....\n")
-        self.assertTrue(stdout.lines[1] == "baz(4)\tscripts missing: 4\n")
-        self.assertTrue(len(stdout.lines) == 2)
+        self.assertTrue(stdout.lines[1] == "baz\t-\t4 runs total\n")
+        self.assertTrue(stdout.lines[2] == "scripts missing: 4\n")
+        self.assertTrue(len(stdout.lines) == 3)
         # (clean slate) stat 
         stdout.lines = []
         pdriver.run_command('stat','')
@@ -279,40 +286,171 @@ class TestSystem(unittest.TestCase):
         pdriver.run_command('errors','')
         self.assertTrue(len(stdout.lines) == 0)
     
+    
+        # GENERATE
+    
+        stdout.lines = []
         pdriver.run_command('gen','')
         # (after gen) summary 
-        
+        pdriver.run_command('summary','')
+        self.assertTrue(stdout.lines[0] == "....\n")
+        self.assertTrue(stdout.lines[1] == "baz\t-\t4 runs total\n")
+        self.assertTrue(stdout.lines[2] == "scripts ready to run: 4\n")
+        self.assertTrue(len(stdout.lines) == 3)
         # (after gen) stat 
+        stdout.lines = []
+        pdriver.run_command('stat','')
+        self.assertTrue(stdout.lines[0] == "NA\tx_1_trial_1\tscript ready\t-> launch\n")
+        self.assertTrue(stdout.lines[1] == "NA\tx_2_trial_1\tscript ready\t-> launch\n")
+        self.assertTrue(stdout.lines[2] == "NA\tx_3_trial_1\tscript ready\t-> launch\n")
+        self.assertTrue(stdout.lines[3] == "NA\tx_4_trial_1\tscript ready\t-> launch\n")
+        self.assertTrue(len(stdout.lines) == 4)
         # (after gen) pending
+        stdout.lines = []
+        pdriver.run_command('pending','')
+        self.assertTrue(stdout.lines[0] == "NA\tx_1_trial_1\tscript ready\t-> launch\n")
+        self.assertTrue(stdout.lines[1] == "NA\tx_2_trial_1\tscript ready\t-> launch\n")
+        self.assertTrue(stdout.lines[2] == "NA\tx_3_trial_1\tscript ready\t-> launch\n")
+        self.assertTrue(stdout.lines[3] == "NA\tx_4_trial_1\tscript ready\t-> launch\n")
         # (after gen) errors
-    
-    # (after test_launch) summary 
-    # (after test_launch) stat 
-    # (after test_launch) pending
-    # (after test_launch) errors
-    
-    # (after launch) summary 
-    # (after launch) stat 
-    # (after launch) pending
-    # (after launch) errors
+        stdout.lines = []
+        pdriver.run_command('errors','')
+        self.assertTrue(len(stdout.lines) == 0)
     
     
-    # (after invoke_log_removed) summary 
-    # (after invoke_log_removed) stat 
-    # (after invoke_log_removed) pending
-    # (after invoke_log_removed) errors
     
-    # clean all but scripts, launch, engage runs
-    # (after run engaged) summary 
-    # (after run engaged) stat 
-    # (after run engaged) pending
-    # (after run engaged) errors
+        # TEST LAUNCH
     
-    # (after results created) summary 
-    # (after results created) stat 
-    # (after results created) pending
-    # (after results created) errors
+        stdout.lines = []
+        pdriver.run_command('test_launch','')
+        # (after test_launch) summary 
+        stdout.lines = []
+        pdriver.run_command('summary','')
+        self.assertTrue(stdout.lines[0] == "....\n")
+        self.assertTrue(stdout.lines[1] == "baz\t-\t4 runs total\n")
+        self.assertTrue(stdout.lines[2] == "scripts ready to run: 3\n")
+        self.assertTrue(stdout.lines[3] == "runs waiting in queue: 1\n")
+        self.assertTrue(len(stdout.lines) == 4)
+        # (after test_launch) stat 
+        stdout.lines = []
+        pdriver.run_command('stat','')
+        self.assertTrue(stdout.lines[0] == "1\tx_1_trial_1\twaiting in queue\n")
+        self.assertTrue(stdout.lines[1] == "NA\tx_2_trial_1\tscript ready\t-> launch\n")
+        self.assertTrue(stdout.lines[2] == "NA\tx_3_trial_1\tscript ready\t-> launch\n")
+        self.assertTrue(stdout.lines[3] == "NA\tx_4_trial_1\tscript ready\t-> launch\n")
+        self.assertTrue(len(stdout.lines) == 4)
+        # (after test_launch) pending
+        stdout.lines = []
+        pdriver.run_command('pending','')
+        self.assertTrue(stdout.lines[0] == "1\tx_1_trial_1\twaiting in queue\n")
+        self.assertTrue(stdout.lines[1] == "NA\tx_2_trial_1\tscript ready\t-> launch\n")
+        self.assertTrue(stdout.lines[2] == "NA\tx_3_trial_1\tscript ready\t-> launch\n")
+        self.assertTrue(stdout.lines[3] == "NA\tx_4_trial_1\tscript ready\t-> launch\n")
+        # (after test_launch) errors
+        stdout.lines = []
+        pdriver.run_command('errors','')
+        self.assertTrue(len(stdout.lines) == 0)
+        
+        
+        
+        
+        
+        # LAUNCH SHOULD IGNORE THE ONE THAT'S ALREADY WAITING AND LAUNCH THE OTHERS
+        stdout.lines = []
+        pdriver.run_command('launch','')
+        # (after launch) summary 
+        stdout.lines = []
+        pdriver.run_command('summary','')
+        self.assertTrue(stdout.lines[0] == "....\n")
+        self.assertTrue(stdout.lines[1] == "baz\t-\t4 runs total\n")
+        self.assertTrue(stdout.lines[2] == "runs waiting in queue: 4\n")
+        self.assertTrue(len(stdout.lines) == 3)
+        # (after launch) stat 
+        stdout.lines = []
+        pdriver.run_command('stat','')
+        self.assertTrue(stdout.lines[0] == "1\tx_1_trial_1\twaiting in queue\n")
+        self.assertTrue(stdout.lines[1] == "2\tx_2_trial_1\twaiting in queue\n")
+        self.assertTrue(stdout.lines[2] == "3\tx_3_trial_1\twaiting in queue\n")
+        self.assertTrue(stdout.lines[3] == "4\tx_4_trial_1\twaiting in queue\n")
+        self.assertTrue(len(stdout.lines) == 4)
+        # (after launch) pending
+        stdout.lines = []
+        pdriver.run_command('pending','')
+        self.assertTrue(stdout.lines[0] == "1\tx_1_trial_1\twaiting in queue\n")
+        self.assertTrue(stdout.lines[1] == "2\tx_2_trial_1\twaiting in queue\n")
+        self.assertTrue(stdout.lines[2] == "3\tx_3_trial_1\twaiting in queue\n")
+        self.assertTrue(stdout.lines[3] == "4\tx_4_trial_1\twaiting in queue\n")
+        self.assertTrue(len(stdout.lines) == 4)
+        # (after launch) errors
+        stdout.lines = []
+        pdriver.run_command('errors','')
+        self.assertTrue(len(stdout.lines) == 0)
     
+
+        # GET THEM RUNNING
+        # engage runs
+        cluster.test_helper_set_ok_to_run('x_1_trial_1')
+        cluster.test_helper_set_ok_to_run('x_2_trial_1')
+        cluster.test_helper_set_ok_to_run('x_3_trial_1')
+        cluster.test_helper_set_ok_to_run('x_4_trial_1')
+        # (after run engaged) summary 
+        stdout.lines = []
+        pdriver.run_command('summary','')
+        self.assertTrue(stdout.lines[0] == "....\n")
+        self.assertTrue(stdout.lines[1] == "baz\t-\t4 runs total\n")
+        self.assertTrue(stdout.lines[2] == "running: 4\n")
+        self.assertTrue(len(stdout.lines) == 3)
+        # (after run engaged) stat 
+        stdout.lines = []
+        pdriver.run_command('stat','')
+        self.assertTrue(stdout.lines[0] == "1\tx_1_trial_1\trunning\n")
+        self.assertTrue(stdout.lines[1] == "2\tx_2_trial_1\trunning\n")
+        self.assertTrue(stdout.lines[2] == "3\tx_3_trial_1\trunning\n")
+        self.assertTrue(stdout.lines[3] == "4\tx_4_trial_1\trunning\n")
+        # (after run engaged) pending
+        stdout.lines = []
+        pdriver.run_command('pending','')
+        self.assertTrue(stdout.lines[0] == "1\tx_1_trial_1\trunning\n")
+        self.assertTrue(stdout.lines[1] == "2\tx_2_trial_1\trunning\n")
+        self.assertTrue(stdout.lines[2] == "3\tx_3_trial_1\trunning\n")
+        self.assertTrue(stdout.lines[3] == "4\tx_4_trial_1\trunning\n")
+        # (after run engaged) errors
+        stdout.lines = []
+        pdriver.run_command('errors','')
+        self.assertTrue(len(stdout.lines) == 0)
+    
+    
+    
+        # CREATE RESULTS WITHOUT DONE MARKER
+        cluster.test_helper_set_run_results_without_done_marker('x_1_trial_1')
+        # (after results created) summary 
+        stdout.lines = []
+        pdriver.run_command('summary','')
+        self.assertTrue(stdout.lines[0] == "....\n")
+        self.assertTrue(stdout.lines[1] == "baz\t-\t4 runs total\n")
+        self.assertTrue(stdout.lines[2] == "running: 3\n")
+        self.assertTrue(stdout.lines[3] == "runs near complete: 1\n")
+        self.assertTrue(len(stdout.lines) == 4)
+        # (after results created) stat 
+        stdout.lines = []
+        pdriver.run_command('stat','')
+        self.assertTrue(stdout.lines[0] == "1\tx_1_trial_1\trun near complete\n")
+        self.assertTrue(stdout.lines[1] == "2\tx_2_trial_1\trunning\n")
+        self.assertTrue(stdout.lines[2] == "3\tx_3_trial_1\trunning\n")
+        self.assertTrue(stdout.lines[3] == "4\tx_4_trial_1\trunning\n")
+        # (after results created) pending
+        pdriver.run_command('pending','')
+        self.assertTrue(stdout.lines[0] == "1\tx_1_trial_1\trun near complete\n")
+        self.assertTrue(stdout.lines[1] == "2\tx_2_trial_1\trunning\n")
+        self.assertTrue(stdout.lines[2] == "3\tx_3_trial_1\trunning\n")
+        self.assertTrue(stdout.lines[3] == "4\tx_4_trial_1\trunning\n")
+        # (after results created) errors
+        stdout.lines = []
+        pdriver.run_command('errors','')
+        self.assertTrue(len(stdout.lines) == 0)
+        
+        
+        
     # cause one run to be broken by missing results
     # cause one run to have missing done marker
     # cause one run to have block error

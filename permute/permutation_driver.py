@@ -24,13 +24,13 @@ class PermutationDriver(object):
         cluster_runs = self.cluster_runs
         cspec_path = self.cspec_path
         if (permute_command == "gen"):
-            generate_scripts(cluster_runs)
+            self.generate_scripts(cluster_runs, self.cluster)
         elif (permute_command == "launch"):
             run_states.assess_all_runs(self.cluster_runs, self.cluster)
             if (run_states.is_ok_to_launch_all(cluster_runs, self.cluster)):
                 self.stdout.println("Permutation jobs still running.  Use 'stop' to stop them before 'launch' to avoid replicated jobs")
             else:
-                launch_scripts(cluster_runs, self.cluster)
+                self.launch_scripts(cluster_runs, self.cluster, run_states)
         #elif (permute_command == "auto"):
         #    run_states.assess_all_runs(self.cluster_runs, self.cluster)
         #    if (run_states.is_ok_to_launch_all(cluster_runs, self.cluster)):
@@ -40,17 +40,17 @@ class PermutationDriver(object):
         #        launch_scripts(cluster_runs, self.cluster)
         elif (permute_command == "retry"):
             run_states.assess_all_runs(self.cluster_runs, self.cluster)
-            retry_failed_runs(cluster_runs, self.cluster, run_states, self.stdout)
+            self.retry_failed_runs(cluster_runs, self.cluster, run_states, self.stdout)
         elif (permute_command == "preview"):
-            preview_scripts(cluster_runs)
+            self.preview_scripts(cluster_runs)
             
         elif (permute_command == "count"):
-            count_scripts(cluster_runs, self.stdout)
+            self.count_scripts(cluster_runs, self.stdout)
             
         elif (permute_command == "test_launch"):
             pcode = self.cluster_runs.run_perm_codes_list[0]
             run_states.assess_run(pcode, self.cluster_runs, self.cluster)
-            if run_states.is_ok_to_launch(pcode):
+            if run_states.is_ok_to_launch_run(pcode,self.cluster):
                 self.cluster.launch(pcode)
           
         #elif (permute_command == "collect"):
@@ -83,13 +83,13 @@ class PermutationDriver(object):
         #    run_command_on_all_specs(cspec_path,"stat_pending",self.cluster)
 
         elif (permute_command == "stop"):
-            stop_runs(cluster_runs, self.cluster)
+            self.stop_runs(cluster_runs, self.cluster)
             
         elif (permute_command == "clean_scripts"):
-            clean_scripts(cluster_runs, self.cluster)
+            self.clean_scripts(cluster_runs, self.cluster)
             
         elif (permute_command == "clean_results"):
-            clean_results(cluster_runs, self.cluster)
+            self.clean_results(cluster_runs, self.cluster)
             
         #elif (permute_command == "clean_pooled_results"):
         #    clean_pooled_results(cluster_runs, self.cluster)
@@ -102,7 +102,7 @@ class PermutationDriver(object):
         elif (permute_command == 'launch_job'):
             user_job_number = scope.replace('j','')
             pcode = cluster_runs.perm_code_for_job_number_map[user_job_number]
-            launch_script(pcode)
+            self.launch_script(pcode)
             
         elif (permute_command == 'stat_job'):
             user_job_number = scope.replace('j','')
@@ -123,104 +123,105 @@ class PermutationDriver(object):
             pass
         
     
-def collect(cluster_runs, cluster, stdout):
-    #warn_of_incomplete_runs(cluster_runs)
-    #logging.info('COLLECTING results')
-    stdout.println('creating pooled results files...')
-    resultsFiles = cluster.create_pooled_results_files(cluster_runs, stdout)
-    stdout.println('creating pooled results delta files...')
-    cluster.create_pooled_results_delta_files(resultsFiles)
-    stdout.println('creating pooled timings files...')
-    cluster.create_pooled_timings_files(cluster_runs)
-    stdout.println('creating ranked results files...')
-    cluster.create_ranked_results_files(cluster_runs)
-
-def stop_runs(cluster_runs, cluster):
-    logging.info('STOPPING runs that are still running or waiting')
-    for pcode in cluster_runs.run_perm_codes_list:
-        cluster.stop_run(pcode)
-'''                    
-def run_command_on_all_specs(cspec_path, permuter_command,stdout, cluster):
-    spec_dir = os.path.dirname(cspec_path)
-    file_or_dirnames = os.listdir(spec_dir)
-    cspec_paths = []
-    for entry in file_or_dirnames:
-        full_path = "{0}/{1}".format(spec_dir,entry)
-        if (os.path.isfile(full_path) and not(full_path.endswith("~"))):
-            f = open(full_path, 'r')
-            header = f.readline()
-            f.close()
-            if (header.startswith("#cspec")):
-                cspec_paths.append(full_path)
-    for path in cspec_paths:
-        command = "python permuter.py {0} {1}".format(permuter_command, path)
-        stdout.println("-------------------------------------------------------------------")
-        #print command
-        cluster.execute_command(command) 
-'''
-     
-def retry_failed_runs(cluster_runs, cluster, run_states, stdout):
-    logging.info('LAUNCHING incomplete runs')
-    for pcode in cluster_runs.run_perm_codes_list:
-        if cluster.is_running(pcode):
-            stdout("{0} left running".format(pcode))
-        elif cluster.is_waiting(pcode):
-            stdout("{0} left waiting".format(pcode))
-        elif run_states.state_names[run_states.run_states[pcode]] == "run complete":
-            stdout("{0} completed".format(pcode))
-        elif run_states.state_names[run_states.run_states[pcode]] == "run near complete":
-            stdout("{0} near complete".format(pcode))
-        else:
-            state_name = run_states.state_names[run_states.run_states[pcode]]
-            stdout("{0} {1} - retrying".format(pcode, state_name))
+    def collect(self, cluster_runs, cluster, stdout):
+        #warn_of_incomplete_runs(cluster_runs)
+        #logging.info('COLLECTING results')
+        stdout.println('creating pooled results files...')
+        resultsFiles = cluster.create_pooled_results_files(cluster_runs, stdout)
+        stdout.println('creating pooled results delta files...')
+        cluster.create_pooled_results_delta_files(resultsFiles)
+        stdout.println('creating pooled timings files...')
+        cluster.create_pooled_timings_files(cluster_runs)
+        stdout.println('creating ranked results files...')
+        cluster.create_ranked_results_files(cluster_runs)
+    
+    def stop_runs(self, cluster_runs, cluster):
+        logging.info('STOPPING runs that are still running or waiting')
+        for pcode in cluster_runs.run_perm_codes_list:
             cluster.stop_run(pcode)
-            if not (cluster.is_script_present(pcode)):
-                cluster.create_script(pcode)
-            cluster.delete_all_but_script(pcode)
-            cluster.launch(pcode)
-            time.sleep(cluster.get_time_delay())
-
-def launch_scripts(cluster_runs, cluster):
-    logging.info('LAUNCHING scripts')
-    for pcode in cluster_runs.run_perm_codes_list:
-        launch_script(pcode)
-        time.sleep(cluster.get_time_delay())
-        
-def launch_script(pcode, cluster):
-    cluster.delete_all_but_script(pcode)
-    cluster.launch(pcode)
+    '''                    
+    def run_command_on_all_specs(cspec_path, permuter_command,stdout, cluster):
+        spec_dir = os.path.dirname(cspec_path)
+        file_or_dirnames = os.listdir(spec_dir)
+        cspec_paths = []
+        for entry in file_or_dirnames:
+            full_path = "{0}/{1}".format(spec_dir,entry)
+            if (os.path.isfile(full_path) and not(full_path.endswith("~"))):
+                f = open(full_path, 'r')
+                header = f.readline()
+                f.close()
+                if (header.startswith("#cspec")):
+                    cspec_paths.append(full_path)
+        for path in cspec_paths:
+            command = "python permuter.py {0} {1}".format(permuter_command, path)
+            stdout.println("-------------------------------------------------------------------")
+            #print command
+            cluster.execute_command(command) 
+    '''
+         
+    def retry_failed_runs(self, cluster_runs, cluster, run_states, stdout):
+        logging.info('LAUNCHING incomplete runs')
+        for pcode in cluster_runs.run_perm_codes_list:
+            if cluster.is_running(pcode):
+                stdout("{0} left running".format(pcode))
+            elif cluster.is_waiting(pcode):
+                stdout("{0} left waiting".format(pcode))
+            elif run_states.state_names[run_states.run_states[pcode]] == "run complete":
+                stdout("{0} completed".format(pcode))
+            elif run_states.state_names[run_states.run_states[pcode]] == "run near complete":
+                stdout("{0} near complete".format(pcode))
+            else:
+                state_name = run_states.state_names[run_states.run_states[pcode]]
+                stdout("{0} {1} - retrying".format(pcode, state_name))
+                cluster.stop_run(pcode)
+                if not (cluster.is_script_present(pcode)):
+                    cluster.create_script(pcode)
+                cluster.delete_all_but_script(pcode)
+                cluster.launch(pcode)
+                time.sleep(cluster.get_time_delay())
     
-def generate_scripts(cluster_runs, cluster):
-    logging.info('GENERATING scripts')
-    for pcode in cluster_runs.run_perm_codes_list:
-        cluster.create_script(pcode)
-
-def clean_scripts(cluster_runs,cluster):
-    logging.info('CLEANING scripts')
-    for pcode in cluster_runs.run_perm_codes_list:
-        cluster.delete_script(pcode)
-
+    def launch_scripts(self, cluster_runs, cluster, run_states):
+        logging.info('LAUNCHING scripts')
+        for pcode in cluster_runs.run_perm_codes_list:
+            if run_states.is_ok_to_launch_run(pcode, cluster):
+                self.launch_script(pcode, cluster)
+                time.sleep(cluster.get_time_delay())
             
-def preview_scripts(cluster_runs):
-    logging.info("PREVIEWING scripts")
-    cscript = cluster_runs.get_first_script()
-    cscript.preview()
-
-def count_scripts(cluster_runs, stdout):
-    logging.info("COUNTING scripts")
-    count = cluster_runs.get_permutation_count()
-    stdout.println('{0} scripts in play'.format(count))
-
-
-def clean_results(cluster_runs, cluster):
-    for pcode in cluster_runs.run_perm_code_list:
-        cluster.delete_results(pcode)
+    def launch_script(self, pcode, cluster):
+        cluster.delete_all_but_script(pcode)
+        cluster.launch(pcode)
+        
+    def generate_scripts(self, cluster_runs, cluster):
+        logging.info('GENERATING scripts')
+        for pcode in cluster_runs.run_perm_codes_list:
+            cluster.create_script(pcode)
     
-def clean_pooled_results(cluster_runs, cluster):
-    cluster.delete_pooled_results()
-    cluster.delete_pooled_results_delta_file()
-    cluster.delete_pooled_results_timings_file()
-    cluster.delete_ranked_results_file()
+    def clean_scripts(self, cluster_runs,cluster):
+        logging.info('CLEANING scripts')
+        for pcode in cluster_runs.run_perm_codes_list:
+            cluster.delete_script(pcode)
+    
+                
+    def preview_scripts(self, cluster_runs):
+        logging.info("PREVIEWING scripts")
+        cscript = cluster_runs.get_first_script()
+        cscript.preview()
+    
+    def count_scripts(self, cluster_runs, stdout):
+        logging.info("COUNTING scripts")
+        count = cluster_runs.get_permutation_count()
+        stdout.println('{0} scripts in play'.format(count))
+    
+    
+    def clean_results(self, cluster_runs, cluster):
+        for pcode in cluster_runs.run_perm_code_list:
+            cluster.delete_results(pcode)
+        
+    def clean_pooled_results(self, cluster_runs, cluster):
+        cluster.delete_pooled_results()
+        cluster.delete_pooled_results_delta_file()
+        cluster.delete_pooled_results_timings_file()
+        cluster.delete_ranked_results_file()
     
     
     

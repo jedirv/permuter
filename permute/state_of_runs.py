@@ -203,7 +203,7 @@ class StateOfRuns(object):
         self.state_cause['running'] = ""
         self.state_todos['running'] = ''
 
-        self.state_names['waiting'] = 'waiting'
+        self.state_names['waiting'] = 'waiting in queue'
         self.state_cause['waiting'] = ""
         self.state_todos['waiting'] = ''
 
@@ -317,7 +317,7 @@ class StateOfRuns(object):
                     run_state_inconsistent_count = run_state_inconsistent_count + 1
                 elif state_name == 'running':
                     running_count = running_count + 1
-                elif state_name == 'waiting':
+                elif state_name == 'waiting in queue':
                     waiting_count = waiting_count + 1
                 elif state_name == 'invoke error':
                     invoke_error_count = invoke_error_count + 1
@@ -336,7 +336,7 @@ class StateOfRuns(object):
         
         stdout.println("")          
         cspec_name = cluster_runs.cspec.cspec_name
-        message = "{0}({1})\t".format(cspec_name, total_count)
+        message = "{0}\t-\t{1} runs total\n".format(cspec_name, total_count)
         
         if script_missing_count != 0:
             message = "{0}scripts missing: {1}\n".format(message, script_missing_count)
@@ -345,9 +345,9 @@ class StateOfRuns(object):
         if running_count != 0:
             message = "{0}running: {1}\n".format(message, running_count)
         if waiting_count != 0:
-            message = "{0}waiting: {1}\n".format(message, waiting_count)
+            message = "{0}runs waiting in queue: {1}\n".format(message, waiting_count)
         if run_near_complete_count != 0:
-            message = "{0}near complete: {1}\n".format(message, run_near_complete_count)
+            message = "{0}runs near complete: {1}\n".format(message, run_near_complete_count)
         if run_complete_count != 0:
             message = "{0}complete: {1}\n".format(message, run_complete_count)
         if output_missing_count != 0:
@@ -365,7 +365,7 @@ class StateOfRuns(object):
 
     def is_ok_to_launch_all(self,cluster_runs, cluster):
         result = True
-        for pcode in cluster_runs.run_perm_code_list:
+        for pcode in cluster_runs.run_perm_codes_list:
             if not(self.is_ok_to_launch_run(pcode, cluster)):
                 result = False
         return result

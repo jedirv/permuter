@@ -57,7 +57,7 @@ class TestStateOfRuns(unittest.TestCase):
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
-        self.assertTrue(stdout.lines[0] == 'NA\tl_A_n_1_trial_1\tscript missing\t-> launch\n')
+        self.assertTrue(stdout.lines[0] == 'NA\tl_A_n_1_trial_1\tscript missing\n')
     # '-----'
     def test_assess_run_______after_cleanup(self):
         #pcode = 'l_A_n_1_trial_1'
@@ -636,7 +636,7 @@ class TestStateOfRuns(unittest.TestCase):
         
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == 'baz(4)\tnear complete: 1\n')
+        self.assertTrue(stdout.lines[1] == 'baz(4)\truns near complete: 1\n')
         self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
         
         stdout.lines = []
