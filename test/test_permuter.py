@@ -4,7 +4,6 @@ Created on Dec 12, 2013
 @author: admin-jed
 '''
 import unittest, os
-import mock_cluster_system
 from permute import cluster_spec
 from permute import permuter
 from permute import permutation_driver

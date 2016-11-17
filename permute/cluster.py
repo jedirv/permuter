@@ -32,7 +32,7 @@ class Cluster(object):
     def create_script(self, pcode):
         cscript = self.cluster_runs.get_script_for_run_permutation_code(pcode)
         self.scripts[pcode] = cscript
-        cscript.persist()
+        cscript.generate()
         return cscript
         
     def delete_script(self, pcode):
@@ -53,7 +53,8 @@ class Cluster(object):
             result_dir = self.cluster_runs.result_dir_for_perm_code_map(pcode)
             if not os.path.exists(result_dir):
                 os.makedirs(result_dir)
-            cscript.launch()
+            self.stdout.println("launching run for {0}".format(pcode))
+            cscript.launch(self)
     #
     # INVOKE_LOG
     #
@@ -395,9 +396,9 @@ class Cluster(object):
             return acct_log.get_failure_reason()
         return 'NA'
         
-    def __init__(self, cluster_runs):
+    def __init__(self, cluster_runs, stdout):
         self.cluster_runs = cluster_runs
-        self.stdout = stdout.Stdout()
+        self.stdout = stdout
         self.scripts = {}
         self.invoke_logs = {}
         self.qacct_logs = {}

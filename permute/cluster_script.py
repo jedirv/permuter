@@ -22,7 +22,7 @@ class ClusterScript(PermutationDriverFile):
     def generate(self):
         if (not(os.path.isdir(self.script_dir))):
             os.makedirs(self.script_dir)
-        print("  generating script file: {0}".format(self.pathname))
+        self.stdout.println("generating script file: {0}".format(self.pathname))
         f = open(self.pathname, 'w')
         f.write("#!/bin/csh\n")
         f.write("#\n")
@@ -51,18 +51,18 @@ class ClusterScript(PermutationDriverFile):
         f.close()  
     
     def exists(self):
-        if (self.cluster_system.exists(self.pathname)):
+        if (os.path.exists(self.pathname)):
             return True
         return False      
     
     def get_last_modification_time(self):
         if (self.exists()):
-            return self.cluster_system.get_last_modification_time(self.pathname)
+            return os.path.getmtime(self.pathname)
         else:
             return 'NA'
         
     def preview(self):
-        self.pathname = "junk.sh"
+        #self.pathname = "sample.sh"
         self.generate()
         f = open(self.pathname, 'r')
         lines = f.readlines()
@@ -72,24 +72,22 @@ class ClusterScript(PermutationDriverFile):
         f.close()
         os.unlink(self.pathname)
         
-    def launch(self):
+    def launch(self, cluster):
         try: 
-            cluster_system = self.cluster_system
-            starting_dir = cluster_system.getcwd()
-            cluster_system.chdir(self.script_dir)
-            print("calling qsub {0}".format(self.pathname))
+            starting_dir = os.getcwd()
+            os.chdir(self.script_dir)
             #args = "{0}.sh > {0}__invoke.txt".format(self.get_job_file_name())
             #args = "{0} > {1}".format(self.pathname, self.stdout_capture_filepath)
             #print "args : {0}".format(args)  
             command = "qsub {0} > {1}".format(self.script_name, self.qsub_invoke_log)
-            cluster_system.execute_command(command) 
+            cluster.execute_command(command) 
             #subprocess.check_call(["qsub", self.pathname, ">" , self.stdout_capture_filepath])
             #subprocess.check_call(["qsub", args])
-            cluster_system.chdir(starting_dir)
+            os.chdir(starting_dir)
             
         except subprocess.CalledProcessError:
-            print("There was a problem invoking the script: {0}".format(self.pathname))
-            print("Return code was {0}".format(subprocess.CalledProcessError.returncode))
+            self.stdout.println("There was a problem invoking the script: {0}".format(self.pathname))
+            self.stdout.println("Return code was {0}".format(subprocess.CalledProcessError.returncode))
         
 def get_done_marker_filename():
     return "run_done_marker.txt"   

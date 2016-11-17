@@ -14,6 +14,7 @@ class MockCluster(object):
         cscript = self.cluster_runs.get_script_for_perm_code(pcode)
         self.scripts[pcode] = cscript
         self.scripts_mod_time[pcode] = get_time()
+        cscript.generate()
         return cscript
         
     #TESTED
@@ -176,6 +177,7 @@ class MockCluster(object):
             self.running_state[pcode] = "waiting"
             self.cluster_job_numbers[pcode] = self.run_number
             self.run_number = self.run_number + 1
+            self.stdout.println("launching run for {0}".format(pcode))
     
     def test_helper_set_ok_to_run(self, pcode):
         if self.running_state[pcode] == "waiting":
@@ -295,7 +297,7 @@ class MockCluster(object):
     def clean_out_dir(self,dirpath):
         pass
     
-    def __init__(self, cluster_runs):
+    def __init__(self, cluster_runs, stdout):
         '''
         Constructor
         '''
@@ -316,6 +318,7 @@ class MockCluster(object):
         self.invoke_errors = {}
         self.run_number = 1;
         self.cluster_job_numbers= {}
+        self.stdout = stdout
         
 def get_time():
     ticks = time.time()

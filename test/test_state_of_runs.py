@@ -5,7 +5,6 @@ Created on Oct 26, 2016
 '''
 import unittest
 from permute import cluster_spec
-from permute import permutations
 from permute import state_of_runs
 from permute import cluster_runs_info
 import mock_stdout
@@ -43,17 +42,19 @@ class TestStateOfRuns(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
         pcode = pcodes[0]
         states = state_of_runs.StateOfRuns()
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == '-----')
         
+        stdout.lines = []
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == 'baz(4)\tscripts missing: 1\n')
-        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz\t-\t4 runs total\n')
+        self.assertTrue(stdout.lines[2] == 'scripts missing: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -64,7 +65,7 @@ class TestStateOfRuns(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
         pcode = pcodes[0]
         cluster.create_script(pcode)
@@ -85,7 +86,7 @@ class TestStateOfRuns(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
         pcode = pcodes[0]
         cluster.create_script(pcode)
@@ -99,10 +100,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == 'S----')
         
+        stdout.lines = []
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == 'baz(4)\tscripts ready to run: 1\n')
-        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz\t-\t4 runs total\n')
+        self.assertTrue(stdout.lines[2] == 'scripts ready to run: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -114,7 +117,7 @@ class TestStateOfRuns(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
         pcode = pcodes[0]
         cluster.create_script(pcode)
@@ -128,10 +131,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == '-L---')
         
+        stdout.lines = []
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == 'baz(4)\trun state inconsistent: 1\n')
-        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz\t-\t4 runs total\n')
+        self.assertTrue(stdout.lines[2] == 'run state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -143,7 +148,7 @@ class TestStateOfRuns(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
         pcode = pcodes[0]
         cluster.create_script(pcode)
@@ -156,10 +161,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == 'SL---')
         
+        stdout.lines = []
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == 'baz(4)\trun state inconsistent: 1\n')
-        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz\t-\t4 runs total\n')
+        self.assertTrue(stdout.lines[2] == 'run state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -172,7 +179,7 @@ class TestStateOfRuns(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
         pcode = pcodes[0]
         cluster.create_script(pcode)
@@ -188,10 +195,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == '--B--')
         
+        stdout.lines = []
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == 'baz(4)\trun state inconsistent: 1\n')
-        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz\t-\t4 runs total\n')
+        self.assertTrue(stdout.lines[2] == 'run state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -204,7 +213,7 @@ class TestStateOfRuns(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
         pcode = pcodes[0]
         cluster.create_script(pcode)
@@ -219,10 +228,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == 'S-B--')
         
+        stdout.lines = []
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == 'baz(4)\trun state inconsistent: 1\n')
-        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz\t-\t4 runs total\n')
+        self.assertTrue(stdout.lines[2] == 'run state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -235,7 +246,7 @@ class TestStateOfRuns(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
         pcode = pcodes[0]
         cluster.create_script(pcode)
@@ -250,10 +261,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == '-LB--')
         
+        stdout.lines = []
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == 'baz(4)\trun state inconsistent: 1\n')
-        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz\t-\t4 runs total\n')
+        self.assertTrue(stdout.lines[2] == 'run state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -266,7 +279,7 @@ class TestStateOfRuns(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
         pcode = pcodes[0]
         cluster.create_script(pcode)
@@ -280,10 +293,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == 'SLB--')
         
+        stdout.lines = []
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == 'baz(4)\tinvoke error: 1\n')
-        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz\t-\t4 runs total\n')
+        self.assertTrue(stdout.lines[2] == 'invoke error: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -296,11 +311,16 @@ class TestStateOfRuns(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
         pcode = pcodes[0]
+        
         cluster.create_script(pcode)
+        self.assertTrue(stdout.lines[0] == 'generating script file: ./myRuns/baz/scripts/j0_l_A_n_1_trial_1.sh\n')
+        stdout.lines = []
         cluster.launch(pcode)
+        self.assertTrue(stdout.lines[0] == 'launching run for l_A_n_1_trial_1\n')
+        
         cluster.test_helper_set_ok_to_run(pcode)
         cluster.test_helper_set_run_finished_complete(pcode)
         cluster.delete_script(pcode)
@@ -310,10 +330,13 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == '---D-')
         
+        stdout.lines = []
         states.emit_state_summary(stdout, cluster_runs)
+        
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == 'baz(4)\trun state inconsistent: 1\n')
-        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz\t-\t4 runs total\n')
+        self.assertTrue(stdout.lines[2] == 'run state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -326,7 +349,7 @@ class TestStateOfRuns(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
         pcode = pcodes[0]
         cluster.create_script(pcode)
@@ -339,10 +362,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == 'S--D-')
         
+        stdout.lines = []
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == 'baz(4)\trun state inconsistent: 1\n')
-        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz\t-\t4 runs total\n')
+        self.assertTrue(stdout.lines[2] == 'run state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -355,7 +380,7 @@ class TestStateOfRuns(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
         pcode = pcodes[0]
         cluster.create_script(pcode)
@@ -368,10 +393,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == '-L-D-')
         
+        stdout.lines = []
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == 'baz(4)\trun state inconsistent: 1\n')
-        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz\t-\t4 runs total\n')
+        self.assertTrue(stdout.lines[2] == 'run state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -384,7 +411,7 @@ class TestStateOfRuns(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
         pcode = pcodes[0]
         cluster.create_script(pcode)
@@ -396,10 +423,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == 'SL-D-')
         
+        stdout.lines = []
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == 'baz(4)\toutput files missing: 1\n')
-        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz\t-\t4 runs total\n')
+        self.assertTrue(stdout.lines[2] == 'output files missing: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -412,7 +441,7 @@ class TestStateOfRuns(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
         pcode = pcodes[0]
         cluster.create_script(pcode)
@@ -427,10 +456,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == '--BD-')
         
+        stdout.lines = []
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == 'baz(4)\trun state inconsistent: 1\n')
-        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz\t-\t4 runs total\n')
+        self.assertTrue(stdout.lines[2] == 'run state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -443,7 +474,7 @@ class TestStateOfRuns(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
         pcode = pcodes[0]
         cluster.create_script(pcode)
@@ -457,10 +488,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == 'S-BD-')
         
+        stdout.lines = []
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == 'baz(4)\trun state inconsistent: 1\n')
-        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz\t-\t4 runs total\n')
+        self.assertTrue(stdout.lines[2] == 'run state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -473,7 +506,7 @@ class TestStateOfRuns(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
         pcode = pcodes[0]
         cluster.create_script(pcode)
@@ -487,10 +520,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == '-LBD-')
         
+        stdout.lines = []
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == 'baz(4)\trun state inconsistent: 1\n')
-        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz\t-\t4 runs total\n')
+        self.assertTrue(stdout.lines[2] == 'run state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -504,7 +539,7 @@ class TestStateOfRuns(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
         pcode = pcodes[0]
         cluster.create_script(pcode)
@@ -517,10 +552,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == 'SLBD-')
         
+        stdout.lines = []
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == 'baz(4)\trun state inconsistent: 1\n')
-        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz\t-\t4 runs total\n')
+        self.assertTrue(stdout.lines[2] == 'run state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -534,11 +571,15 @@ class TestStateOfRuns(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
         pcode = pcodes[0]
         cluster.create_script(pcode)
+        self.assertTrue(stdout.lines[0] == 'generating script file: ./myRuns/baz/scripts/j0_l_A_n_1_trial_1.sh\n')
+        stdout.lines = []
         cluster.launch(pcode)
+        self.assertTrue(stdout.lines[0] == 'launching run for l_A_n_1_trial_1\n')
+        stdout.lines = []
         cluster.test_helper_set_ok_to_run(pcode)
         cluster.test_helper_set_run_finished_complete(pcode)
         cluster.delete_script(pcode)
@@ -550,8 +591,9 @@ class TestStateOfRuns(unittest.TestCase):
         
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == 'baz(4)\tpossible stale results: 1\n')
-        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz\t-\t4 runs total\n')
+        self.assertTrue(stdout.lines[2] == 'possible stale results: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -564,7 +606,7 @@ class TestStateOfRuns(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
         pcode = pcodes[0]
         cluster.create_script(pcode)
@@ -577,10 +619,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == 'S---O')
         
+        stdout.lines = []
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == 'baz(4)\tpossible stale results: 1\n')
-        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz\t-\t4 runs total\n')
+        self.assertTrue(stdout.lines[2] == 'possible stale results: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -593,7 +637,7 @@ class TestStateOfRuns(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
         pcode = pcodes[0]
         cluster.create_script(pcode)
@@ -606,10 +650,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == '-L--O')
         
+        stdout.lines = []
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == 'baz(4)\tpossible stale results: 1\n')
-        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz\t-\t4 runs total\n')
+        self.assertTrue(stdout.lines[2] == 'possible stale results: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -622,7 +668,7 @@ class TestStateOfRuns(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
         pcode = pcodes[0]
         cluster.create_script(pcode)
@@ -634,10 +680,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == 'SL--O')
         
+        stdout.lines = []
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == 'baz(4)\truns near complete: 1\n')
-        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz\t-\t4 runs total\n')
+        self.assertTrue(stdout.lines[2] == 'runs near complete: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -650,7 +698,7 @@ class TestStateOfRuns(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
         pcode = pcodes[0]
         cluster.create_script(pcode)
@@ -665,10 +713,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == '--B-O')
         
+        stdout.lines = []
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == 'baz(4)\tpossible stale results: 1\n')
-        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz\t-\t4 runs total\n')
+        self.assertTrue(stdout.lines[2] == 'possible stale results: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -681,7 +731,7 @@ class TestStateOfRuns(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
         pcode = pcodes[0]
         cluster.create_script(pcode)
@@ -695,10 +745,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == 'S-B-O')
         
+        stdout.lines = []
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == 'baz(4)\tpossible stale results: 1\n')
-        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz\t-\t4 runs total\n')
+        self.assertTrue(stdout.lines[2] == 'possible stale results: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -711,7 +763,7 @@ class TestStateOfRuns(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
         pcode = pcodes[0]
         cluster.create_script(pcode)
@@ -725,10 +777,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == '-LB-O')
         
+        stdout.lines = []
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == 'baz(4)\tpossible stale results: 1\n')
-        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz\t-\t4 runs total\n')
+        self.assertTrue(stdout.lines[2] == 'possible stale results: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -741,7 +795,7 @@ class TestStateOfRuns(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
         pcode = pcodes[0]
         cluster.create_script(pcode)
@@ -754,10 +808,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == 'SLB-O')
         
+        stdout.lines = []
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == 'baz(4)\trun state inconsistent: 1\n')
-        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz\t-\t4 runs total\n')
+        self.assertTrue(stdout.lines[2] == 'run state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -770,7 +826,7 @@ class TestStateOfRuns(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
         pcode = pcodes[0]
         cluster.create_script(pcode)
@@ -783,10 +839,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == '---DO')
         
+        stdout.lines = []
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == 'baz(4)\tpossible stale results: 1\n')
-        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz\t-\t4 runs total\n')
+        self.assertTrue(stdout.lines[2] == 'possible stale results: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -800,7 +858,7 @@ class TestStateOfRuns(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
         pcode = pcodes[0]
         cluster.create_script(pcode)
@@ -812,10 +870,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == 'S--DO')
         
+        stdout.lines = []
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == 'baz(4)\tpossible stale results: 1\n')
-        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz\t-\t4 runs total\n')
+        self.assertTrue(stdout.lines[2] == 'possible stale results: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -828,7 +888,7 @@ class TestStateOfRuns(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
         pcode = pcodes[0]
         cluster.create_script(pcode)
@@ -840,10 +900,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == '-L-DO')
         
+        stdout.lines = []
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == 'baz(4)\tpossible stale results: 1\n')
-        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz\t-\t4 runs total\n')
+        self.assertTrue(stdout.lines[2] == 'possible stale results: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -856,7 +918,7 @@ class TestStateOfRuns(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
         pcode = pcodes[0]
         cluster.create_script(pcode)
@@ -870,10 +932,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == '--BDO')
         
+        stdout.lines = []
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == 'baz(4)\tpossible stale results: 1\n')
-        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz\t-\t4 runs total\n')
+        self.assertTrue(stdout.lines[2] == 'possible stale results: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -886,7 +950,7 @@ class TestStateOfRuns(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
         pcode = pcodes[0]
         cluster.create_script(pcode)
@@ -899,10 +963,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == 'S-BDO')
         
+        stdout.lines = []
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == 'baz(4)\tpossible stale results: 1\n')
-        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz\t-\t4 runs total\n')
+        self.assertTrue(stdout.lines[2] == 'possible stale results: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -915,7 +981,7 @@ class TestStateOfRuns(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
         pcode = pcodes[0]
         cluster.create_script(pcode)
@@ -928,10 +994,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == '-LBDO')
         
+        stdout.lines = []
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == 'baz(4)\tpossible stale results: 1\n')
-        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz\t-\t4 runs total\n')
+        self.assertTrue(stdout.lines[2] == 'possible stale results: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -944,7 +1012,7 @@ class TestStateOfRuns(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
         pcode = pcodes[0]
         cluster.create_script(pcode)
@@ -956,10 +1024,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == 'SLBDO')
         
+        stdout.lines = []
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == 'baz(4)\tpossible stale results: 1\n')
-        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz\t-\t4 runs total\n')
+        self.assertTrue(stdout.lines[2] == 'possible stale results: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -973,7 +1043,7 @@ class TestStateOfRuns(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
         pcode = pcodes[0]
         cluster.create_script(pcode)
@@ -984,10 +1054,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.assess_run(pcode, cluster_runs, cluster)
         self.assertTrue(states.run_states[pcode] == 'SL-DO')
         
+        stdout.lines = []
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
-        self.assertTrue(stdout.lines[1] == 'baz(4)\tcomplete: 1\n')
-        self.assertTrue(stdout.lines[2] == 'state undefined: 3\n')
+        self.assertTrue(stdout.lines[1] == 'baz\t-\t4 runs total\n')
+        self.assertTrue(stdout.lines[2] == 'complete: 1\n')
+        self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
@@ -1000,7 +1072,7 @@ class TestStateOfRuns(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
         pcode = pcodes[0]
         cluster.create_script(pcode)
@@ -1021,7 +1093,7 @@ class TestStateOfRuns(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
         pcode = pcodes[0]
         cluster.create_script(pcode)

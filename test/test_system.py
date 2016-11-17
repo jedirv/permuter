@@ -1,7 +1,6 @@
 import unittest, os
 from permute import cluster_spec
 from permute import cluster_script
-from permute import permuter
 from permute import permutation_driver
 from permute import cluster_runs_info
 import mock_stdout
@@ -38,11 +37,12 @@ class TestSystem(unittest.TestCase):
         lines.append("<replace>:pretty[2]=two\n")
         lines.append("<replace>:pretty[3]=three\n")
 
-        lines.append("<replace>:root=/nfs/foo/bar\n")
-        lines.append("<replace>:x_dir=<root>/(letter)/<config[(letter)]>/(number)\n")
-        lines.append("<replace>:algs_dir=/nfs/algs\n")
-        lines.append("<replace>:tools_dir=<algs_dir>/tools\n")
-        lines.append("<replace>:outfile_root=<pretty[(number)]>__TEST\n")
+        #lines.append("<replace>:root=.\n")
+        #lines.append("<replace>:root=/nfs/foo/bar\n")
+        #lines.append("<replace>:x_dir=<root>/(letter)/<config[(letter)]>/(number)\n")
+        #lines.append("<replace>:algs_dir=/nfs/algs\n")
+        #lines.append("<replace>:tools_dir=<algs_dir>/tools\n")
+        #lines.append("<replace>:outfile_root=<pretty[(number)]>__TEST\n")
 
         lines.append("root_dir:./myRuns\n")
 
@@ -58,34 +58,34 @@ class TestSystem(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         perm_driver = permutation_driver.PermutationDriver(self.lines, "/foo/bar/baz.cspec", stdout, cluster)
         perm_driver.preview_scripts(cluster_runs)
-        self.assertTrue(stdout.lines[0] == "#!/bin/csh\n")
-        self.assertTrue(stdout.lines[1] == "#\n")
-        self.assertTrue(stdout.lines[2] == "#$ -q eecs,eecs1,eecs,share\n")
-        self.assertTrue(stdout.lines[3] == "#$ -M someone@gmail.com\n")
-        self.assertTrue(stdout.lines[4] == "#$ -m beas\n")
-        self.assertTrue(stdout.lines[5] == "#$ -N baz-j100_an_cat_l_aa_number_1_s_300_trial_1\n")
-        self.assertTrue(stdout.lines[6] == "#\n")
-        self.assertTrue(stdout.lines[7] == "# send stdout and stderror to this file\n")
-        self.assertTrue(stdout.lines[8] == "#$ -o j100_an_cat_l_aa_number_1_s_300_trial_1.out\n")
-        self.assertTrue(stdout.lines[9] == "#$ -e j100_an_cat_l_aa_number_1_s_300_trial_1.err\n")
-        self.assertTrue(stdout.lines[10] == "#\n")
-        self.assertTrue(stdout.lines[11] == "#see where the job is being run\n")
-        self.assertTrue(stdout.lines[12] == "hostname\n")
-        self.assertTrue(stdout.lines[13] == "echo AAA 1 300 > ./myRuns/baz/results/an_cat_l_aa_number_1_s_300_trial_1/AAA_1_one.txt\n")
+        self.assertTrue(stdout.lines[0] == "generating script file: ./myRuns/baz/scripts/j100_an_cat_l_aa_number_1_s_300_trial_1.sh\n")
+        self.assertTrue(stdout.lines[1] == "#!/bin/csh\n")
+        self.assertTrue(stdout.lines[2] == "#\n")
+        self.assertTrue(stdout.lines[3] == "#$ -q eecs,eecs1,eecs,share\n")
+        self.assertTrue(stdout.lines[4] == "#$ -M someone@gmail.com\n")
+        self.assertTrue(stdout.lines[5] == "#$ -m beas\n")
+        self.assertTrue(stdout.lines[6] == "#$ -N baz-j100_an_cat_l_aa_number_1_s_300_trial_1\n")
+        self.assertTrue(stdout.lines[7] == "#\n")
+        self.assertTrue(stdout.lines[8] == "# send stdout and stderror to this file\n")
+        self.assertTrue(stdout.lines[9] == "#$ -o j100_an_cat_l_aa_number_1_s_300_trial_1.out\n")
+        self.assertTrue(stdout.lines[10] == "#$ -e j100_an_cat_l_aa_number_1_s_300_trial_1.err\n")
+        self.assertTrue(stdout.lines[11] == "#\n")
+        self.assertTrue(stdout.lines[12] == "#see where the job is being run\n")
+        self.assertTrue(stdout.lines[13] == "hostname\n")
+        self.assertTrue(stdout.lines[14] == "echo AAA 1 300 > ./myRuns/baz/results/an_cat_l_aa_number_1_s_300_trial_1/AAA_1_one.txt\n")
         done_file = cluster_script.get_done_marker_filename()
         touch_string = "touch ./myRuns/baz/results/an_cat_l_aa_number_1_s_300_trial_1/{0}\n".format(done_file)
-        self.assertTrue(stdout.lines[14] == touch_string)
+        self.assertTrue(stdout.lines[15] == touch_string)
 
       
     def test_generate(self):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         perm_driver = permutation_driver.PermutationDriver(self.lines, "/foo/bar/baz.cspec",stdout, cluster)
         perm_driver.generate_scripts(cluster_runs, cluster)
         pcodes = cluster_runs.run_perm_codes_list
@@ -147,11 +147,11 @@ class TestSystem(unittest.TestCase):
         lines.append("<replace>:pretty[2]=two\n")
         lines.append("<replace>:pretty[3]=three\n")
 
-        lines.append("<replace>:root=/nfs/foo/bar\n")
-        lines.append("<replace>:x_dir=<root>/(letter)/<config[(letter)]>/(number)\n")
-        lines.append("<replace>:algs_dir=/nfs/algs\n")
-        lines.append("<replace>:tools_dir=<algs_dir>/tools\n")
-        lines.append("<replace>:outfile_root=<pretty[(number)]>__TEST\n")
+        #lines.append("<replace>:root=/nfs/foo/bar\n")
+        #lines.append("<replace>:x_dir=<root>/(letter)/<config[(letter)]>/(number)\n")
+        #lines.append("<replace>:algs_dir=/nfs/algs\n")
+        #lines.append("<replace>:tools_dir=<algs_dir>/tools\n")
+        #lines.append("<replace>:outfile_root=<pretty[(number)]>__TEST\n")
 
         lines.append("root_dir:./myRuns\n")
 
@@ -165,7 +165,7 @@ class TestSystem(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         perm_driver = permutation_driver.PermutationDriver(self.lines, "/foo/bar/baz.cspec",stdout, cluster)
         perm_driver.generate_scripts(cluster_runs, cluster)
         pcodes = cluster_runs.run_perm_codes_list
@@ -216,7 +216,7 @@ class TestSystem(unittest.TestCase):
         lines.append('# using permutations like this:  <config[(month)]>\n')
         lines.append('#\n')
         lines.append('#\n')
-        lines.append('<replace>:root=/nfs/stak/students/i/irvine/python/cluster/test\n')
+        lines.append('<replace>:root=.\n')
         lines.append('#\n')
         lines.append('#  results_dir is where the generated results will be\n')
         lines.append('#\n')
@@ -241,22 +241,20 @@ class TestSystem(unittest.TestCase):
         lines = self.get_lines_for_simpleCaseCspec()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec", stdout, cluster)
         pdriver.run_command('count','')
         self.assertTrue(stdout.lines[0] == "4 scripts in play\n")
         self.assertTrue(len(stdout.lines) == 1)
         
    
-    def test_status_commands(self):
+    def test_status_clean_slate(self):
         stdout = mock_stdout.MockStdout()
         lines = self.get_lines_for_simpleCaseCspec()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
-        cluster = mock_cluster.MockCluster(cluster_runs)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec", stdout, cluster)
-        
-        
         
         
         # (clean slate) summary 
@@ -285,13 +283,27 @@ class TestSystem(unittest.TestCase):
         stdout.lines = []
         pdriver.run_command('errors','')
         self.assertTrue(len(stdout.lines) == 0)
+        
     
-    
+    def test_status_generate(self):
+        stdout = mock_stdout.MockStdout()
+        lines = self.get_lines_for_simpleCaseCspec()
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout)
+        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
+        pdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec", stdout, cluster)
+            
         # GENERATE
     
         stdout.lines = []
         pdriver.run_command('gen','')
+        self.assertTrue(stdout.lines[0] == "generating script file: ./myRuns/baz/scripts/j0_x_1_trial_1.sh\n")
+        self.assertTrue(stdout.lines[1] == "generating script file: ./myRuns/baz/scripts/j1_x_2_trial_1.sh\n")
+        self.assertTrue(stdout.lines[2] == "generating script file: ./myRuns/baz/scripts/j2_x_3_trial_1.sh\n")
+        self.assertTrue(stdout.lines[3] == "generating script file: ./myRuns/baz/scripts/j3_x_4_trial_1.sh\n")
+        self.assertTrue(len(stdout.lines) == 4)
         # (after gen) summary 
+        stdout.lines = []
         pdriver.run_command('summary','')
         self.assertTrue(stdout.lines[0] == "....\n")
         self.assertTrue(stdout.lines[1] == "baz\t-\t4 runs total\n")
@@ -318,11 +330,21 @@ class TestSystem(unittest.TestCase):
         self.assertTrue(len(stdout.lines) == 0)
     
     
-    
+    def test_status_test_launch(self):
+        stdout = mock_stdout.MockStdout()
+        lines = self.get_lines_for_simpleCaseCspec()
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout)
+        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
+        pdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec", stdout, cluster)
+                
         # TEST LAUNCH
     
+        pdriver.run_command('gen','')
         stdout.lines = []
         pdriver.run_command('test_launch','')
+        self.assertTrue(stdout.lines[0] == "launching run for x_1_trial_1\n")
+        self.assertTrue(len(stdout.lines) == 1)
         # (after test_launch) summary 
         stdout.lines = []
         pdriver.run_command('summary','')
@@ -353,11 +375,24 @@ class TestSystem(unittest.TestCase):
         
         
         
-        
+    def test_status_launch_after_test_launch(self):
+        stdout = mock_stdout.MockStdout()
+        lines = self.get_lines_for_simpleCaseCspec()
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout)
+        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
+        pdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec", stdout, cluster)
+                
         
         # LAUNCH SHOULD IGNORE THE ONE THAT'S ALREADY WAITING AND LAUNCH THE OTHERS
+        pdriver.run_command('gen','')
+        pdriver.run_command('test_launch','') 
+        
         stdout.lines = []
         pdriver.run_command('launch','')
+        self.assertTrue(stdout.lines[0] == "launching run for x_2_trial_1\n")
+        self.assertTrue(stdout.lines[1] == "launching run for x_3_trial_1\n")
+        self.assertTrue(stdout.lines[2] == "launching run for x_4_trial_1\n")
         # (after launch) summary 
         stdout.lines = []
         pdriver.run_command('summary','')
@@ -387,6 +422,16 @@ class TestSystem(unittest.TestCase):
         self.assertTrue(len(stdout.lines) == 0)
     
 
+    def test_status_running(self):
+        stdout = mock_stdout.MockStdout()
+        lines = self.get_lines_for_simpleCaseCspec()
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout)
+        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
+        pdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec", stdout, cluster)
+                
+        pdriver.run_command('gen','')
+        pdriver.run_command('launch','')
         # GET THEM RUNNING
         # engage runs
         cluster.test_helper_set_ok_to_run('x_1_trial_1')
@@ -420,7 +465,7 @@ class TestSystem(unittest.TestCase):
         self.assertTrue(len(stdout.lines) == 0)
     
     
-    
+    left off here - make this its own test
         # CREATE RESULTS WITHOUT DONE MARKER
         cluster.test_helper_set_run_results_without_done_marker('x_1_trial_1')
         # (after results created) summary 

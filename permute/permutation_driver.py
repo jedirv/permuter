@@ -27,10 +27,7 @@ class PermutationDriver(object):
             self.generate_scripts(cluster_runs, self.cluster)
         elif (permute_command == "launch"):
             run_states.assess_all_runs(self.cluster_runs, self.cluster)
-            if (run_states.is_ok_to_launch_all(cluster_runs, self.cluster)):
-                self.stdout.println("Permutation jobs still running.  Use 'stop' to stop them before 'launch' to avoid replicated jobs")
-            else:
-                self.launch_scripts(cluster_runs, self.cluster, run_states)
+            self.launch_scripts(cluster_runs, self.cluster, run_states)
         #elif (permute_command == "auto"):
         #    run_states.assess_all_runs(self.cluster_runs, self.cluster)
         #    if (run_states.is_ok_to_launch_all(cluster_runs, self.cluster)):

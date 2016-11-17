@@ -8,7 +8,6 @@ from permute import pooled_results_file
 from permute import pooled_results_delta_file
 from permute import pooled_timings_file
 from permute import cluster_spec
-import mock_cluster_system
 import mock_stdout
 
 class TestPooledResultsFile(unittest.TestCase):
@@ -111,7 +110,6 @@ class TestPooledResultsFile(unittest.TestCase):
         lines.append("scores_to:./collected_results\n")
         lines.append("scores_y_axis:letter\n")
         lines.append("scores_x_axis:number,animal\n")
-        mc_system = mock_cluster_system.MockClusterSystem()
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout)
         dirname = pooled_results_file.generate_target_dirname(cspec)
@@ -188,8 +186,7 @@ class TestPooledResultsFile(unittest.TestCase):
         self.assertTrue(code == 'res_userDay_s_300')
         
     def test_get_result_from_file(self):
-        mc_system = mock_cluster_system.MockClusterSystem()
-        f = mc_system.open_file('./sample_result_file.txt','w')
+        f = open('./sample_result_file.txt','w')
         f.write('recall,precision,anomaly,rank,auc,ap\n')
         f.write('0,0,143001,1564,0.87682755275285,0.000748909371611072\n')
         f.write('0.00882175431075814,0,116061,1897,0,0\n')
