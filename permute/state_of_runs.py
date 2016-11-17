@@ -93,7 +93,7 @@ class StateOfRuns(object):
         self.state_todos['---D-'] = 'retry'
         
         self.state_names['S--D-'] = 'inconsistent'
-        self.state_cause['S--D-'] = 'done marker found, but no evidence of script being invoked - stale results?'
+        self.state_cause['S--D-'] = 'done marker found, but no evidence of script being invoked'
         self.state_todos['S--D-'] = 'retry'
         
         self.state_names['-L-D-'] = 'inconsistent'
@@ -150,7 +150,7 @@ class StateOfRuns(object):
         self.state_cause['-LB-O'] = 'output exists, done marker missing, script missing'
         self.state_todos['-LB-O'] = 'retry if unexpected'
         
-        self.state_names['SLB-O'] = 'inconsistent'
+        self.state_names['SLB-O'] = 'stale results?'
         self.state_cause['SLB-O'] = 'output exists, done marker missing and evidence of invoke error'
         self.state_todos['SLB-O'] = 'retry if unexpected'
         

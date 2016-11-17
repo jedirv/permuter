@@ -465,7 +465,22 @@ class TestSystem(unittest.TestCase):
         self.assertTrue(len(stdout.lines) == 0)
     
     
-    left off here - make this its own test
+    def test_status_results_no_done_marker(self):
+        stdout = mock_stdout.MockStdout()
+        lines = self.get_lines_for_simpleCaseCspec()
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout)
+        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
+        pdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec", stdout, cluster)
+                
+        pdriver.run_command('gen','')
+        pdriver.run_command('launch','')
+        # GET THEM RUNNING
+        # engage runs
+        cluster.test_helper_set_ok_to_run('x_1_trial_1')
+        cluster.test_helper_set_ok_to_run('x_2_trial_1')
+        cluster.test_helper_set_ok_to_run('x_3_trial_1')
+        cluster.test_helper_set_ok_to_run('x_4_trial_1')
         # CREATE RESULTS WITHOUT DONE MARKER
         cluster.test_helper_set_run_results_without_done_marker('x_1_trial_1')
         # (after results created) summary 
@@ -484,6 +499,7 @@ class TestSystem(unittest.TestCase):
         self.assertTrue(stdout.lines[2] == "3\tx_3_trial_1\trunning\n")
         self.assertTrue(stdout.lines[3] == "4\tx_4_trial_1\trunning\n")
         # (after results created) pending
+        stdout.lines = []
         pdriver.run_command('pending','')
         self.assertTrue(stdout.lines[0] == "1\tx_1_trial_1\trun near complete\n")
         self.assertTrue(stdout.lines[1] == "2\tx_2_trial_1\trunning\n")
@@ -495,21 +511,137 @@ class TestSystem(unittest.TestCase):
         self.assertTrue(len(stdout.lines) == 0)
         
         
+    def test_status_problems1(self):
+        stdout = mock_stdout.MockStdout()
+        lines = self.get_lines_for_simpleCaseCspec()
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout)
+        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
+        pdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec", stdout, cluster)
+                
+        pdriver.run_command('gen','')
+        pdriver.run_command('launch','')
+        # GET THEM RUNNING
+        # engage runs
+        cluster.test_helper_set_ok_to_run('x_1_trial_1')
+        cluster.test_helper_set_ok_to_run('x_2_trial_1')
+        cluster.test_helper_set_ok_to_run('x_3_trial_1')
+        cluster.test_helper_set_ok_to_run('x_4_trial_1')
+        # CREATE RESULTS AND DONE MARKER
+        cluster.test_helper_set_run_finished_complete('x_1_trial_1')
+        cluster.test_helper_set_run_finished_complete('x_2_trial_1')
+        cluster.test_helper_set_run_finished_complete('x_3_trial_1')
+        cluster.test_helper_set_run_finished_complete('x_4_trial_1')
         
-    # cause one run to be broken by missing results
-    # cause one run to have missing done marker
-    # cause one run to have block error
-    # cause one run to have missing script
-    # (after these errors) summary 
-    # (after these errors) stat 
-    # (after these errors) pending
-    # (after these errors) errors
+        # cause one run to be broken by missing results - "results_missing"
+        cluster.delete_results('x_1_trial_1')
+        # cause one run to have missing invoke_log    "stale_results?"
+        cluster.delete_invoke_log('x_2_trial_1')
+        # cause one run to have block error        "stale_results?"
+        cluster.test_helper_set_invoke_error('x_3_trial_1')
+        # cause one run to have missing script     "stale_results?"
+        cluster.delete_script('x_4_trial_1')
     
-    # retry
-    # (after retry) summary 
-    # (after retry) stat 
-    # (after retry) pending
-    # (after retry) errors
+        # (after these errors) summary 
+        stdout.lines = []
+        pdriver.run_command('summary','')
+        self.assertTrue(stdout.lines[0] == "....\n")
+        self.assertTrue(stdout.lines[1] == "baz\t-\t4 runs total\n")
+        self.assertTrue(stdout.lines[2] == "output files missing: 1\n")
+        self.assertTrue(stdout.lines[3] == "possible stale results: 3\n")
+        self.assertTrue(len(stdout.lines) == 4)
+        # (after these errors) stat 
+        stdout.lines = []
+        pdriver.run_command('stat','')
+        self.assertTrue(stdout.lines[0] == "1\tx_1_trial_1\tresults missing\t(done marker found, but no results)\t-> troubleshoot, then retry\n")
+        self.assertTrue(stdout.lines[1] == "2\tx_2_trial_1\tstale results?\t(output exists, invoke log missing)\t-> retry if unexpected\n")
+        self.assertTrue(stdout.lines[2] == "3\tx_3_trial_1\tstale results?\t(results present but evidence of invoke error)\t-> retry if unexpected\n")
+        self.assertTrue(stdout.lines[3] == "4\tx_4_trial_1\tstale results?\t(output exists, script missing)\t-> retry if unexpected\n")
+        # (after these errors) pending
+        stdout.lines = []
+        pdriver.run_command('pending','')
+        self.assertTrue(stdout.lines[0] == "1\tx_1_trial_1\tresults missing\t(done marker found, but no results)\t-> troubleshoot, then retry\n")
+        self.assertTrue(stdout.lines[1] == "2\tx_2_trial_1\tstale results?\t(output exists, invoke log missing)\t-> retry if unexpected\n")
+        self.assertTrue(stdout.lines[2] == "3\tx_3_trial_1\tstale results?\t(results present but evidence of invoke error)\t-> retry if unexpected\n")
+        self.assertTrue(stdout.lines[3] == "4\tx_4_trial_1\tstale results?\t(output exists, script missing)\t-> retry if unexpected\n")
+        # (after these errors) errors
+        stdout.lines = []
+        pdriver.run_command('errors','')
+        self.assertTrue(stdout.lines[0] == "1\tx_1_trial_1\tresults missing\t(done marker found, but no results)\t-> troubleshoot, then retry\n")
+        self.assertTrue(stdout.lines[1] == "2\tx_2_trial_1\tstale results?\t(output exists, invoke log missing)\t-> retry if unexpected\n")
+        self.assertTrue(stdout.lines[2] == "3\tx_3_trial_1\tstale results?\t(results present but evidence of invoke error)\t-> retry if unexpected\n")
+        self.assertTrue(stdout.lines[3] == "4\tx_4_trial_1\tstale results?\t(output exists, script missing)\t-> retry if unexpected\n")      
+        
+    
+        
+        
+    def test_status_retry(self):
+        stdout = mock_stdout.MockStdout()
+        lines = self.get_lines_for_simpleCaseCspec()
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout)
+        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
+        pdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec", stdout, cluster)
+                
+        pdriver.run_command('gen','')
+        pdriver.run_command('launch','')
+        # GET THEM RUNNING
+        # engage runs
+        cluster.test_helper_set_ok_to_run('x_1_trial_1')
+        cluster.test_helper_set_ok_to_run('x_2_trial_1')
+        cluster.test_helper_set_ok_to_run('x_3_trial_1')
+        cluster.test_helper_set_ok_to_run('x_4_trial_1')
+        # CREATE RESULTS AND DONE MARKER (except for first run)
+        
+        cluster.test_helper_set_run_finished_complete('x_2_trial_1')
+        cluster.test_helper_set_run_finished_complete('x_3_trial_1')
+        cluster.test_helper_set_run_finished_complete('x_4_trial_1')
+        
+        # cause one run to have missing invoke_log    "stale_results?"
+        cluster.delete_invoke_log('x_2_trial_1')
+        # cause one run to have block error        "stale_results?"
+        cluster.test_helper_set_invoke_error('x_3_trial_1')
+        # cause one run to have missing script     "stale_results?"
+        cluster.delete_script('x_4_trial_1')
+    
+        stdout.lines = []
+        pdriver.run_command("retry",'')
+        self.assertTrue(stdout.lines[0] == "x_1_trial_1 left running\n")
+        self.assertTrue(stdout.lines[1] == "x_2_trial_1 stale results? - retrying\n")
+        self.assertTrue(stdout.lines[2] == "launching run for x_2_trial_1\n")
+        self.assertTrue(stdout.lines[3] == "x_3_trial_1 stale results? - retrying\n")
+        self.assertTrue(stdout.lines[4] == "launching run for x_3_trial_1\n")
+        self.assertTrue(stdout.lines[5] == "x_4_trial_1 stale results? - retrying\n")
+        self.assertTrue(stdout.lines[6] == "generating script file: ./myRuns/baz/scripts/j3_x_4_trial_1.sh\n")
+        self.assertTrue(stdout.lines[7] == "launching run for x_4_trial_1\n")
+        # (after rery) summary 
+        stdout.lines = []
+        pdriver.run_command('summary','')
+        self.assertTrue(stdout.lines[0] == "....\n")
+        self.assertTrue(stdout.lines[1] == "baz\t-\t4 runs total\n")
+        self.assertTrue(stdout.lines[2] == "running: 1\n")
+        self.assertTrue(stdout.lines[3] == "runs waiting in queue: 3\n")
+        self.assertTrue(len(stdout.lines) == 4)
+        # (after retry) stat 
+        stdout.lines = []
+        pdriver.run_command('stat','')
+        self.assertTrue(stdout.lines[0] == "1\tx_1_trial_1\trunning\n")
+        self.assertTrue(stdout.lines[1] == "5\tx_2_trial_1\twaiting in queue\n")
+        self.assertTrue(stdout.lines[2] == "6\tx_3_trial_1\twaiting in queue\n")
+        self.assertTrue(stdout.lines[3] == "7\tx_4_trial_1\twaiting in queue\n")
+        # (after retry) pending
+        stdout.lines = []
+        pdriver.run_command('pending','')
+        self.assertTrue(stdout.lines[0] == "1\tx_1_trial_1\trunning\n")
+        self.assertTrue(stdout.lines[1] == "5\tx_2_trial_1\twaiting in queue\n")
+        self.assertTrue(stdout.lines[2] == "6\tx_3_trial_1\twaiting in queue\n")
+        self.assertTrue(stdout.lines[3] == "7\tx_4_trial_1\twaiting in queue\n")
+        # (after retry) errors
+        stdout.lines = []
+        pdriver.run_command('errors','')
+        self.assertTrue(len(stdout.lines) == 0)   
+        
+    
     
     # clean all but scripts, launch, engage one run
     # stop

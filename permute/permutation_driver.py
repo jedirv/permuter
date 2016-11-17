@@ -160,16 +160,16 @@ class PermutationDriver(object):
         logging.info('LAUNCHING incomplete runs')
         for pcode in cluster_runs.run_perm_codes_list:
             if cluster.is_running(pcode):
-                stdout("{0} left running".format(pcode))
+                stdout.println("{0} left running".format(pcode))
             elif cluster.is_waiting(pcode):
-                stdout("{0} left waiting".format(pcode))
+                stdout.println("{0} left waiting".format(pcode))
             elif run_states.state_names[run_states.run_states[pcode]] == "run complete":
-                stdout("{0} completed".format(pcode))
+                stdout.println("{0} completed".format(pcode))
             elif run_states.state_names[run_states.run_states[pcode]] == "run near complete":
-                stdout("{0} near complete".format(pcode))
+                stdout.println("{0} near complete".format(pcode))
             else:
                 state_name = run_states.state_names[run_states.run_states[pcode]]
-                stdout("{0} {1} - retrying".format(pcode, state_name))
+                stdout.println("{0} {1} - retrying".format(pcode, state_name))
                 cluster.stop_run(pcode)
                 if not (cluster.is_script_present(pcode)):
                     cluster.create_script(pcode)
