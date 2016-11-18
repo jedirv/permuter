@@ -273,7 +273,8 @@ class StateOfRuns(object):
     def emit_run_state_pending(self, stdout, pcode):
         state = self.run_states[pcode]
         cluster_job_number = self.cluster_job_numbers[pcode]
-        if state != 'run complete':
+        state_name = self.state_names[state]
+        if state_name != 'run complete':
             self.emit_state(stdout, cluster_job_number, pcode, state)
     
     def emit_state(self, stdout, cluster_job_number, pcode, state):

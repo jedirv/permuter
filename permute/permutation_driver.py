@@ -135,7 +135,13 @@ class PermutationDriver(object):
     def stop_runs(self, cluster_runs, cluster):
         logging.info('STOPPING runs that are still running or waiting')
         for pcode in cluster_runs.run_perm_codes_list:
-            cluster.stop_run(pcode)
+            if cluster.is_running(pcode) or cluster.is_waiting(pcode):
+                cluster_job_number = cluster.get_cluster_job_number(pcode)
+                user_job_number_as_string = cluster_runs.get_job_number_string_for_run_permutation_code(pcode)
+                self.stdout.println("stopping {0} (j{1})".format(cluster_job_number, user_job_number_as_string))
+                cluster.stop_run(pcode)
+            else:
+                self.stdout.println("{0} not running or waiting in queue".format(pcode))
     '''                    
     def run_command_on_all_specs(cspec_path, permuter_command,stdout, cluster):
         spec_dir = os.path.dirname(cspec_path)

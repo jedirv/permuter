@@ -641,9 +641,63 @@ class TestSystem(unittest.TestCase):
         pdriver.run_command('errors','')
         self.assertTrue(len(stdout.lines) == 0)   
         
+    def test_status_stop(self):
+        stdout = mock_stdout.MockStdout()
+        lines = self.get_lines_for_simpleCaseCspec()
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout)
+        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
+        pdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec", stdout, cluster)
+                
+        pdriver.run_command('gen','')
+        pdriver.run_command('launch','')
+        # GET THEM RUNNING
+        # engage one run
+        cluster.test_helper_set_ok_to_run('x_1_trial_1')
+        # finish one run
+        cluster.test_helper_set_ok_to_run('x_4_trial_1')
+        cluster.test_helper_set_run_finished_complete('x_4_trial_1')
+        # CREATE RESULTS AND DONE MARKER (except for first run)
     
+        stdout.lines = []
+        pdriver.run_command("stop",'')
+        self.assertTrue(stdout.lines[0] == "stopping 1 (j0)\n")
+        self.assertTrue(stdout.lines[1] == "stopping 2 (j1)\n")
+        self.assertTrue(stdout.lines[2] == "stopping 3 (j2)\n")
+        self.assertTrue(stdout.lines[3] == "x_4_trial_1 not running or waiting in queue\n")
+        # (after stop) summary 
+        stdout.lines = []
+        pdriver.run_command('summary','')
+        self.assertTrue(stdout.lines[0] == "....\n")
+        self.assertTrue(stdout.lines[1] == "baz\t-\t4 runs total\n")
+        self.assertTrue(stdout.lines[2] == "complete: 1\n")
+        self.assertTrue(stdout.lines[3] == "run state inconsistent: 3\n")
+        self.assertTrue(len(stdout.lines) == 4)
+        # (after stop) stat 
+        stdout.lines = []
+        pdriver.run_command('stat','')
+        self.assertTrue(stdout.lines[0] == "1\tx_1_trial_1\tinconsistent\t(files suggest system should be running, but not seen in qstat)\t-> retry\n")
+        self.assertTrue(stdout.lines[1] == "2\tx_2_trial_1\tinconsistent\t(files suggest system should be running, but not seen in qstat)\t-> retry\n")
+        self.assertTrue(stdout.lines[2] == "3\tx_3_trial_1\tinconsistent\t(files suggest system should be running, but not seen in qstat)\t-> retry\n")
+        self.assertTrue(stdout.lines[3] == "4\tx_4_trial_1\trun complete\n")
+        # (after stop) pending
+        stdout.lines = []
+        pdriver.run_command('pending','')
+        self.assertTrue(stdout.lines[0] == "1\tx_1_trial_1\tinconsistent\t(files suggest system should be running, but not seen in qstat)\t-> retry\n")
+        self.assertTrue(stdout.lines[1] == "2\tx_2_trial_1\tinconsistent\t(files suggest system should be running, but not seen in qstat)\t-> retry\n")
+        self.assertTrue(stdout.lines[2] == "3\tx_3_trial_1\tinconsistent\t(files suggest system should be running, but not seen in qstat)\t-> retry\n")
+        self.assertTrue(len(stdout.lines) == 3)
+        # (after stop) errors
+        stdout.lines = []
+        pdriver.run_command('errors','')
+        self.assertTrue(stdout.lines[0] == "1\tx_1_trial_1\tinconsistent\t(files suggest system should be running, but not seen in qstat)\t-> retry\n")
+        self.assertTrue(stdout.lines[1] == "2\tx_2_trial_1\tinconsistent\t(files suggest system should be running, but not seen in qstat)\t-> retry\n")
+        self.assertTrue(stdout.lines[2] == "3\tx_3_trial_1\tinconsistent\t(files suggest system should be running, but not seen in qstat)\t-> retry\n")
+        self.assertTrue(len(stdout.lines) == 3)   
+        
+        
     
-    # clean all but scripts, launch, engage one run
+    # gen, launch, engage one run
     # stop
     # (after stop) summary 
     # (after stop) stat 

@@ -360,11 +360,9 @@ class Cluster(object):
     def stop_run(self, pcode):
         if self.is_running(pcode) or self.is_waiting(pcode):
             cluster_job_number = self.get_cluster_job_number(pcode)
-            user_job_number_as_string = self.cluster_runs.get_job_number_string_for_run_permutation_code(pcode)
             if (cluster_job_number == "NA"):
-                self.stdout.println("{0} - no evidence of having launched".format(user_job_number_as_string))
+                pass
             else:
-                self.stdout.println("stopping {0} (j{1}...)".format(cluster_job_number, user_job_number_as_string))
                 command = "qdel {0}".format(cluster_job_number)
                 self.execute_command(command)
 
