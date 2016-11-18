@@ -92,9 +92,10 @@ class PermutationDriver(object):
         #    clean_pooled_results(cluster_runs, self.cluster)
             
         elif (permute_command == "clean"):
-            for pcode in cluster_runs.run_perm_code_list:
-                self.cluster.stop_run(pcode)
-                self.cluster.delete_script()
+            self.stop_runs(cluster_runs, self.cluster)
+            self.clean_scripts(cluster_runs, self.cluster)
+            for pcode in cluster_runs.run_perm_codes_list:
+                self.stdout.println("deleting all files for {0}\n".format(pcode))
                 self.cluster.delete_all_but_script(pcode)
         elif (permute_command == 'launch_job'):
             user_job_number = scope.replace('j','')
@@ -202,6 +203,7 @@ class PermutationDriver(object):
     def clean_scripts(self, cluster_runs,cluster):
         logging.info('CLEANING scripts')
         for pcode in cluster_runs.run_perm_codes_list:
+            self.stdout.println("deleting script for {0}".format(pcode))
             cluster.delete_script(pcode)
     
                 

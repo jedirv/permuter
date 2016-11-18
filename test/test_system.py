@@ -266,18 +266,18 @@ class TestSystem(unittest.TestCase):
         # (clean slate) stat 
         stdout.lines = []
         pdriver.run_command('stat','')
-        self.assertTrue(stdout.lines[0] == "NA\tx_1_trial_1\tscript missing\n")
-        self.assertTrue(stdout.lines[1] == "NA\tx_2_trial_1\tscript missing\n")
-        self.assertTrue(stdout.lines[2] == "NA\tx_3_trial_1\tscript missing\n")
-        self.assertTrue(stdout.lines[3] == "NA\tx_4_trial_1\tscript missing\n")
+        self.assertTrue(stdout.lines[0] == "NA\tx_1_trial_1\tscript missing\t-> gen\n")
+        self.assertTrue(stdout.lines[1] == "NA\tx_2_trial_1\tscript missing\t-> gen\n")
+        self.assertTrue(stdout.lines[2] == "NA\tx_3_trial_1\tscript missing\t-> gen\n")
+        self.assertTrue(stdout.lines[3] == "NA\tx_4_trial_1\tscript missing\t-> gen\n")
         self.assertTrue(len(stdout.lines) == 4)
         # (clean slate) pending 
         stdout.lines = []
         pdriver.run_command('pending','')
-        self.assertTrue(stdout.lines[0] == "NA\tx_1_trial_1\tscript missing\n")
-        self.assertTrue(stdout.lines[1] == "NA\tx_2_trial_1\tscript missing\n")
-        self.assertTrue(stdout.lines[2] == "NA\tx_3_trial_1\tscript missing\n")
-        self.assertTrue(stdout.lines[3] == "NA\tx_4_trial_1\tscript missing\n")
+        self.assertTrue(stdout.lines[0] == "NA\tx_1_trial_1\tscript missing\t-> gen\n")
+        self.assertTrue(stdout.lines[1] == "NA\tx_2_trial_1\tscript missing\t-> gen\n")
+        self.assertTrue(stdout.lines[2] == "NA\tx_3_trial_1\tscript missing\t-> gen\n")
+        self.assertTrue(stdout.lines[3] == "NA\tx_4_trial_1\tscript missing\t-> gen\n")
         self.assertTrue(len(stdout.lines) == 4)
         # (clean slate) errors 
         stdout.lines = []
@@ -657,7 +657,6 @@ class TestSystem(unittest.TestCase):
         # finish one run
         cluster.test_helper_set_ok_to_run('x_4_trial_1')
         cluster.test_helper_set_run_finished_complete('x_4_trial_1')
-        # CREATE RESULTS AND DONE MARKER (except for first run)
     
         stdout.lines = []
         pdriver.run_command("stop",'')
@@ -695,27 +694,66 @@ class TestSystem(unittest.TestCase):
         self.assertTrue(stdout.lines[2] == "3\tx_3_trial_1\tinconsistent\t(files suggest system should be running, but not seen in qstat)\t-> retry\n")
         self.assertTrue(len(stdout.lines) == 3)   
         
-        
+
+    def test_status_clean(self):
+        stdout = mock_stdout.MockStdout()
+        lines = self.get_lines_for_simpleCaseCspec()
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout)
+        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
+        pdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec", stdout, cluster)
+                
+        pdriver.run_command('gen','')
+        pdriver.run_command('launch','')
+        # GET THEM RUNNING
+        # engage one run
+        cluster.test_helper_set_ok_to_run('x_1_trial_1')
+        # finish one run
+        cluster.test_helper_set_ok_to_run('x_4_trial_1')
+        cluster.test_helper_set_run_finished_complete('x_4_trial_1')
     
-    # gen, launch, engage one run
-    # stop
-    # (after stop) summary 
-    # (after stop) stat 
-    # (after stop) pending
-    # (after stop) errors
+        stdout.lines = []
+        pdriver.run_command("clean",'')
+        self.assertTrue(stdout.lines[0] == "stopping 1 (j0)\n")
+        self.assertTrue(stdout.lines[1] == "stopping 2 (j1)\n")
+        self.assertTrue(stdout.lines[2] == "stopping 3 (j2)\n")
+        self.assertTrue(stdout.lines[3] == "x_4_trial_1 not running or waiting in queue\n")
+        self.assertTrue(stdout.lines[4] == "deleting script for x_1_trial_1\n")
+        self.assertTrue(stdout.lines[5] == "deleting script for x_2_trial_1\n")
+        self.assertTrue(stdout.lines[6] == "deleting script for x_3_trial_1\n")
+        self.assertTrue(stdout.lines[7] == "deleting script for x_4_trial_1\n")
+        self.assertTrue(stdout.lines[8] == "deleting all files for x_1_trial_1\n")
+        self.assertTrue(stdout.lines[9] == "deleting all files for x_2_trial_1\n")
+        self.assertTrue(stdout.lines[10] == "deleting all files for x_3_trial_1\n")
+        self.assertTrue(stdout.lines[11] == "deleting all files for x_4_trial_1\n")
+        # (after clean) summary 
+        stdout.lines = []
+        pdriver.run_command('summary','')
+        self.assertTrue(stdout.lines[0] == "....\n")
+        self.assertTrue(stdout.lines[1] == "baz\t-\t4 runs total\n")
+        self.assertTrue(stdout.lines[2] == "scripts missing: 4\n")
+        self.assertTrue(len(stdout.lines) == 3)
+        # (after clean) stat 
+        stdout.lines = []
+        pdriver.run_command('stat','')
+        self.assertTrue(stdout.lines[0] == "1\tx_1_trial_1\tscript missing\t-> gen\n")
+        self.assertTrue(stdout.lines[1] == "2\tx_2_trial_1\tscript missing\t-> gen\n")
+        self.assertTrue(stdout.lines[2] == "3\tx_3_trial_1\tscript missing\t-> gen\n")
+        self.assertTrue(stdout.lines[3] == "4\tx_4_trial_1\tscript missing\t-> gen\n")
+        # (after clean) pending
+        stdout.lines = []
+        pdriver.run_command('pending','')
+        self.assertTrue(stdout.lines[0] == "1\tx_1_trial_1\tscript missing\t-> gen\n")
+        self.assertTrue(stdout.lines[1] == "2\tx_2_trial_1\tscript missing\t-> gen\n")
+        self.assertTrue(stdout.lines[2] == "3\tx_3_trial_1\tscript missing\t-> gen\n")
+        self.assertTrue(stdout.lines[3] == "4\tx_4_trial_1\tscript missing\t-> gen\n")
+        self.assertTrue(len(stdout.lines) == 4)
+        # (after clean) errors
+        stdout.lines = []
+        pdriver.run_command('errors','')
+        self.assertTrue(len(stdout.lines) == 0)   
+           
     
-    # clean 
-    # (after clean) summary 
-    # (after clean) stat 
-    # (after clean) pending
-    # (after clean) errors
-    
-    # clean all but scripts, launch
-    # clean
-    # (after clean that should also stop) summary 
-    # (after clean that should also stop) stat 
-    # (after clean that should also stop) pending
-    # (after clean that should also stop) errors
 
     # clean all but scripts
     # launch_job

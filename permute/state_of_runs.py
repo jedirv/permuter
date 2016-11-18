@@ -55,7 +55,7 @@ class StateOfRuns(object):
         # S    L   B    D    O  
         self.state_names['-----'] = 'script missing'
         self.state_cause['-----'] = ''
-        self.state_todos['-----'] = ''
+        self.state_todos['-----'] = 'gen'
         
         self.state_names['S----'] = 'script ready'
         self.state_cause['S----'] = ''

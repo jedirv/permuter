@@ -58,7 +58,7 @@ class TestStateOfRuns(unittest.TestCase):
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
-        self.assertTrue(stdout.lines[0] == 'NA\tl_A_n_1_trial_1\tscript missing\n')
+        self.assertTrue(stdout.lines[0] == 'NA\tl_A_n_1_trial_1\tscript missing\t-> gen\n')
     # '-----'
     def test_assess_run_______after_cleanup(self):
         #pcode = 'l_A_n_1_trial_1'
@@ -371,7 +371,7 @@ class TestStateOfRuns(unittest.TestCase):
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
-        self.assertTrue(stdout.lines[0] == '1\tl_A_n_1_trial_1\tinconsistent\t(done marker found, but no evidence of script being invoked - stale results?)\t-> retry\n')
+        self.assertTrue(stdout.lines[0] == '1\tl_A_n_1_trial_1\tinconsistent\t(done marker found, but no evidence of script being invoked)\t-> retry\n')
 
         
     # '-L-D-'
@@ -812,12 +812,12 @@ class TestStateOfRuns(unittest.TestCase):
         states.emit_state_summary(stdout, cluster_runs)
         self.assertTrue(stdout.lines[0] == '....\n')
         self.assertTrue(stdout.lines[1] == 'baz\t-\t4 runs total\n')
-        self.assertTrue(stdout.lines[2] == 'run state inconsistent: 1\n')
+        self.assertTrue(stdout.lines[2] == 'possible stale results: 1\n')
         self.assertTrue(stdout.lines[3] == 'state undefined: 3\n')
         
         stdout.lines = []
         states.emit_run_state_full(stdout, pcode)
-        self.assertTrue(stdout.lines[0] == '1\tl_A_n_1_trial_1\tinconsistent\t(output exists, done marker missing and evidence of invoke error)\t-> retry if unexpected\n')
+        self.assertTrue(stdout.lines[0] == '1\tl_A_n_1_trial_1\tstale results?\t(output exists, done marker missing and evidence of invoke error)\t-> retry if unexpected\n')
 
            
     # '---DO'
