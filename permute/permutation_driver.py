@@ -109,8 +109,13 @@ class PermutationDriver(object):
             
         elif (permute_command == 'stat_job'):
             user_job_number = scope.replace('j','')
-            pcode = cluster_runs.perm_code_for_job_number_map[user_job_number]
-            run_states.emit_run_state_full(stdout, pcode)
+            if cluster_runs.perm_code_for_job_number_map.has_key(user_job_number):
+                pcode = cluster_runs.perm_code_for_job_number_map[user_job_number]
+                run_states.assess_run(pcode, cluster_runs, cluster)
+                run_states.emit_run_state_full(stdout, pcode)
+            else:
+                stdout.println("ERROR: job number j{0} not valid for this cspec\n".format(user_job_number))
+            
             
         elif (permute_command == 'stop_job'):
             user_job_number = scope.replace('j','')

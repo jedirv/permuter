@@ -284,7 +284,6 @@ class TestSystem(unittest.TestCase):
         pdriver.run_command('errors','')
         self.assertTrue(len(stdout.lines) == 0)
         
-    
     def test_status_generate(self):
         stdout = mock_stdout.MockStdout()
         lines = self.get_lines_for_simpleCaseCspec()
@@ -329,7 +328,6 @@ class TestSystem(unittest.TestCase):
         pdriver.run_command('errors','')
         self.assertTrue(len(stdout.lines) == 0)
     
-    
     def test_status_test_launch(self):
         stdout = mock_stdout.MockStdout()
         lines = self.get_lines_for_simpleCaseCspec()
@@ -372,8 +370,6 @@ class TestSystem(unittest.TestCase):
         stdout.lines = []
         pdriver.run_command('errors','')
         self.assertTrue(len(stdout.lines) == 0)
-        
-        
         
     def test_status_launch_after_test_launch(self):
         stdout = mock_stdout.MockStdout()
@@ -421,7 +417,6 @@ class TestSystem(unittest.TestCase):
         pdriver.run_command('errors','')
         self.assertTrue(len(stdout.lines) == 0)
     
-
     def test_status_running(self):
         stdout = mock_stdout.MockStdout()
         lines = self.get_lines_for_simpleCaseCspec()
@@ -463,7 +458,6 @@ class TestSystem(unittest.TestCase):
         stdout.lines = []
         pdriver.run_command('errors','')
         self.assertTrue(len(stdout.lines) == 0)
-    
     
     def test_status_results_no_done_marker(self):
         stdout = mock_stdout.MockStdout()
@@ -509,7 +503,6 @@ class TestSystem(unittest.TestCase):
         stdout.lines = []
         pdriver.run_command('errors','')
         self.assertTrue(len(stdout.lines) == 0)
-        
         
     def test_status_problems1(self):
         stdout = mock_stdout.MockStdout()
@@ -571,9 +564,6 @@ class TestSystem(unittest.TestCase):
         self.assertTrue(stdout.lines[1] == "2\tx_2_trial_1\tstale results?\t(output exists, invoke log missing)\t-> retry if unexpected\n")
         self.assertTrue(stdout.lines[2] == "3\tx_3_trial_1\tstale results?\t(results present but evidence of invoke error)\t-> retry if unexpected\n")
         self.assertTrue(stdout.lines[3] == "4\tx_4_trial_1\tstale results?\t(output exists, script missing)\t-> retry if unexpected\n")      
-        
-    
-        
         
     def test_status_retry(self):
         stdout = mock_stdout.MockStdout()
@@ -694,7 +684,6 @@ class TestSystem(unittest.TestCase):
         self.assertTrue(stdout.lines[2] == "NA\tx_3_trial_1\tinconsistent\t(files suggest system should be running, but not seen in qstat)\t-> retry\n")
         self.assertTrue(len(stdout.lines) == 3)   
         
-
     def test_status_clean(self):
         stdout = mock_stdout.MockStdout()
         lines = self.get_lines_for_simpleCaseCspec()
@@ -783,6 +772,18 @@ class TestSystem(unittest.TestCase):
         self.assertTrue(stdout.lines[2] == "scripts ready to run: 3\n")
         self.assertTrue(stdout.lines[3] == "runs waiting in queue: 1\n")
         self.assertTrue(len(stdout.lines) == 4)
+        
+        # (after launch_job) stat_job with bad job number
+        stdout.lines = []
+        pdriver.run_command('stat_job','j33')
+        self.assertTrue(stdout.lines[0] == "ERROR: job number j33 not valid for this cspec\n")
+        self.assertTrue(len(stdout.lines) == 1)   
+        
+        # (after launch_job) stat_job 
+        stdout.lines = []
+        pdriver.run_command('stat_job','j3')
+        self.assertTrue(stdout.lines[0] == "1\tx_4_trial_1\twaiting in queue\n")
+        self.assertTrue(len(stdout.lines) == 1)   
         # (after launch_job) stat 
         stdout.lines = []
         pdriver.run_command('stat','')
