@@ -90,6 +90,8 @@ class MockCluster(object):
         self.delete_qstat_log()
         self.delete_done_marker(pcode)
         self.delete_results(pcode)
+        if self.cluster_job_numbers.has_key(pcode):
+            self.cluster_job_numbers.pop(pcode)
         
     def delete_pooled_results_file(self):
         pass
@@ -194,6 +196,7 @@ class MockCluster(object):
     def stop_run(self, pcode):
         if self.running_state.has_key(pcode):
             self.running_state.pop(pcode)
+            self.cluster_job_numbers.pop(pcode)
 
     #TESTED
     def is_script_present(self, pcode):
