@@ -216,6 +216,7 @@ class SpecHelp(object):
         print("root_dir:/someDir/myRuns")
         print("  ")
         print("  ")
+        '''
         print("############################################################################")
         print("# script_dir - the location where scripts will be generated.  It will also be ")
         print("#       where .qil, .err, .out, .qacct files are put.   Here's what each of these is")
@@ -234,6 +235,7 @@ class SpecHelp(object):
         print("script_dir:<project_root>/<cspec_name>/scripts")
         print("  ")
         print("  ")
+        '''
         print("############################################################################")
         print("# qsub_command: - these values are routed into each script file and wind up ")
         print("#       with the syntax: ")
@@ -296,6 +298,6 @@ class SpecHelp(object):
         print("#  touch <permutation_results_dir>/{0}".format(done_file))
         print("#  ")
         print("#  This file is used to signal that the script has run through all of its commands.")
-        print("#  It does not signify that all commands ran error-free.  it is used by the stat")
+        print("#  It does not signify that all commands ran error-free.  It is used by the stat")
         print("#  commands to help assess the state of the runs")
 
