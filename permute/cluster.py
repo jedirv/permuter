@@ -68,6 +68,7 @@ class Cluster(object):
         cspec = self.cluster_runs.cspec
         qil = qsub_invoke_log.QsubInvokeLog(user_job_number_as_string, perm_info, cspec, trial, self.stdout)
         self.invoke_logs[pcode] = qil
+        return qil
         
     def get_invoke_log_mod_time(self,pcode):
         if self.invoke_log_exists(pcode):
