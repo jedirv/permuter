@@ -30,7 +30,7 @@ class Cluster(object):
         return False
 
     def create_script(self, pcode):
-        cscript = self.cluster_runs.get_script_for_run_permutation_code(pcode)
+        cscript = self.cluster_runs.get_script_for_perm_code(pcode)
         self.scripts[pcode] = cscript
         cscript.generate()
         return cscript
