@@ -18,7 +18,7 @@ scores_x_axis:x
 #
 #  results_dir is where the generated results will be
 #
-root_results_dir:<root>/runtest_out/results
+root_dir:<root>/runtest_out
 
 #qsub_command:-q eecs,eecs1,eecs,share
 qsub_command:-q eecs,share
