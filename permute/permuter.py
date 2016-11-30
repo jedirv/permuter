@@ -65,12 +65,11 @@ def main():
     f = open(cspec_path, 'r')
     cspec_lines = f.readlines()
     f.close()
-    stdout = stdout.Stdout()
-    if (not(cluster_spec.validate(cspec_lines, stdout))):
+    true_stdout = stdout.Stdout()
+    if (not(cluster_spec.validate(cspec_lines, true_stdout))):
         exit()
-    stdout = stdout.Stdout()
-    cluster = cluster.Cluster(stdout)
-    pdriver = permutation_driver.PermutationDriver(cspec_lines, cspec_path, stdout, cluster)
+    cluster = cluster.Cluster(true_stdout)
+    pdriver = permutation_driver.PermutationDriver(cspec_lines, cspec_path, true_stdout, cluster)
     uu = user_usage.UserUsage()
     uu.log_command(permute_command, scope)
     pdriver.run_command(permute_command, scope)
