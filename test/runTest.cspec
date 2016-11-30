@@ -4,7 +4,7 @@ trials:1
 (permute):y=1,2,3
 
 scores_from:file=<permutation_results_dir>/run_test.csv,column_name=auc,row_number=1
-scores_to:/nfs/stak/faculty/i/irvine/permuterGH/test/runtest_out/collected_results
+scores_to:/nfs/stak/faculty/i/irvineje/permuterGH/test/runtest_out/collected_results
 scores_y_axis:y
 scores_x_axis:x
 
@@ -14,7 +14,7 @@ scores_x_axis:x
 #
 
 #
-<replace>:root=/nfs/stak/faculty/i/irvine/permuterGH/test
+<replace>:root=/nfs/stak/faculty/i/irvineje/permuterGH/test
 #
 #  results_dir is where the generated results will be
 #
