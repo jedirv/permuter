@@ -5,6 +5,7 @@ Created on Nov 19, 2013
 '''
 import sys, os
 import cluster_spec
+import cluster_runs_info
 import logging
 import permutation_driver
 import spec_help
@@ -68,7 +69,9 @@ def main():
     true_stdout = stdout.Stdout()
     if (not(cluster_spec.validate(cspec_lines, true_stdout))):
         exit()
-    hp_cluster = cluster.Cluster(true_stdout)
+    cspec = cluster_spec.ClusterSpec(cspec_path, cspec_lines, true_stdout)
+    cluster_runs_info = cluster_runs_info.ClusterRunsInfo(cspec, true_stdout)
+    hp_cluster = cluster.Cluster(cluster_runs_info, true_stdout)
     pdriver = permutation_driver.PermutationDriver(cspec_lines, cspec_path, true_stdout, hp_cluster)
     uu = user_usage.UserUsage()
     uu.log_command(permute_command, scope)
