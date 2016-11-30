@@ -22,23 +22,24 @@ def main():
         
     if (len(sys.argv) < 3 or len(sys.argv) > 5):
         usage()
-        usage()
         exit()
     cspec_path = sys.argv[1]
     permute_command = sys.argv[2]
-    scope = ''
-    debug = False
-    if (len(sys.argv) == 4):
+    if len(sys.argv) == 3:
+        scope = ''
+        debug = False
+    elif len(sys.argv) == 4:
         if sys.argv[3] == '-debug':
+            scope = ''
             debug = True
         else:
             scope = sys.argv[3]
-    else: #length is 5
-        scope = sys.argv[3]
-        if sys.argv[4] != '-debug':
+            debug = False
+    else:  #len(sys.argv) == 5
+        if (sys.argv[4] != '-debug'):
             usage()
-            exit()
         else:
+            scope = sys.argv[3]
             debug = True
         
     #real_cluster_system = cluster_system.ClusterSystem()
@@ -117,12 +118,16 @@ def validate_cspec_is_cspec(cspec_path):
         exit()
   
 def usage():
+    print "usage:  python permuter.py spec_help"
+    print"               # prints documentation for the cspec file contents."  
+    print ""
+    print "or"
+    print ""
     print "usage:  python permuter.py <path of cluster_spec> <command> [scope]  [-debug]"  # TODOadd [scope]
     print ""
     print "   where some_command can be..."
     print"        ...for generating a template cspec file" 
     print"               new_spec               # generate a template cspec file the user can fill out"  
-    print"               spec_help              # prints documentation for the cspec file contents."  
     print""            
     print"        ...for actions to launch permutations"              
     print"               count                  # show the number of scripts that will be generated"                   
