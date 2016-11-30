@@ -62,9 +62,9 @@ class Cluster(object):
     def get_invoke_log(self, pcode):
         if self.invoke_logs.has_key(pcode):
             return self.invoke_logs[pcode]
-        perm_info = self.cluster_runs.run_permutation_info_for_run_permutation_code_map[pcode]
+        perm_info = self.cluster_runs.perm_info_for_perm_code_map[pcode]
         trial = perm_info['trial']
-        user_job_number_as_string = self.cluster_runs.get_job_number_string_for_run_permutation_code(pcode)
+        user_job_number_as_string = self.cluster_runs.get_job_number_string_for_perm_code(pcode)
         cspec = self.cluster_runs.cspec
         qil = qsub_invoke_log.QsubInvokeLog(user_job_number_as_string, perm_info, cspec, trial, self.stdout)
         self.invoke_logs[pcode] = qil
@@ -93,8 +93,8 @@ class Cluster(object):
     # QACCT
     #
     def get_qacct_log(self,pcode):
-        user_job_number_as_string = self.cluster_runs.get_job_number_string_for_run_permutation_code(pcode)
-        permutation_info = self.cluster_runs.run_permutation_info_for_run_permutation_code_map[pcode]
+        user_job_number_as_string = self.cluster_runs.get_job_number_string_for_perm_code(pcode)
+        permutation_info = self.cluster_runs.perm_info_for_perm_code_map[pcode]
         cspec = self.cluster_runs.cspec
         cluster_job_number = self.get_cluster_job_number(pcode)
         if (cluster_job_number == "NA" or self.is_running(pcode) or self.is_waiting(pcode)):
@@ -156,7 +156,7 @@ class Cluster(object):
     Once we again have a way of knowing all the output files of a run, we can change back to this
     def get_missing_output_files(self, pcode, cluster_system):
         missing_output_files = []
-        permutation_info = self.cluster_runs_info.get_permutation_info_for_permutation_code(pcode)
+        permutation_info = self.cluster_runs_info.get_permutation_info_for_perm_code(pcode)
         list_of_output_files = permutations.get_list_of_output_files(permutation_info, self.cluster_runs.cspec)
         for output_file_path in list_of_output_files:
             if (not(os.path.exists(output_file_path))):
@@ -189,7 +189,7 @@ class Cluster(object):
         return False
 
     def get_output_file_mod_time(self, pcode):
-        permutation_info = self.cluster_runs.get_permutation_info_for_permutation_code(pcode)
+        permutation_info = self.cluster_runs.get_permutation_info_for_perm_code(pcode)
         list_of_output_files = permutations.get_list_of_output_files(permutation_info, self.cluster_runs.cspec)
         time = 0
         # find the oldest output_file mod time
@@ -285,7 +285,7 @@ class Cluster(object):
     #
     
     def is_done_marker_present(self, pcode):
-        done_marker_file_path = self.cluster_runs.get_donefile_path_for_run_permutation_code(pcode)
+        done_marker_file_path = self.cluster_runs.get_donefile_path_for_perm_code(pcode)
         #print "done_marker_file_path {0}".format(done_marker_file_path)
         run_finished = False
         if (os.path.exists(done_marker_file_path)):
@@ -294,13 +294,13 @@ class Cluster(object):
 
     def get_done_marker_mode_time(self,pcode):
         if self.is_done_marker_present(pcode):
-            done_marker_file_path = self.cluster_runs.get_donefile_path_for_run_permutation_code(pcode)
+            done_marker_file_path = self.cluster_runs.get_donefile_path_for_perm_code(pcode)
             return os.path.getmtime(done_marker_file_path)
         return 'NA'
             
 
     def delete_done_marker(self, pcode):
-        done_marker_file_path = self.cluster_runs.get_donefile_path_for_run_permutation_code(pcode)
+        done_marker_file_path = self.cluster_runs.get_donefile_path_for_perm_code(pcode)
         if (os.path.exists(done_marker_file_path)):
             os.unlink(done_marker_file_path)
                 

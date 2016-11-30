@@ -57,7 +57,7 @@ class PooledResultsFile(object):
         # write the x_axis column names
         header = "{0},".format(beautify_header("{0}".format(cspec.scores_y_axis)))
         for x_permutation in x_permutations:
-            concise_x_permutation = permutations.generate_permutation_code(x_permutation, cspec.concise_print_map, permutations.IGNORE_TRIALS)
+            concise_x_permutation = permutations.generate_perm_code(x_permutation, cspec.concise_print_map, permutations.IGNORE_TRIALS)
             header = "{0}{1},".format(header, concise_x_permutation)
         header = header.rstrip(',')
         f.write("{0}\n".format(header))
@@ -65,10 +65,10 @@ class PooledResultsFile(object):
         # make a list of x permutation codes for use later
         x_perm_codes = []
         for x_permutation in x_permutations:
-            x_perm_codes.append(permutations.generate_permutation_code(x_permutation, cspec.concise_print_map, permutations.IGNORE_TRIALS))
+            x_perm_codes.append(permutations.generate_perm_code(x_permutation, cspec.concise_print_map, permutations.IGNORE_TRIALS))
         # the main loop    
         for y_permutation in y_permutations:
-            concise_y_permutation = permutations.generate_permutation_code(y_permutation, cspec.concise_print_map, permutations.IGNORE_TRIALS)
+            concise_y_permutation = permutations.generate_perm_code(y_permutation, cspec.concise_print_map, permutations.IGNORE_TRIALS)
             self.stdout.println('y axis: {0}'.format(concise_y_permutation))
             line = "{0},".format(concise_y_permutation)
             for x_permutation in x_permutations:
@@ -84,7 +84,7 @@ class PooledResultsFile(object):
                     
                 median_value = get_median(trial_values, False)
                 line = "{0}{1},".format(line, median_value)
-                x_perm_code = permutations.generate_permutation_code(x_permutation, cspec.concise_print_map, permutations.IGNORE_TRIALS)
+                x_perm_code = permutations.generate_perm_code(x_permutation, cspec.concise_print_map, permutations.IGNORE_TRIALS)
                 record_median(x_perm_code, medians, median_value)
             line = line.rstrip(',')
             f.write("{0}\n".format(line))

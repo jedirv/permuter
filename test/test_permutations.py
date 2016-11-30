@@ -57,12 +57,12 @@ class TestPermuter(unittest.TestCase):
         self.assertTrue(resolved_commands[0] == 'ls -la /nfs/1/AAA/aaa')
 
 
-    def test_generate_permutation_code(self):
+    def test_generate_perm_code(self):
         permutation_info = {'number': '1', 'letter': 'AAA', 'trial': '1'}
         concisePrintMap = { 'number': 'n', 'AAA':'A'}
-        code = permutations.generate_permutation_code(permutation_info, concisePrintMap, permutations.IGNORE_TRIALS)
+        code = permutations.generate_perm_code(permutation_info, concisePrintMap, permutations.IGNORE_TRIALS)
         self.assertTrue(code == 'letter_A_n_1')     
-        code = permutations.generate_permutation_code(permutation_info, concisePrintMap, permutations.INCLUDE_TRIALS)
+        code = permutations.generate_perm_code(permutation_info, concisePrintMap, permutations.INCLUDE_TRIALS)
         self.assertTrue(code == 'letter_A_n_1_trial_1')      
         
 if __name__ == '__main__':

@@ -19,7 +19,7 @@ class PermutationDriverFile(object):
         self.cspec = cspec
         self.trial = trial
         self.permutation_info = permutation_info
-        self.pcode = permutations.generate_permutation_code(permutation_info, cspec.concise_print_map, permutations.INCLUDE_TRIALS)
+        self.pcode = permutations.generate_perm_code(permutation_info, cspec.concise_print_map, permutations.INCLUDE_TRIALS)
         self.key_val_map = {}
         for key, val in cspec.key_val_map.items():
             self.key_val_map[key] = val

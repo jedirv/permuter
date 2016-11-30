@@ -41,7 +41,7 @@ def get_list_of_output_files(permutation_info, cspec):
     #...need to generate list of all output files for permutation, keying off
     #scores_permute:color=red,blue,
     
-def generate_permutation_code(permutation_info, concisePrintMap, include_trials):
+def generate_perm_code(permutation_info, concisePrintMap, include_trials):
     code = ""
     keys = permutation_info.keys()
     sorted_keys = sorted(keys)
@@ -166,7 +166,7 @@ def resolve_list_for_permutation(permutation_info, commands, keyValMap):
     return commands_for_this_permutation
 
 def get_resolved_results_dir_for_permutation(permutation_info, cspec):
-    pcode = generate_permutation_code(permutation_info, cspec.concise_print_map, True)
+    pcode = generate_perm_code(permutation_info, cspec.concise_print_map, True)
     interim_results_dir = cspec.generate_results_dir_for_permutation(pcode)
     dir_list = [interim_results_dir]
     resolved_results_dir =  resolve_list_for_permutation(permutation_info, dir_list, cspec.key_val_map)[0]

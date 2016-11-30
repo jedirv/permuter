@@ -160,7 +160,7 @@ class PermutationDriver(object):
     def stop_run(self, pcode, cluster_runs, cluster):
         if cluster.is_running(pcode) or cluster.is_waiting(pcode):
             cluster_job_number = cluster.get_cluster_job_number(pcode)
-            user_job_number_as_string = cluster_runs.get_job_number_string_for_run_permutation_code(pcode)
+            user_job_number_as_string = cluster_runs.get_job_number_string_for_perm_code(pcode)
             self.stdout.println("stopping {0} (j{1})".format(cluster_job_number, user_job_number_as_string))
             cluster.stop_run(pcode)
         else:
