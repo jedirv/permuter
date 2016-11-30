@@ -17,10 +17,11 @@ def main():
         spechelp = spec_help.SpecHelp()
         spechelp.express()
         uu = user_usage.UserUsage()
-        uu.log_command("spec_help")
+        uu.log_command("spec_help", '')
         exit()
         
     if (len(sys.argv) < 3 or len(sys.argv) > 5):
+        usage()
         usage()
         exit()
     cspec_path = sys.argv[1]
@@ -44,7 +45,7 @@ def main():
     if (permute_command == "new_spec"):
         cluster_spec.generate_new_spec(cspec_path)
         uu = user_usage.UserUsage()
-        uu.log_command(permute_command)
+        uu.log_command(permute_command,'')
         exit()
         
    
