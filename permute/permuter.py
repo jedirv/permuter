@@ -68,8 +68,8 @@ def main():
     true_stdout = stdout.Stdout()
     if (not(cluster_spec.validate(cspec_lines, true_stdout))):
         exit()
-    cluster = cluster.Cluster(true_stdout)
-    pdriver = permutation_driver.PermutationDriver(cspec_lines, cspec_path, true_stdout, cluster)
+    hp_cluster = cluster.Cluster(true_stdout)
+    pdriver = permutation_driver.PermutationDriver(cspec_lines, cspec_path, true_stdout, hp_cluster)
     uu = user_usage.UserUsage()
     uu.log_command(permute_command, scope)
     pdriver.run_command(permute_command, scope)
