@@ -70,8 +70,8 @@ def main():
     if (not(cluster_spec.validate(cspec_lines, true_stdout))):
         exit()
     cspec = cluster_spec.ClusterSpec(cspec_path, cspec_lines, true_stdout)
-    cluster_runs_info = cluster_runs_info.ClusterRunsInfo(cspec, true_stdout)
-    hp_cluster = cluster.Cluster(cluster_runs_info, true_stdout)
+    cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, true_stdout)
+    hp_cluster = cluster.Cluster(cluster_runs, true_stdout)
     pdriver = permutation_driver.PermutationDriver(cspec_lines, cspec_path, true_stdout, hp_cluster)
     uu = user_usage.UserUsage()
     uu.log_command(permute_command, scope)
