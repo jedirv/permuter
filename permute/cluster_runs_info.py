@@ -92,7 +92,7 @@ class ClusterRunsInfo(object):
     def get_script_for_perm_code(self, pcode):
         return self.cluster_script_for_perm_code_map[pcode]
     
-    def get_donefile_path_for_perm__code(self,pcode):
+    def get_donefile_path_for_perm_code(self,pcode):
         results_dir = self.get_results_dir_for_perm_code(pcode)
         done_file = cluster_script.get_done_marker_filename()
         done_marker_file_path = "{0}/{1}".format(results_dir, done_file)

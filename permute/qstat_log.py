@@ -7,8 +7,9 @@ class QStatLog(object):
     '''
     Wraps the qstat result
     '''
-    def __init__(self, script_dir):
-        self.run_state = {}
+    def __init__(self, script_dir, cspec_name):
+        self.cspec_name = cspec_name
+        self.job_state = {}
         self.run_number = {}
         self.job_names = []
         self.logpath = "{0}/{1}".format(script_dir,'qstat.txt')
@@ -43,7 +44,13 @@ class QStatLog(object):
     </job_list>
     '''    
     def ingest(self):
-        self.ingest_from_path(self.logpath)
+        statinfo = os.stat(self.logpath)
+        bytes_in_file = statinfo.st_size
+        if bytes_in_file != 0:
+            try:
+                self.ingest_from_path(self.logpath)
+            except:
+                print("Exception trying to read stat_info_file {0} - cannot assess run state\n".format(self.logpath))
     
     '''
     <foo>
@@ -55,7 +62,7 @@ class QStatLog(object):
     '''
     def ingest_from_path(self, path):
         e = xml.etree.ElementTree.parse(path).getroot()
-        for job_list in e.findall('./queue_info/job_list'):
+        for job_list in e.findall('./job_info/job_list'):
             for child in job_list:
                 if child.tag == 'state':
                     job_state = child.text
@@ -65,7 +72,10 @@ class QStatLog(object):
                     job_name = child.text
                 else:
                     pass
-            self.run_state[job_name] = job_state
+            #print "job_state {0}\n".format(job_state)
+            #print "job_number {0}\n".format(job_number)
+            #print "job_name {0}\n".format(job_name)
+            self.job_state[job_name] = job_state
             self.run_number[job_name] = job_number
             self.job_names.append(job_name)    
         '''
@@ -79,7 +89,7 @@ class QStatLog(object):
                     job_state = self.getText(job.getElementsByTagName('state')[0].childNodes)
                     job_number = self.getText(job.getElementsByTagName('JB_job_number')[0].childNodes)
                     job_name = self.getText(job.getElementsByTagName('JB_name')[0].childNodes)
-                    self.run_state[job_name] = job_state
+                    self.job_state[job_name] = job_state
                     self.run_number[job_name] = job_number
                     self.job_names.append(job_name)
         '''
@@ -90,16 +100,21 @@ class QStatLog(object):
                 rc.append(node.data)
         return ''.join(rc)
 
+ 
     def is_running(self, job_name):
         if self.job_state.has_key(job_name):
             if self.job_state[job_name] == 'r':
+                #print "{0} isRunning TRUE".format(job_name)
                 return True
+        #print "{0} isRunning FALSE".format(job_name)
         return False
         
     def is_waiting(self, job_name):
         if self.job_state.has_key(job_name):
             if self.job_state[job_name] == 'qw':
+                #print "{0} isWaiting TRUE".format(job_name)
                 return True
+        #print "{0} isWaiting FALSE".format(job_name)
         return False
         
     

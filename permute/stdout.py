@@ -1,3 +1,4 @@
+import sys
 '''
 Created on Oct 29, 2016
 
@@ -12,6 +13,9 @@ class Stdout(object):
     def println(self, s):
         print s
 
+    def print_without_newline(self, s):
+        sys.stdout.write(s)
+        
     def __init__(self):
         '''
         Constructor

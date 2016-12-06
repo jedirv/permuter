@@ -11,7 +11,7 @@ class TestQstatLog(unittest.TestCase):
 
     def testLoadXml(self):
         path = './qstat_out.xml'
-        qstat = qstat_log.QStatLog("ignored_value")
+        qstat = qstat_log.QStatLog("ignored_dir", "ignored_name")
         qstat.ingest_from_path(path)
         self.assertTrue(qstat.run_state['runtest-j08_1_x_3_y_3_1'] == 'r')
         self.assertTrue(qstat.run_number['runtest-j08_1_x_3_y_3_1'] == '5911601')

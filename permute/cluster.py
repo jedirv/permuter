@@ -16,6 +16,7 @@ import pooled_timings_file
 import ranked_results_file
 import pooled_results_file
 import logging
+import cluster_script
 
 class Cluster(object):
     '''
@@ -26,7 +27,8 @@ class Cluster(object):
     #
     def is_script_present(self, pcode):
         if self.scripts.has_key(pcode):
-            return True
+            if self.scripts[pcode].exists():
+                return True
         return False
 
     def create_script(self, pcode):
@@ -38,7 +40,8 @@ class Cluster(object):
     def delete_script(self, pcode):
         if self.scripts.has_key(pcode):
             cscript = self.scripts[pcode]
-            cscript.delete()
+            if cscript.exists():
+                cscript.delete()
             
     def get_script_mod_time(self,pcode):
         if self.is_script_present(pcode):
@@ -49,12 +52,15 @@ class Cluster(object):
 
     def launch(self, pcode):
         if self.scripts.has_key(pcode):
-            cscript = self.scripts[pcode]
-            result_dir = self.cluster_runs.result_dir_for_perm_code_map(pcode)
-            if not os.path.exists(result_dir):
-                os.makedirs(result_dir)
-            self.stdout.println("launching run for {0}".format(pcode))
-            cscript.launch(self)
+            if self.scripts[pcode].exists():
+                cscript = self.scripts[pcode]
+                result_dir = self.cluster_runs.result_dir_for_perm_code_map[pcode]
+                if not os.path.exists(result_dir):
+                    os.makedirs(result_dir)
+                self.stdout.println("launching run for {0}".format(pcode))
+                cscript.launch(self)
+            else:
+                self.stdout.println("cannot launch run for {0} - script does not exist".format(pcode))
     #
     # INVOKE_LOG
     #
@@ -71,7 +77,7 @@ class Cluster(object):
         return qil
         
     def get_invoke_log_mod_time(self,pcode):
-        if self.invoke_log_exists(pcode):
+        if self.is_invoke_log_present(pcode):
             invoke_log = self.get_invoke_log(pcode)
             return os.path.getmtime(invoke_log.pathname)
         return 'NA'
@@ -79,7 +85,8 @@ class Cluster(object):
     def delete_invoke_log(self, pcode):
         if self.invoke_logs.has_key(pcode):
             qil = self.invoke_logs[pcode]
-            qil.delete()
+            if qil.exists():
+                qil.delete()
             self.invoke_logs.pop(pcode)
 
     def is_invoke_log_present(self, pcode):
@@ -101,28 +108,13 @@ class Cluster(object):
         if (cluster_job_number == "NA" or self.is_running(pcode) or self.is_waiting(pcode)):
             self.stdout.println("skipping qacct, job not started yet")
             return 0
-        else:
-            #print "opening {0}".format(self.qstat_log)
-            
+        else:            
             qacctlog = qacct_log.QacctLog(user_job_number_as_string, permutation_info, cspec, permutation_info['trial'], self.stdout)
             command = "qacct -j {0} > {1}".format(cluster_job_number, qacctlog.qacct_log_path)
             self.execute_command(command) 
             qacctlog.ingest(cluster_job_number)
-            self.qacct_logs[pcode]= qacctlog
             return qacctlog
-            
-            
-    def is_qacct_log_present(self, pcode):
-        if self.qacct_logs.has_key(pcode):
-            return True
-        return False
-        
-    def delete_qacct_log(self, pcode):
-        if self.qacct_logs.has_key(pcode):
-            qacct_log = self.qacct_logs[pcode]
-            qacct_log.delete()
-            self.qacct_logs.pop(pcode)
-      
+  
     #
     # QSTAT
     #
@@ -132,23 +124,14 @@ class Cluster(object):
         if self.qstat_log:
             return self.qstat_log
         cspec = self.cluster_runs.cspec
-        self.qstat_log = qstat_log.QStatLog(cspec.script_dir)
+        self.qstat_log = qstat_log.QStatLog(cspec.script_dir, cspec.cspec_name)
         username = getpass.getuser()
-        command = "qstat -u {0} > {1}".format(username, self.qstat_log.logpath)
+        command = "qstat -u {0} -xml > {1}".format(username, self.qstat_log.logpath)
+        #self.stdout.println(command)
         self.execute_command(command) 
         self.qstat_log.ingest()
         return self.qstat_log
-        
-        
-    def is_qstat_log_present(self):
-        if self.qstat_log:
-            return True
-        return False
-      
-    def delete_qstat_log(self):
-        if self.qstat_log:
-            self.qstat_log.delete()
-            self.qstat_log = 0
+   
 
     #
     # RESULTS
@@ -173,20 +156,21 @@ class Cluster(object):
         '''
         cscript = self.scripts[pcode]
         results_dir = cscript.resolved_results_dir
-        done_marker_filename = cscript.get_done_marker_filename()
-        filenames = os.listdir(results_dir)
-        count = 0
-        for filename in filenames:
-            if filename == done_marker_filename:
-                pass
-            elif filename == '.':
-                pass 
-            elif filename == '..':
-                pass
-            else:
-                count = count + 1
-        if count > 0 :
-            return True
+        done_marker_filename = cluster_script.get_done_marker_filename()
+        if os.path.exists(results_dir):
+            filenames = os.listdir(results_dir)
+            count = 0
+            for filename in filenames:
+                if filename == done_marker_filename:
+                    pass
+                elif filename == '.':
+                    pass 
+                elif filename == '..':
+                    pass
+                else:
+                    count = count + 1
+            if count > 0 :
+                return True
         return False
 
     def get_output_file_mod_time(self, pcode):
@@ -195,12 +179,13 @@ class Cluster(object):
         time = 0
         # find the oldest output_file mod time
         for output_file in list_of_output_files:
-            curtime = os.path.getmtime(output_file)
-            if time == 0:
-                time = curtime
-            else:
-                if curtime < time:
+            if os.path.exists(output_file):
+                curtime = os.path.getmtime(output_file)
+                if time == 0:
                     time = curtime
+                else:
+                    if curtime < time:
+                        time = curtime
         if time == 0:
             return 'NA'
         else:
@@ -293,7 +278,7 @@ class Cluster(object):
             run_finished=True
         return run_finished
 
-    def get_done_marker_mode_time(self,pcode):
+    def get_done_marker_mod_time(self,pcode):
         if self.is_done_marker_present(pcode):
             done_marker_file_path = self.cluster_runs.get_donefile_path_for_perm_code(pcode)
             return os.path.getmtime(done_marker_file_path)
@@ -312,8 +297,8 @@ class Cluster(object):
     #
     def delete_all_but_script(self,pcode):
         self.delete_invoke_log(pcode)
-        self.delete_qacct_log(pcode)
-        self.delete_qstat_log()
+        # we always get the qacct_log fresh so no need to clean 
+        # we always get the qstat_log fresh regardless, so no need to clean
         self.delete_done_marker(pcode)
         self.delete_results(pcode)
 
@@ -371,14 +356,14 @@ class Cluster(object):
         cscript = self.scripts[pcode]
         runs_name = cscript.cspec.cspec_name
         job_name = "{0}-{1}".format(runs_name, cscript.get_job_file_name())
-        qstatlog= self.get_stat_log()
+        qstatlog= self.get_qstat_log()
         return qstatlog.is_running(job_name)
 
     def is_waiting(self, pcode):
         cscript = self.scripts[pcode]
         runs_name = cscript.cspec.cspec_name
         job_name = "{0}-{1}".format(runs_name, cscript.get_job_file_name())
-        qstatlog= self.get_stat_log()
+        qstatlog= self.get_qstat_log()
         return qstatlog.is_waiting(job_name)
 
 
@@ -395,14 +380,24 @@ class Cluster(object):
             return acct_log.get_failure_reason()
         return 'NA'
         
+    def load_scripts(self):
+        for pcode in self.cluster_runs.run_perm_codes_list:
+            cscript = self.cluster_runs.get_script_for_perm_code(pcode)
+            self.scripts[pcode] = cscript
+    
+    def load_invoke_logs(self):
+        for pcode in self.cluster_runs.run_perm_codes_list:
+            self.get_invoke_log(pcode)
+                        
     def __init__(self, cluster_runs, stdout):
         self.cluster_runs = cluster_runs
         self.stdout = stdout
         self.scripts = {}
         self.invoke_logs = {}
-        self.qacct_logs = {}
-        self.qstat_log= 0
+        self.qstat_log = 0
         '''
         Constructor
         '''
+        self.load_scripts()
+        self.load_invoke_logs()
         
