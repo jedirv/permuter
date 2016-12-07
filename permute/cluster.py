@@ -192,10 +192,12 @@ class Cluster(object):
             return time
         
     def delete_results(self, pcode):
-        results_dir = self.cluster_runs.cspec.generate_results_dir_for_permutation(self, pcode)
+        cspec = self.cluster_runs.cspec
+        print "pcode given : {0}".format(pcode)
+        print cspec.cspec_name
+        results_dir = cspec.generate_results_dir_for_permutation(pcode)
+        print "results_dir to clean out : {0}".format(results_dir)
         self.clean_out_dir(results_dir)
-        
-        
     #
     # POOLED_RESULST
     #
