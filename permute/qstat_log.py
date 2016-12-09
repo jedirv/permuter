@@ -62,6 +62,23 @@ class QStatLog(object):
     '''
     def ingest_from_path(self, path):
         e = xml.etree.ElementTree.parse(path).getroot()
+        for job_list in e.findall('./queue_info/job_list'):
+            for child in job_list:
+                if child.tag == 'state':
+                    job_state = child.text
+                elif child.tag == 'JB_job_number':
+                    job_number = child.text
+                elif child.tag == 'JB_name':
+                    job_name = child.text
+                else:
+                    pass
+            #print "job_state {0}\n".format(job_state)
+            #print "job_number {0}\n".format(job_number)
+            #print "job_name {0}\n".format(job_name)
+            self.job_state[job_name] = job_state
+            self.run_number[job_name] = job_number
+            self.job_names.append(job_name)    
+            
         for job_list in e.findall('./job_info/job_list'):
             for child in job_list:
                 if child.tag == 'state':
