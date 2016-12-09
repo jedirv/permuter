@@ -702,40 +702,36 @@ class TestSystem(unittest.TestCase):
         cluster.test_helper_set_run_finished_complete('x_4_trial_1')
     
         stdout.lines = []
-        pdriver.run_command("clean",'')
+        pdriver.run_command("clean_runs",'')
         self.assertTrue(stdout.lines[0] == "stopping 1 (j0)\n")
         self.assertTrue(stdout.lines[1] == "stopping 2 (j1)\n")
         self.assertTrue(stdout.lines[2] == "stopping 3 (j2)\n")
         self.assertTrue(stdout.lines[3] == "x_4_trial_1 not running or waiting in queue\n")
-        self.assertTrue(stdout.lines[4] == "deleting script for x_1_trial_1\n")
-        self.assertTrue(stdout.lines[5] == "deleting script for x_2_trial_1\n")
-        self.assertTrue(stdout.lines[6] == "deleting script for x_3_trial_1\n")
-        self.assertTrue(stdout.lines[7] == "deleting script for x_4_trial_1\n")
-        self.assertTrue(stdout.lines[8] == "deleting all files for x_1_trial_1\n")
-        self.assertTrue(stdout.lines[9] == "deleting all files for x_2_trial_1\n")
-        self.assertTrue(stdout.lines[10] == "deleting all files for x_3_trial_1\n")
-        self.assertTrue(stdout.lines[11] == "deleting all files for x_4_trial_1\n")
+        self.assertTrue(stdout.lines[4] == "deleting all files for x_1_trial_1\n")
+        self.assertTrue(stdout.lines[5] == "deleting all files for x_2_trial_1\n")
+        self.assertTrue(stdout.lines[6] == "deleting all files for x_3_trial_1\n")
+        self.assertTrue(stdout.lines[7] == "deleting all files for x_4_trial_1\n")
         # (after clean) summary 
         stdout.lines = []
         pdriver.run_command('summary','')
         self.assertTrue(stdout.lines[0] == "....\n")
         self.assertTrue(stdout.lines[1] == "baz\t-\t4 runs total\n")
-        self.assertTrue(stdout.lines[2] == "scripts missing: 4\n")
+        self.assertTrue(stdout.lines[2] == "scripts ready to run: 4\n")
         self.assertTrue(len(stdout.lines) == 3)
         # (after clean) stat 
         stdout.lines = []
         pdriver.run_command('stat','')
-        self.assertTrue(stdout.lines[0] == "NA\tx_1_trial_1\tscript missing\t-> gen\n")
-        self.assertTrue(stdout.lines[1] == "NA\tx_2_trial_1\tscript missing\t-> gen\n")
-        self.assertTrue(stdout.lines[2] == "NA\tx_3_trial_1\tscript missing\t-> gen\n")
-        self.assertTrue(stdout.lines[3] == "NA\tx_4_trial_1\tscript missing\t-> gen\n")
+        self.assertTrue(stdout.lines[0] == "NA\tx_1_trial_1\tscript ready\t-> launch\n")
+        self.assertTrue(stdout.lines[1] == "NA\tx_2_trial_1\tscript ready\t-> launch\n")
+        self.assertTrue(stdout.lines[2] == "NA\tx_3_trial_1\tscript ready\t-> launch\n")
+        self.assertTrue(stdout.lines[3] == "NA\tx_4_trial_1\tscript ready\t-> launch\n")
         # (after clean) pending
         stdout.lines = []
         pdriver.run_command('pending','')
-        self.assertTrue(stdout.lines[0] == "NA\tx_1_trial_1\tscript missing\t-> gen\n")
-        self.assertTrue(stdout.lines[1] == "NA\tx_2_trial_1\tscript missing\t-> gen\n")
-        self.assertTrue(stdout.lines[2] == "NA\tx_3_trial_1\tscript missing\t-> gen\n")
-        self.assertTrue(stdout.lines[3] == "NA\tx_4_trial_1\tscript missing\t-> gen\n")
+        self.assertTrue(stdout.lines[0] == "NA\tx_1_trial_1\tscript ready\t-> launch\n")
+        self.assertTrue(stdout.lines[1] == "NA\tx_2_trial_1\tscript ready\t-> launch\n")
+        self.assertTrue(stdout.lines[2] == "NA\tx_3_trial_1\tscript ready\t-> launch\n")
+        self.assertTrue(stdout.lines[3] == "NA\tx_4_trial_1\tscript ready\t-> launch\n")
         self.assertTrue(len(stdout.lines) == 4)
         # (after clean) errors
         stdout.lines = []
