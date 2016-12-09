@@ -93,9 +93,8 @@ class PermutationDriver(object):
         #elif (permute_command == "clean_pooled_results"):
         #    clean_pooled_results(cluster_runs, cluster)
             
-        elif (permute_command == "clean"):
+        elif (permute_command == "clean_runs"):
             self.stop_runs(cluster_runs, cluster)
-            self.clean_scripts(cluster_runs, cluster)
             for pcode in cluster_runs.run_perm_codes_list:
                 stdout.println("deleting all files for {0}\n".format(pcode))
                 cluster.delete_all_but_script(pcode)

@@ -90,7 +90,7 @@ def validate_args(command, scope):
         return
     if (command == 'summary' or command == 'stat' or command == 'pending' or command == 'errors'):
         return
-    if (command == 'stop' or command == 'clean'):
+    if (command == 'stop' or command == 'clean_runs'):
         return
     if (command == 'launch_job' or command == 'stat_job' or command == 'stop_job' or command == 'clean_job'):
         if is_plausible_job_number(scope):
@@ -147,7 +147,7 @@ def usage():
     print""                
     print"        ...for actions to run after permutations have launched"               
     print"               stop                   # call qdel on any runs that are unfinished to abort them"   
-    print"               clean                  # stop running jobs, clean scripts, results" 
+    print"               clean_runs             # stop running jobs, clean everything but scripts" 
     #print"               collect                # created pooled results from results"  
     print""      
     print"        ...surgical commands that are normally handled in aggregate"
