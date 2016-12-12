@@ -12,6 +12,8 @@ import mock_stdout
 
 class TestPermuter(unittest.TestCase):
 
+    '''
+    COMMENTED OUT UNTIL WE RE_ENGAGE RESULTS COLLECTION
     def test_create_source_file_map(self):
         lines = []
         lines.append("#cspec\n")
@@ -93,7 +95,7 @@ class TestPermuter(unittest.TestCase):
         self.assertTrue(source_file_map['an_cat_l_bb_number_2_res_userMonth_s_300_trial_2']== '/foo/myRuns/baz/results/an_cat_l_bb_number_2_s_300_trial_2/userMonth.csv')
         self.assertTrue(source_file_map['an_cat_l_aa_number_3_res_userMonth_s_300_trial_2']== '/foo/myRuns/baz/results/an_cat_l_aa_number_3_s_300_trial_2/userMonth.csv')
         self.assertTrue(source_file_map['an_cat_l_bb_number_3_res_userMonth_s_300_trial_2']== '/foo/myRuns/baz/results/an_cat_l_bb_number_3_s_300_trial_2/userMonth.csv')
-    
+    '''    
     def test_is_plausible_job_number(self):
         self.assertFalse(permutation_driver.is_plausible_job_number(''))
         self.assertFalse(permutation_driver.is_plausible_job_number('k'))

@@ -55,14 +55,15 @@ class ClusterSpec(object):
             self.script_dir = "{0}/{1}/{2}".format(self.root_dir, self.cspec_name, 'scripts')
             self.one_up_basis = self.load_special_value(self.lines, 'one_up_basis:')
             
-            self.scores_permuters = load_permuters(self.lines, 'scores_permute:','(scores_permute):')
-            self.scores_from_filepath = ""
-            self.scores_from_colname = ""
-            self.scores_from_rownum = ""
-            self.load_scores_from(self.lines)
-            self.scores_to = self.load_special_value(self.lines,'scores_to:')
-            self.scores_x_axis = self.load_list(self.lines, 'scores_x_axis:')
-            self.scores_y_axis = self.load_list(self.lines, 'scores_y_axis:')
+            # disengage the scores_to and scores_from until we re-engage collection of results.
+            #self.scores_permuters = load_permuters(self.lines, 'scores_permute:','(scores_permute):')
+            #self.scores_from_filepath = ""
+            #self.scores_from_colname = ""
+            #self.scores_from_rownum = ""
+            #self.load_scores_from(self.lines)
+            #self.scores_to = self.load_special_value(self.lines,'scores_to:')
+            #self.scores_x_axis = self.load_list(self.lines, 'scores_x_axis:')
+            #self.scores_y_axis = self.load_list(self.lines, 'scores_y_axis:')
             #print "done loading cspec"
         except IOError:
             self.stdout.println("An error occurred trying to open cspec file {0}".format(path))

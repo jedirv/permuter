@@ -201,7 +201,8 @@ class Cluster(object):
     #
     # POOLED_RESULST
     #
-    
+    '''
+    POOLED RESULTS PROCESSING COMMENTED OUT UNTIL WE RE-ENGAGE RESULTS COLLECTION
     def create_pooled_results_delta_files(self,resultsFiles):
         for resultsFile in resultsFiles:
             deltaFile = pooled_results_delta_file.PooledResultsDeltaFile(resultsFile)
@@ -267,7 +268,7 @@ class Cluster(object):
     def delete_ranked_results_file(self,pcode):
         pass
      
-          
+    '''          
     #
     # DONE MARKER
     #
