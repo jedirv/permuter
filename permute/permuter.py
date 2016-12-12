@@ -87,13 +87,8 @@ def validate_args(command, scope):
         return
     if (command == 'stop' or command == 'clean_runs'):
         return
-    #if (command == 'launch_job' or command == 'stat_job' or command == 'stop_job' or command == 'clean_job'):
-    #    if is_plausible_job_number(scope):
-    #        return
-    #    else:
-    #        print "scope must be a job number of the form 'j123'"
-    #        usage()
-    #        exit()
+    if (command == 'launch_job' or command == 'stat_job' or command == 'stop_job' or command == 'clean_job'):
+        return  #arg checking done downstream
     if (command == 'clean_scripts' or command == 'clean_results'):
         return
     usage()
