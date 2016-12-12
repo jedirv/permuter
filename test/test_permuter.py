@@ -95,13 +95,13 @@ class TestPermuter(unittest.TestCase):
         self.assertTrue(source_file_map['an_cat_l_bb_number_3_res_userMonth_s_300_trial_2']== '/foo/myRuns/baz/results/an_cat_l_bb_number_3_s_300_trial_2/userMonth.csv')
     
     def test_is_plausible_job_number(self):
-        self.assertFalse(permuter.is_plausible_job_number(''))
-        self.assertFalse(permuter.is_plausible_job_number('k'))
-        self.assertFalse(permuter.is_plausible_job_number('j'))
-        self.assertFalse(permuter.is_plausible_job_number('jx'))
-        self.assertFalse(permuter.is_plausible_job_number('j123x'))
-        self.assertTrue(permuter.is_plausible_job_number('j0'))
-        self.assertTrue(permuter.is_plausible_job_number('j123'))
+        self.assertFalse(permutation_driver.is_plausible_job_number(''))
+        self.assertFalse(permutation_driver.is_plausible_job_number('k'))
+        self.assertFalse(permutation_driver.is_plausible_job_number('j'))
+        self.assertFalse(permutation_driver.is_plausible_job_number('jx'))
+        self.assertFalse(permutation_driver.is_plausible_job_number('j123x'))
+        self.assertTrue(permutation_driver.is_plausible_job_number('j0'))
+        self.assertTrue(permutation_driver.is_plausible_job_number('j123'))
     '''    
     def test_create_pooled_results_files(self):
         userday_answers_trial1 = {}

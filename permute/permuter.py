@@ -77,12 +77,7 @@ def main():
     uu.log_command(permute_command, scope)
     pdriver.run_command(permute_command, scope)
 
-def is_plausible_job_number(s):
-    if not(s.startswith('j')):
-        return False
-    s = s.replace('j','')
-    return s.isdigit() 
- 
+
 def validate_args(command, scope):
     if (command == 'count' or command == 'preview' or command == 'gen'):
         return
@@ -92,13 +87,13 @@ def validate_args(command, scope):
         return
     if (command == 'stop' or command == 'clean_runs'):
         return
-    if (command == 'launch_job' or command == 'stat_job' or command == 'stop_job' or command == 'clean_job'):
-        if is_plausible_job_number(scope):
-            return
-        else:
-            print "scope must be a job number of the form 'j123'"
-            usage()
-            exit()
+    #if (command == 'launch_job' or command == 'stat_job' or command == 'stop_job' or command == 'clean_job'):
+    #    if is_plausible_job_number(scope):
+    #        return
+    #    else:
+    #        print "scope must be a job number of the form 'j123'"
+    #        usage()
+    #        exit()
     if (command == 'clean_scripts' or command == 'clean_results'):
         return
     usage()
