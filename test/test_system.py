@@ -872,6 +872,140 @@ class TestSystem(unittest.TestCase):
         pdriver.run_command('errors','')
         self.assertTrue(len(stdout.lines) == 0)       
 
+   
+    def test_status_single_jobs_as_pcode(self):
+        stdout = mock_stdout.MockStdout()
+        lines = self.get_lines_for_simpleCaseCspec()
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout)
+        cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
+        cluster = mock_cluster.MockCluster(cluster_runs, stdout)
+        pdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec", stdout, cluster)
+                
+        pdriver.run_command('gen','')
+        stdout.lines = []
+        # try to launch with bad job number
+        pdriver.run_command('launch_job','z_1_d_5')
+        self.assertTrue(stdout.lines[0] == "ERROR: job z_1_d_5 not valid for this cspec\n")
+        self.assertTrue(len(stdout.lines) == 1)   
+        
+        # try to launch with valid job number
+        stdout.lines = []
+        pdriver.run_command('launch_job','x_4_trial_1')
+        self.assertTrue(stdout.lines[0] == "launching run for x_4_trial_1\n")
+        self.assertTrue(len(stdout.lines) == 1)   
+        
+        # (after launch_job) summary 
+        stdout.lines = []
+        pdriver.run_command('summary','')
+        self.assertTrue(stdout.lines[0] == "....\n")
+        self.assertTrue(stdout.lines[1] == "baz\t-\t4 runs total\n")
+        self.assertTrue(stdout.lines[2] == "scripts ready to run: 3\n")
+        self.assertTrue(stdout.lines[3] == "runs waiting in queue: 1\n")
+        self.assertTrue(len(stdout.lines) == 4)
+        
+        # (after launch_job) stat_job with bad job number
+        stdout.lines = []
+        pdriver.run_command('stat_job','z_1_d_5')
+        self.assertTrue(stdout.lines[0] == "ERROR: job z_1_d_5 not valid for this cspec\n")
+        self.assertTrue(len(stdout.lines) == 1)   
+        
+        # (after launch_job) stat_job 
+        stdout.lines = []
+        pdriver.run_command('stat_job','x_4_trial_1')
+        self.assertTrue(stdout.lines[0] == "1\tx_4_trial_1\twaiting in queue\n")
+        self.assertTrue(len(stdout.lines) == 1)   
+        # (after launch_job) stat 
+        stdout.lines = []
+        pdriver.run_command('stat','')
+        self.assertTrue(stdout.lines[0] == "NA\tx_1_trial_1\tscript ready\t-> launch\n")
+        self.assertTrue(stdout.lines[1] == "NA\tx_2_trial_1\tscript ready\t-> launch\n")
+        self.assertTrue(stdout.lines[2] == "NA\tx_3_trial_1\tscript ready\t-> launch\n")
+        self.assertTrue(stdout.lines[3] == "1\tx_4_trial_1\twaiting in queue\n")
+        # (after launch_job) pending
+        stdout.lines = []
+        pdriver.run_command('pending','')
+        self.assertTrue(stdout.lines[0] == "NA\tx_1_trial_1\tscript ready\t-> launch\n")
+        self.assertTrue(stdout.lines[1] == "NA\tx_2_trial_1\tscript ready\t-> launch\n")
+        self.assertTrue(stdout.lines[2] == "NA\tx_3_trial_1\tscript ready\t-> launch\n")
+        self.assertTrue(stdout.lines[3] == "1\tx_4_trial_1\twaiting in queue\n")
+        self.assertTrue(len(stdout.lines) == 4)
+        # (after launch_job) errors
+        stdout.lines = []
+        pdriver.run_command('errors','')
+        self.assertTrue(len(stdout.lines) == 0)   
+        
+        # STOP THE JOB
+        stdout.lines = []
+        #stop job with bad job number
+        pdriver.run_command('stop_job','z_1_d_5')
+        self.assertTrue(stdout.lines[0] == "ERROR: job z_1_d_5 not valid for this cspec\n")
+        self.assertTrue(len(stdout.lines) == 1)   
+        # try to stop with valid job number
+        stdout.lines = []
+        pdriver.run_command('stop_job','x_4_trial_1')
+        self.assertTrue(stdout.lines[0] == "stopping 1 (j3)\n")
+        self.assertTrue(len(stdout.lines) == 1)   
+        
+        stdout.lines = []
+        pdriver.run_command('summary','')
+        self.assertTrue(stdout.lines[0] == "....\n")
+        self.assertTrue(stdout.lines[1] == "baz\t-\t4 runs total\n")
+        self.assertTrue(stdout.lines[2] == "scripts ready to run: 3\n")
+        self.assertTrue(stdout.lines[3] == "run state inconsistent: 1\n")
+        self.assertTrue(len(stdout.lines) == 4)
+        # (after stop_job) stat 
+        stdout.lines = []
+        pdriver.run_command('stat','')
+        self.assertTrue(stdout.lines[0] == "NA\tx_1_trial_1\tscript ready\t-> launch\n")
+        self.assertTrue(stdout.lines[1] == "NA\tx_2_trial_1\tscript ready\t-> launch\n")
+        self.assertTrue(stdout.lines[2] == "NA\tx_3_trial_1\tscript ready\t-> launch\n")
+        self.assertTrue(stdout.lines[3] == "NA\tx_4_trial_1\tinconsistent\t(files suggest system should be running, but not seen in qstat)\t-> retry\n")
+        # (after stop_job) pending
+        stdout.lines = []
+        pdriver.run_command('pending','')
+        self.assertTrue(stdout.lines[0] == "NA\tx_1_trial_1\tscript ready\t-> launch\n")
+        self.assertTrue(stdout.lines[1] == "NA\tx_2_trial_1\tscript ready\t-> launch\n")
+        self.assertTrue(stdout.lines[2] == "NA\tx_3_trial_1\tscript ready\t-> launch\n")
+        self.assertTrue(stdout.lines[3] == "NA\tx_4_trial_1\tinconsistent\t(files suggest system should be running, but not seen in qstat)\t-> retry\n")
+        self.assertTrue(len(stdout.lines) == 4)
+        # (after stop_job) errors
+        stdout.lines = []
+        pdriver.run_command('errors','')
+        self.assertTrue(stdout.lines[0] == "NA\tx_4_trial_1\tinconsistent\t(files suggest system should be running, but not seen in qstat)\t-> retry\n")
+        self.assertTrue(len(stdout.lines) == 1)   
+        #CLEAN THE JOB
+           
+        stdout.lines = []
+        #clean job with bad job number
+        pdriver.run_command('clean_job','z_1_d_5')
+        self.assertTrue(stdout.lines[0] == "ERROR: job z_1_d_5 not valid for this cspec\n")
+        self.assertTrue(len(stdout.lines) == 1)   
+        # try to clean the job with valid job number
+        stdout.lines = []
+        pdriver.run_command('clean_job','x_4_trial_1')
+        self.assertTrue(stdout.lines[0] == "deleting all files for x_4_trial_1\n")
+        self.assertTrue(len(stdout.lines) == 1)   
+
+        # (after clean_job) stat 
+        stdout.lines = []
+        pdriver.run_command('stat','')
+        self.assertTrue(stdout.lines[0] == "NA\tx_1_trial_1\tscript ready\t-> launch\n")
+        self.assertTrue(stdout.lines[1] == "NA\tx_2_trial_1\tscript ready\t-> launch\n")
+        self.assertTrue(stdout.lines[2] == "NA\tx_3_trial_1\tscript ready\t-> launch\n")
+        self.assertTrue(stdout.lines[3] == "NA\tx_4_trial_1\tscript ready\t-> launch\n")
+        # (after clean_job) pending
+        stdout.lines = []
+        pdriver.run_command('pending','')
+        self.assertTrue(stdout.lines[0] == "NA\tx_1_trial_1\tscript ready\t-> launch\n")
+        self.assertTrue(stdout.lines[1] == "NA\tx_2_trial_1\tscript ready\t-> launch\n")
+        self.assertTrue(stdout.lines[2] == "NA\tx_3_trial_1\tscript ready\t-> launch\n")
+        self.assertTrue(stdout.lines[3] == "NA\tx_4_trial_1\tscript ready\t-> launch\n")
+        self.assertTrue(len(stdout.lines) == 4)
+        # (after clean_job) errors
+        stdout.lines = []
+        pdriver.run_command('errors','')
+        self.assertTrue(len(stdout.lines) == 0)       
+
     def test_status_complete_runs(self):
         stdout = mock_stdout.MockStdout()
         lines = self.get_lines_for_simpleCaseCspec()
