@@ -54,6 +54,8 @@ class ClusterSpec(object):
             
             self.script_dir = "{0}/{1}/{2}".format(self.root_dir, self.cspec_name, 'scripts')
             self.one_up_basis = self.load_special_value(self.lines, 'one_up_basis:')
+            if self.one_up_basis == '':
+                self.one_up_basis = '0'
             
             # disengage the scores_to and scores_from until we re-engage collection of results.
             #self.scores_permuters = load_permuters(self.lines, 'scores_permute:','(scores_permute):')

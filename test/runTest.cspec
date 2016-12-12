@@ -3,28 +3,19 @@ trials:1
 (permute):x=range(1,5)
 (permute):y=1,2,3
 
-#scores_from:file=<permutation_results_dir>/run_test.csv,column_name=auc,row_number=1
-#scores_to:/nfs/stak/faculty/i/irvineje/permuterGH/test/runtest_out/collected_results
-#scores_y_axis:y
-#scores_x_axis:x
-
 #
 # permutation-dependent mappings can be expressed like this.  These will be matched by 
 # using permutations like this:  <config[(month)]>
 #
 
 #
-<replace>:root=/nfs/stak/faculty/i/irvineje/permuterGH/test
+<replace>:root=.
 #
 #  results_dir is where the generated results will be
 #
 root_dir:<root>/runtest_out
 
-#qsub_command:-q eecs,eecs1,eecs,share
 qsub_command:-q eecs,share
-#qsub_command:-M someone@gmail.com
-#qsub_command:-m beas
 qsub_command:-cwd
-one_up_basis:0
 
 command:python <root>/run_test.py (x) (y) 5 <permutation_results_dir>/run_test.csv
