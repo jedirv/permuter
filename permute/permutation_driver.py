@@ -98,46 +98,44 @@ class PermutationDriver(object):
             for pcode in cluster_runs.run_perm_codes_list:
                 stdout.println("deleting all files for {0}\n".format(pcode))
                 cluster.delete_all_but_script(pcode)
+                
         elif (permute_command == 'launch_job'):
-            user_job_number = scope.replace('j','')
-            if cluster_runs.perm_code_for_job_number_map.has_key(user_job_number):
-                pcode = cluster_runs.perm_code_for_job_number_map[user_job_number]
-                self.launch_script(pcode, cluster)
-            else:
-                stdout.println("ERROR: job number j{0} not valid for this cspec\n".format(user_job_number))
+            pcode = self.get_pcode_for_job_scope(scope)
+            self.launch_script(pcode, cluster)
             
         elif (permute_command == 'stat_job'):
-            user_job_number = scope.replace('j','')
-            if cluster_runs.perm_code_for_job_number_map.has_key(user_job_number):
-                pcode = cluster_runs.perm_code_for_job_number_map[user_job_number]
-                run_states.assess_run(pcode, cluster_runs, cluster)
-                run_states.emit_run_state_full(stdout, pcode)
-            else:
-                stdout.println("ERROR: job number j{0} not valid for this cspec\n".format(user_job_number))
-            
+            pcode = self.get_pcode_for_job_scope(scope)
+            run_states.assess_run(pcode, cluster_runs, cluster)
+            run_states.emit_run_state_full(stdout, pcode)
             
         elif (permute_command == 'stop_job'):
-            user_job_number = scope.replace('j','')
-            if cluster_runs.perm_code_for_job_number_map.has_key(user_job_number):
-                pcode = cluster_runs.perm_code_for_job_number_map[user_job_number]
-                self.stop_run(pcode, cluster_runs, cluster)
-            else:
-                stdout.println("ERROR: job number j{0} not valid for this cspec\n".format(user_job_number))
+            pcode = self.get_pcode_for_job_scope(scope)
+            self.stop_run(pcode, cluster_runs, cluster)
             
         elif (permute_command == 'clean_job'):
-            user_job_number = scope.replace('j','')
-            if cluster_runs.perm_code_for_job_number_map.has_key(user_job_number):
-                pcode = cluster_runs.perm_code_for_job_number_map[user_job_number]
-                if cluster.is_running(pcode) or cluster.is_waiting(pcode):
-                    self.stop_run(pcode, cluster_runs, cluster)
-                stdout.println("deleting all files for {0}\n".format(pcode))
-                cluster.delete_all_but_script(pcode)
-            else:
-                stdout.println("ERROR: job number j{0} not valid for this cspec\n".format(user_job_number))
+            pcode = self.get_pcode_for_job_scope(scope)
+            if cluster.is_running(pcode) or cluster.is_waiting(pcode):
+                self.stop_run(pcode, cluster_runs, cluster)
+            stdout.println("deleting all files for {0}\n".format(pcode))
+            cluster.delete_all_but_script(pcode)
             
         else:
             pass
-        
+    
+    def get_pcode_for_job_scope(self, scope):
+        if self.is_scope_valid_pcode(scope):
+            return scope
+        elif self.is_plausible_job_number(scope):
+            user_job_number = scope.replace('j','')
+            if self.cluster_runs.perm_code_for_job_number_map.has_key(user_job_number):
+                pcode = self.cluster_runs.perm_code_for_job_number_map[user_job_number]
+                return pcode
+            else:
+                self.stdout.println("ERROR: job number j{0} not valid for this cspec\n".format(user_job_number))
+                exit()
+        else:
+            self.stdout.println("ERROR: job {0} not valid for this cspec\n".format(scope))
+            exit()
     
     def collect(self, cluster_runs, cluster, stdout):
         #warn_of_incomplete_runs(cluster_runs)
@@ -183,7 +181,12 @@ class PermutationDriver(object):
             #print command
             cluster.execute_command(command) 
     '''
-         
+    def is_plausible_job_number(self,s):
+        if not(s.startswith('j')):
+            return False
+        s = s.replace('j','')
+        return s.isdigit() 
+      
     def retry_failed_runs(self, cluster_runs, cluster, run_states, stdout):
         logging.info('LAUNCHING incomplete runs')
         for pcode in cluster_runs.run_perm_codes_list:
