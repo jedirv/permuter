@@ -21,7 +21,7 @@ class TestPooledResultsFile(unittest.TestCase):
         lines.append("permute:animal=dog,cat\n")
 
         lines.append("scores_permute:resolution=userDay,userMonth\n")
-        lines.append("scores_from:file=<permutation_results_dir>/(resolution).csv,column_name=auc,row_number=1\n")
+        lines.append("scores_from:file=<permutation_output_dir>/(resolution).csv,column_name=auc,row_number=1\n")
         lines.append("scores_to:./collected_results\n")
         lines.append("scores_y_axis:letter\n")
         lines.append("scores_x_axis:number,animal\n")
@@ -77,7 +77,7 @@ class TestPooledResultsFile(unittest.TestCase):
         lines.append("concise_print:BBB,bb\n")
 
         lines.append("scores_permute:resolution=userDay,userMonth\n")
-        lines.append("scores_from:file=<permutation_results_dir>/(resolution).csv,column_name=auc,row_number=1\n")
+        lines.append("scores_from:file=<permutation_output_dir>/(resolution).csv,column_name=auc,row_number=1\n")
         lines.append("scores_to:./collected_results\n")
         lines.append("scores_y_axis:letter\n")
         lines.append("scores_x_axis:number,animal\n")
@@ -106,7 +106,7 @@ class TestPooledResultsFile(unittest.TestCase):
         lines.append("concise_print:AAA,aa\n")
         lines.append("concise_print:BBB,bb\n")
         lines.append("scores_permute:resolution=userDay,userMonth\n")
-        lines.append("scores_from:file=<permutation_results_dir>/(resolution).csv,column_name=auc,row_number=1\n")
+        lines.append("scores_from:file=<permutation_output_dir>/(resolution).csv,column_name=auc,row_number=1\n")
         lines.append("scores_to:./collected_results\n")
         lines.append("scores_y_axis:letter\n")
         lines.append("scores_x_axis:number,animal\n")

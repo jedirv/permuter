@@ -173,7 +173,8 @@ class Cluster(object):
                 return True
         return False
 
-    def get_output_file_mod_time(self, pcode):
+    # not used until we add support multiple output_filenames in cspec
+    def get_output_files_mod_time(self, pcode):
         permutation_info = self.cluster_runs.get_permutation_info_for_perm_code(pcode)
         list_of_output_files = permutations.get_list_of_output_files(permutation_info, self.cluster_runs.cspec)
         time = 0
@@ -186,6 +187,20 @@ class Cluster(object):
                 else:
                     if curtime < time:
                         time = curtime
+        if time == 0:
+            return 'NA'
+        else:
+            return time
+        
+    def get_output_file_mod_time(self, pcode):
+        output_path = "{0}{1}{2}".format(self.cluster_runs.cspec.generate_results_dir_for_permutation(pcode), self.cluster_runs.cspec.output_filename)
+        print "output_path in get_output_file_mod_time is {0}".format(output_path)
+        time = 0
+        # find the oldest output_file mod time
+        if os.path.exists(output_path):
+            curtime = os.path.getmtime(output_path)
+            time = curtime
+            
         if time == 0:
             return 'NA'
         else:

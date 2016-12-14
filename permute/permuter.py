@@ -146,7 +146,7 @@ def usage():
     print"               stop_job j<#>          # call qdel on any runs that are unfinished to abort them"
     print"               clean_job j<#>         # clean downstream files for job"                    
     print"               clean_scripts          # clean the launch scripts and associated .out, .err, and .qil files"          
-    print"               clean_results          # clean only the contents of <permutation_results_dir>" 
+    print"               clean_results          # clean only the contents of <permutation_output_dir>" 
     #print"               clean_pooled_results   # clean only the pooled results"           
     print""
     print""

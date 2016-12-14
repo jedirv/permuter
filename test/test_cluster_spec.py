@@ -46,7 +46,7 @@ class TestClusterSpec(unittest.TestCase):
         lines.append("concise_print:BBB,bb\n")
 
         #lines.append("scores_permute:resolution=userDay,userMonth\n")
-        #lines.append("scores_from:file=<permutation_results_dir>/(resolution).csv,column_name=auc,row_number=1\n")
+        #lines.append("scores_from:file=<permutation_output_dir>/(resolution).csv,column_name=auc,row_number=1\n")
         #lines.append("scores_to:./collected_results\n")
         #lines.append("scores_y_axis:letter\n")
         #lines.append("scores_x_axis:number,animal\n")
@@ -69,9 +69,9 @@ class TestClusterSpec(unittest.TestCase):
         lines.append("qsub_command:-q eecs,eecs1,eecs,share\n")
         lines.append("qsub_command:-M someone@gmail.com\n")
         lines.append("qsub_command:-m beas\n")
-        lines.append("one_up_basis:100\n")
+        lines.append("first_job_number:100\n")
 
-        lines.append("command:echo (letter) (number) (singleton_val) > <permutation_results_dir>/(letter)_(number)_<pretty[(number)]>.txt\n")
+        lines.append("command:echo (letter) (number) (singleton_val) > <permutation_output_dir>/(letter)_(number)_<pretty[(number)]>.txt\n")
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines,stdout)
         #print self.cspec.concise_print_map
@@ -85,7 +85,7 @@ class TestClusterSpec(unittest.TestCase):
         #self.assertTrue(cspec.scores_permuters['resolution'][0] == 'userDay')
         #self.assertTrue(cspec.scores_permuters['resolution'][1] == 'userMonth')
         
-        #self.assertTrue(cspec.scores_from_filepath=='<permutation_results_dir>/(resolution).csv')
+        #self.assertTrue(cspec.scores_from_filepath=='<permutation_output_dir>/(resolution).csv')
         #self.assertTrue(cspec.scores_from_colname=='auc')
         #self.assertTrue(cspec.scores_from_rownum=='1')
         #print 'self.cspec.scores_to : {0}'.format(self.cspec.scores_to)
@@ -103,8 +103,8 @@ class TestClusterSpec(unittest.TestCase):
         #master_job_name:
         self.assertTrue(cspec.cspec_name=='baz')
             
-        #one_up_basis:
-        self.assertTrue(cspec.one_up_basis == '100')
+        #first_job_number:
+        self.assertTrue(cspec.first_job_number == '100')
         
         #root_dir:
         self.assertTrue(cspec.root_dir == './myRuns')
@@ -140,7 +140,7 @@ class TestClusterSpec(unittest.TestCase):
             
         #commands:
         commands_as_string = "{0}".format(cspec.commands)
-        self.assertTrue(commands_as_string == "['echo (letter) (number) (singleton_val) > <permutation_results_dir>/(letter)_(number)_<pretty[(number)]>.txt']")
+        self.assertTrue(commands_as_string == "['echo (letter) (number) (singleton_val) > <permutation_output_dir>/(letter)_(number)_<pretty[(number)]>.txt']")
            
         #qsub_commands:
         qsub_commands_as_string = "{0}".format(cspec.qsub_commands)
@@ -186,7 +186,7 @@ class TestClusterSpec(unittest.TestCase):
         lines.append("concise_print:BBB, bb\n")
 
         #lines.append("scores_permute:resolution=userDay,userMonth\n")
-        #lines.append("scores_from:file= <permutation_results_dir>/(resolution).csv, column_name=auc,row_number=1\n")
+        #lines.append("scores_from:file= <permutation_output_dir>/(resolution).csv, column_name=auc,row_number=1\n")
         #lines.append("scores_to: ./collected_results\n")
         #lines.append("scores_y_axis: letter \n")
         #lines.append("scores_x_axis:number,\t\t\tanimal\n")
@@ -209,10 +209,16 @@ class TestClusterSpec(unittest.TestCase):
         lines.append("qsub_command:-q eecs,eecs1,eecs,share\n")
         lines.append("qsub_command:-M someone@gmail.com\n")
         lines.append("qsub_command:-m beas\n")
-        lines.append("one_up_basis:100 \n")
+        lines.append("first_job_number:100 \n")
 
-        lines.append("command:echo (letter) (number) (singleton_val) > <permutation_results_dir>/(letter)_(number)_<pretty[(number)]>.txt\n")
+        lines.append("command:echo (letter) (number) (singleton_val) > <permutation_output_dir>/(letter)_(number)_<pretty[(number)]>.txt\n")
         stdout = mock_stdout.MockStdout()
+        
+        #complain until output_filename added
+        self.assertFalse(cluster_spec.validate(lines, stdout))
+        lines.append("output_filename:sout.txt\n")
+        self.assertTrue(cluster_spec.validate(lines, stdout))
+        
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines,stdout)
         #print self.cspec.concise_print_map
         # concise_name
@@ -225,7 +231,7 @@ class TestClusterSpec(unittest.TestCase):
         #self.assertTrue(cspec.scores_permuters['resolution'][0] == 'userDay')
         #self.assertTrue(cspec.scores_permuters['resolution'][1] == 'userMonth')
         
-        #self.assertTrue(cspec.scores_from_filepath=='<permutation_results_dir>/(resolution).csv')
+        #self.assertTrue(cspec.scores_from_filepath=='<permutation_output_dir>/(resolution).csv')
         #self.assertTrue(cspec.scores_from_colname=='auc')
         #self.assertTrue(cspec.scores_from_rownum=='1')
         #print 'self.cspec.scores_to : {0}'.format(self.cspec.scores_to)
@@ -243,8 +249,8 @@ class TestClusterSpec(unittest.TestCase):
         #cspec_name:
         self.assertTrue(cspec.cspec_name=='baz')
             
-        #one_up_basis:
-        self.assertTrue(cspec.one_up_basis == '100')
+        #first_job_number:
+        self.assertTrue(cspec.first_job_number == '100')
         
         #root_dir:
         self.assertTrue(cspec.root_dir == './myRuns')
@@ -280,7 +286,7 @@ class TestClusterSpec(unittest.TestCase):
             
         #commands:
         commands_as_string = "{0}".format(cspec.commands)
-        self.assertTrue(commands_as_string == "['echo (letter) (number) (singleton_val) > <permutation_results_dir>/(letter)_(number)_<pretty[(number)]>.txt']")
+        self.assertTrue(commands_as_string == "['echo (letter) (number) (singleton_val) > <permutation_output_dir>/(letter)_(number)_<pretty[(number)]>.txt']")
            
         #qsub_commands:
         qsub_commands_as_string = "{0}".format(cspec.qsub_commands)
@@ -469,11 +475,11 @@ class TestClusterSpec(unittest.TestCase):
         self.assertTrue(cluster_spec.validate_scores_to(lines))
         
     def test_validate_scores_from(self):
-        #scores_from:file=<permutation_results_dir>/(resolution).csv,column_name=auc,row_number=1
+        #scores_from:file=<permutation_output_dir>/(resolution).csv,column_name=auc,row_number=1
         # multiple entries
         lines = []
-        lines.append('scores_from:file=<permutation_results_dir>/(resolution).csv,column_name=auc,row_number=1')
-        lines.append('scores_from:file=<permutation_results_dir>/foo.csv,column_name=auc,row_number=1')
+        lines.append('scores_from:file=<permutation_output_dir>/(resolution).csv,column_name=auc,row_number=1')
+        lines.append('scores_from:file=<permutation_output_dir>/foo.csv,column_name=auc,row_number=1')
         self.assertFalse(cluster_spec.validate_scores_from(lines))
         
         #no permuteion_results_dir
@@ -483,33 +489,33 @@ class TestClusterSpec(unittest.TestCase):
         
         # not a csv file
         lines = []
-        lines.append('scores_from:file=<permutation_results_dir>/(resolution).txt,column_name=auc,row_number=1')
+        lines.append('scores_from:file=<permutation_output_dir>/(resolution).txt,column_name=auc,row_number=1')
         self.assertFalse(cluster_spec.validate_scores_from(lines))
         
         # wrong colname flag
         lines = []
-        lines.append('scores_from:file=<permutation_results_dir>/(resolution).csv,col_name=auc,row_number=1')
+        lines.append('scores_from:file=<permutation_output_dir>/(resolution).csv,col_name=auc,row_number=1')
         self.assertFalse(cluster_spec.validate_scores_from(lines))
         
         #wrong rownum flag
         lines = []
-        lines.append('scores_from:file=<permutation_results_dir>/(resolution).csv,column_name=auc,row_num=1')
+        lines.append('scores_from:file=<permutation_output_dir>/(resolution).csv,column_name=auc,row_num=1')
         self.assertFalse(cluster_spec.validate_scores_from(lines))
         
         
         #non integer rownum
         lines = []
-        lines.append('scores_from:file=<permutation_results_dir>/(resolution).csv,column_name=auc,row_number=a')
+        lines.append('scores_from:file=<permutation_output_dir>/(resolution).csv,column_name=auc,row_number=a')
         self.assertFalse(cluster_spec.validate_scores_from(lines))
         
         #good one
         lines = []
-        lines.append('scores_from:file=<permutation_results_dir>/(resolution).csv,column_name=auc,row_number=1')
+        lines.append('scores_from:file=<permutation_output_dir>/(resolution).csv,column_name=auc,row_number=1')
         self.assertTrue(cluster_spec.validate_scores_from(lines))
         
         #good one with spaces
         lines = []
-        lines.append('scores_from:file= <permutation_results_dir>/(resolution).csv, column_name = auc , row_number = 1')
+        lines.append('scores_from:file= <permutation_output_dir>/(resolution).csv, column_name = auc , row_number = 1')
         self.assertTrue(cluster_spec.validate_scores_from(lines))
         
     '''    
@@ -543,7 +549,7 @@ class TestClusterSpec(unittest.TestCase):
         #missing to
         stdout = mock_stdout.MockStdout()
         lines = []
-        lines.append('scores_from:file=<permutation_results_dir>/foo.csv,column_name=auc,row_number=1')
+        lines.append('scores_from:file=<permutation_output_dir>/foo.csv,column_name=auc,row_number=1')
         lines.append('scores_y_axis:letter')
         lines.append('scores_x_axis:number,animal')
         self.assertFalse(cluster_spec.validate_scores_gathering_info(lines, stdout))
@@ -551,7 +557,7 @@ class TestClusterSpec(unittest.TestCase):
         #missing x axis
         stdout = mock_stdout.MockStdout()
         lines = []
-        lines.append('scores_from:file=<permutation_results_dir>/foo.csv,column_name=auc,row_number=1')
+        lines.append('scores_from:file=<permutation_output_dir>/foo.csv,column_name=auc,row_number=1')
         lines.append('scores_to:./collected_results')
         lines.append('scores_y_axis:letter')
         self.assertFalse(cluster_spec.validate_scores_gathering_info(lines, stdout))
@@ -559,7 +565,7 @@ class TestClusterSpec(unittest.TestCase):
         #missing y axis
         stdout = mock_stdout.MockStdout()
         lines = []
-        lines.append('scores_from:file=<permutation_results_dir>/foo.csv,column_name=auc,row_number=1')
+        lines.append('scores_from:file=<permutation_output_dir>/foo.csv,column_name=auc,row_number=1')
         lines.append('scores_to:./collected_results')
         lines.append('scores_x_axis:number,animal')
         self.assertFalse(cluster_spec.validate_scores_gathering_info(lines, stdout))
@@ -571,7 +577,7 @@ class TestClusterSpec(unittest.TestCase):
         lines.append('(permute):number=range(1,3)\n')
         lines.append('(permute):animal=cat,dog\n')
         lines.append('(permute):letter=a,b,c\n')
-        lines.append('scores_from:file=<permutation_results_dir>/foo.csv,column_name=auc,row_number=1')
+        lines.append('scores_from:file=<permutation_output_dir>/foo.csv,column_name=auc,row_number=1')
         lines.append('scores_to:./collected_results')
         lines.append('scores_x_axis:number,animal')
         lines.append('scores_y_axis:letter')
@@ -584,7 +590,7 @@ class TestClusterSpec(unittest.TestCase):
         lines.append('(permute):number=range(1,3)\n')
         lines.append('(permute):animal=cat,dog\n')
         lines.append('(permute):letter=a,b,c\n')
-        lines.append('scores_from:file= <permutation_results_dir>/foo.csv, column_name=auc,row_number=1')
+        lines.append('scores_from:file= <permutation_output_dir>/foo.csv, column_name=auc,row_number=1')
         lines.append('scores_to:./collected_results ')
         lines.append('scores_x_axis:number, animal')
         lines.append('scores_y_axis: letter')

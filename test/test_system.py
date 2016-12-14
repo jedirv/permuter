@@ -25,7 +25,7 @@ class TestSystem(unittest.TestCase):
         lines.append("concise_print:BBB,bb\n")
 
         lines.append("scores_permute:resolution=userDay,userMonth\n")
-        lines.append("scores_from:file=<permutation_results_dir>/(resolution).csv,column_name=auc,row_number=1\n")
+        lines.append("scores_from:file=<permutation_output_dir>/(resolution).csv,column_name=auc,row_number=1\n")
         lines.append("scores_to:./collected_results\n")
         lines.append("scores_y_axis:letter\n")
         lines.append("scores_x_axis:number,animal\n")
@@ -49,9 +49,9 @@ class TestSystem(unittest.TestCase):
         lines.append("qsub_command:-q eecs,eecs1,eecs,share\n")
         lines.append("qsub_command:-M someone@gmail.com\n")
         lines.append("qsub_command:-m beas\n")
-        lines.append("one_up_basis:100\n")
+        lines.append("first_job_number:100\n")
 
-        lines.append("command:echo (letter) (number) (singleton_val) > <permutation_results_dir>/(letter)_(number)_<pretty[(number)]>.txt\n")
+        lines.append("command:echo (letter) (number) (singleton_val) > <permutation_output_dir>/(letter)_(number)_<pretty[(number)]>.txt\n")
         self.lines = lines
         
     def test_preview(self):
@@ -135,7 +135,7 @@ class TestSystem(unittest.TestCase):
         lines.append("concise_print:BBB,bb\n")
 
         lines.append("scores_permute:resolution=userDay,userMonth\n")
-        lines.append("scores_from:file=<permutation_results_dir>/(resolution).csv,column_name=auc,row_number=1\n")
+        lines.append("scores_from:file=<permutation_output_dir>/(resolution).csv,column_name=auc,row_number=1\n")
         lines.append("scores_to:./collected_results\n")
         lines.append("scores_y_axis:letter\n")
         lines.append("scores_x_axis:number,animal\n")
@@ -158,9 +158,9 @@ class TestSystem(unittest.TestCase):
         lines.append("qsub_command:-q eecs,eecs1,eecs,share\n")
         lines.append("qsub_command:-M someone@gmail.com\n")
         lines.append("qsub_command:-m beas\n")
-        lines.append("one_up_basis:100\n")
+        lines.append("first_job_number:100\n")
 
-        lines.append("command:echo (letter) (number) (singleton_val) > <permutation_results_dir>/(letter)_(number)_<pretty[(number)]>.txt\n")
+        lines.append("command:echo (letter) (number) (singleton_val) > <permutation_output_dir>/(letter)_(number)_<pretty[(number)]>.txt\n")
         
         stdout = mock_stdout.MockStdout()
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout)
@@ -209,7 +209,7 @@ class TestSystem(unittest.TestCase):
         lines.append('#cspec\n')
         lines.append('trials:1\n')
         lines.append('permute:x=range(1,5)\n')
-        lines.append('scores_from:file=<permutation_results_dir>/run_test.csv,column_name=auc,row_number=1\n')
+        lines.append('scores_from:file=<permutation_output_dir>/run_test.csv,column_name=auc,row_number=1\n')
         lines.append('scores_to:/nfs/stak/students/i/irvine/python/cluster/test/runtest_out/collected_results\n')
         lines.append('#\n')
         lines.append('# permutation-dependent mappings can be expressed like this.  These will be matched by \n')
@@ -229,8 +229,8 @@ class TestSystem(unittest.TestCase):
         lines.append('#qsub_command:-M someone@gmail.com\n')
         lines.append('#qsub_command:-m beas\n')
         lines.append('qsub_command:-cwd\n')
-        lines.append('one_up_basis:0\n')
-        lines.append('command:python <root>/run_test.py (x)  5 <permutation_results_dir>/run_test.csv\n')
+        lines.append('first_job_number:0\n')
+        lines.append('command:python <root>/run_test.py (x)  5 <permutation_output_dir>/run_test.csv\n')
         return lines
 
     

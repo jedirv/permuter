@@ -22,7 +22,7 @@ class TestStateOfRuns(unittest.TestCase):
         self.lines.append("concise_print:number,n\n")
         self.lines.append("concise_print:letter,l\n")
 
-        self.lines.append("scores_from:file=<permutation_results_dir>/out_(letter)_(number).csv,column_name=auc,row_number=1\n")
+        self.lines.append("scores_from:file=<permutation_output_dir>/out_(letter)_(number).csv,column_name=auc,row_number=1\n")
         self.lines.append("scores_to:./collected_results\n")
         self.lines.append("scores_y_axis:letter\n")
         self.lines.append("scores_x_axis:number\n")
@@ -32,9 +32,9 @@ class TestStateOfRuns(unittest.TestCase):
         self.lines.append("qsub_command:-q eecs,eecs1,eecs,share\n")
         self.lines.append("qsub_command:-M someone@gmail.com\n")
         self.lines.append("qsub_command:-m beas\n")
-        self.lines.append("one_up_basis:0\n")
+        self.lines.append("first_job_number:0\n")
 
-        self.lines.append("command:echo (letter) (number) > <permutation_results_dir>/(letter)_(number).txt\n")
+        self.lines.append("command:echo (letter) (number) > <permutation_output_dir>/(letter)_(number).txt\n")
         
     # '-----'
     def test_assess_run_______before_run(self):

@@ -53,9 +53,10 @@ class ClusterSpec(object):
             self.commands = self.load_commands(self.lines)
             
             self.script_dir = "{0}/{1}/{2}".format(self.root_dir, self.cspec_name, 'scripts')
-            self.one_up_basis = self.load_special_value(self.lines, 'one_up_basis:')
-            if self.one_up_basis == '':
-                self.one_up_basis = '0'
+            self.first_job_number = self.load_special_value(self.lines, 'first_job_number:')
+            if self.first_job_number == '':
+                self.first_job_number = '0'
+            self.output_filename = self.load_special_value(self.lines, 'output_filename:')
             
             # disengage the scores_to and scores_from until we re-engage collection of results.
             #self.scores_permuters = load_permuters(self.lines, 'scores_permute:','(scores_permute):')
@@ -93,7 +94,8 @@ class ClusterSpec(object):
             return self.concise_print_map[permuter_name]
         else:
             return permuter_name
-        
+    
+    '''    
     def load_scores_from(self, lines):
         for line in lines:
             line = line.rstrip()
@@ -104,7 +106,7 @@ class ClusterSpec(object):
                 file_flag, self.scores_from_filepath = file_info.split('=')
                 colname_flag , self.scores_from_colname = column_info.split('=')
                 rownum_flag, self.scores_from_rownum = row_info.split('=')
-        
+    '''    
     
     def load_dir(self, lines, dir_flag):
         for line in lines:
@@ -303,6 +305,7 @@ def is_string_a_float(val):
     except ValueError:
         return False
                
+               
 def validate(lines, stdout):
     result_permute = validate_permute_entries(lines)
     if not(result_permute):
@@ -324,7 +327,10 @@ def validate(lines, stdout):
     if not(result_scores_info):
         stdout.println("problem found in scores gathering info entries")
         
-    return result_permute and result_replace and result_root_dir and result_trials and result_scores_info
+    output_filename = validate_statement_present(lines, "output_filename:", "some_filename", stdout)
+    if not(output_filename):
+        stdout.println("problem found in output_filename: statement")
+    return result_permute and result_replace and result_root_dir and result_trials and result_scores_info and output_filename
 
 
 def validate_statement_present(lines, statement, val, stdout):
@@ -503,7 +509,7 @@ def single_entry_present(lines, prefix):
         return False
 
 def validate_scores_from(lines):
-    #scores_from:file=<permutation_results_dir>/(resolution).csv,column_name=auc,row_number=1
+    #scores_from:file=<permutation_output_dir>/(resolution).csv,column_name=auc,row_number=1
     if (not(single_entry_present(lines, 'scores_from:'))):
         print 'more than one entry for scores_from:  Should be one entry'
         return False
@@ -514,8 +520,8 @@ def validate_scores_from(lines):
             flag, from_info = line.split(':')
             path_info, column_info, row_info = from_info.split(',')
             path_flag, path = path_info.split('=')
-            if (not(path.startswith('<permutation_results_dir>'))):
-                print 'scores_from: entry should start with "<permutation_results_dir>"'
+            if (not(path.startswith('<permutation_output_dir>'))):
+                print 'scores_from: entry should start with "<permutation_output_dir>"'
                 print 'currently is:  {0}'.format(line)
                 return False
             if (not(path.endswith('.csv'))):
@@ -524,12 +530,12 @@ def validate_scores_from(lines):
                 return False
             column_flag, column_name = column_info.split('=')
             if (not(column_flag == 'column_name')):
-                print 'scores_from should be of this form: scores_from:file=<permutation_results_dir>/some_name.csv,column_name=some_col,row_number=some_int'
+                print 'scores_from should be of this form: scores_from:file=<permutation_output_dir>/some_name.csv,column_name=some_col,row_number=some_int'
                 print 'currently is:  {0}'.format(line)
                 return False
             row_flag, row_num = row_info.split('=')
             if (not(row_flag == 'row_number')):
-                print 'scores_from should be of this form: scores_from:file=<permutation_results_dir>/some_name.csv,column_name=some_col,row_number=some_int'
+                print 'scores_from should be of this form: scores_from:file=<permutation_output_dir>/some_name.csv,column_name=some_col,row_number=some_int'
                 print 'currently is:  {0}'.format(line)
                 return False
             if (not(row_num.isdigit())):

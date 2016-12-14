@@ -246,8 +246,8 @@ def expand_permutations(permuters):
 
 def launch_scripts(keyValMap, permute_dictionary_list, concisePrintMap):
     user_job_number = 1
-    if keyValMap.has_key('one_up_basis'):
-        user_job_number = int(keyValMap['one_up_basis'])
+    if keyValMap.has_key('first_job_number'):
+        user_job_number = int(keyValMap['first_job_number'])
     for permute_dict in permute_dictionary_list:
         permute_code = generate_perm_code(permute_dict, concisePrintMap)
         launch_script(user_job_number, keyValMap, permute_code)
@@ -256,8 +256,8 @@ def launch_scripts(keyValMap, permute_dictionary_list, concisePrintMap):
 
 def generate_scripts(keyValMap, commands, permute_dictionary_list, qsub_commands, concisePrintMap):
     user_job_number = 1
-    if keyValMap.has_key('one_up_basis'):
-        user_job_number = int(keyValMap['one_up_basis'])
+    if keyValMap.has_key('first_job_number'):
+        user_job_number = int(keyValMap['first_job_number'])
     for permute_dict in permute_dictionary_list:
         permute_code = generate_perm_code(permute_dict, concisePrintMap)
         commands_for_this_permutation = resolve_permutation(permute_dict, commands, keyValMap)

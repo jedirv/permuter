@@ -26,7 +26,7 @@ class TestCluster(unittest.TestCase):
         lines.append("concise_print:number,n\n")
 
         lines.append("scores_permute:resolution=userDay,userMonth\n")
-        lines.append("scores_from:file=<permutation_results_dir>/(resolution).csv,column_name=auc,row_number=1\n")
+        lines.append("scores_from:file=<permutation_output_dir>/(resolution).csv,column_name=auc,row_number=1\n")
         lines.append("scores_to:./collected_results\n")
         lines.append("scores_y_axis:letter\n")
         lines.append("scores_x_axis:number,animal\n")
@@ -49,9 +49,9 @@ class TestCluster(unittest.TestCase):
         lines.append("qsub_command:-q eecs,eecs1,eecs,share\n")
         lines.append("qsub_command:-M someone@gmail.com\n")
         lines.append("qsub_command:-m beas\n")
-        lines.append("one_up_basis:100\n")
+        lines.append("first_job_number:100\n")
 
-        lines.append("command:echo (letter) (number) > <permutation_results_dir>/(letter)_(number).txt\n")
+        lines.append("command:echo (letter) (number) > <permutation_output_dir>/(letter)_(number).txt\n")
         self.lines = lines
         
     def testCreateScript(self):

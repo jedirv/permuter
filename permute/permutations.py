@@ -3,7 +3,9 @@ import logging
 #constants to help with permutation processing
 IGNORE_TRIALS = False
 INCLUDE_TRIALS = True
- 
+
+'''
+leave in place in case we support multiple output files for each permutation 
 def get_list_of_output_files(permutation_info, cspec):
     output_file_paths = []
     scores_permutations = expand_permutations(cspec.scores_permuters)
@@ -27,19 +29,24 @@ def get_list_of_output_files(permutation_info, cspec):
         unresolved_output_files = []
         #print "cspec.scores_from_filepath {0}".format(cspec.scores_from_filepath)
         #print "cspec.key_val_map {0}".format(cspec.key_val_map)
+        #permutation_output_dir = cspec.generate_results_dir_for_permutation(pcode) 
+        
+        
+                  #scores_from_filepath obsolete!
         unresolved_output_files.append(cspec.scores_from_filepath)
         kvm_with_results_dir_resolved = {}
         for key, val in cspec.key_val_map.items():
             kvm_with_results_dir_resolved[key] = val
-        kvm_with_results_dir_resolved['permutation_results_dir'] = get_resolved_results_dir_for_permutation(permutation_info, cspec)      
+        kvm_with_results_dir_resolved['permutation_output_dir'] = get_resolved_results_dir_for_permutation(permutation_info, cspec)      
         resolved_list_of_one = resolve_list_for_permutation(complete_permutation_info, unresolved_output_files, kvm_with_results_dir_resolved)
         #print resolved_list_of_one
         output_file_paths.append(resolved_list_of_one[0])
     return output_file_paths
     #resolve_permutation(permutation_info, commands, keyValMap)
-    #scores_from:file=<permutation_results_dir>/score_out_(color).csv,column_name=auc,row_number=1
+    #scores_from:file=<permutation_output_dir>/score_out_(color).csv,column_name=auc,row_number=1
     #...need to generate list of all output files for permutation, keying off
     #scores_permute:color=red,blue,
+'''
     
 def generate_perm_code(permutation_info, concisePrintMap, include_trials):
     code = ""

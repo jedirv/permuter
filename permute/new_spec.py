@@ -31,7 +31,7 @@ class NewSpec(object):
         f.write("command:<tools_dir>/post_processor -i <permutation_result_dir>/rawresult.csv -o -technique 1 <permutation_result_dir>/finalresult_technique1.csv\n");
         f.write("command:<tools_dir>/post_processor -i <permutation_result_dir>/rawresult.csv -o -technique 2 <permutation_result_dir>/finalresult_technique2.csv\n");
         f.write("\n")
-        f.write("one_up_basis:0");
+        f.write("first_job_number:0");
         f.write("\n")
         f.write("(permute):year=2011,2012,2013\n");
         f.write("(permute):month=08,09,10\n");
@@ -42,7 +42,7 @@ class NewSpec(object):
         '''
         f.write("#\n");
         f.write("scores_permute:post_proc_approach=technique1,techniqu2\n");
-        f.write("scores_from:file=<permutation_results_dir>/final_result_(post_proc_approach).csv,column_name=auc,row_number=1\n");
+        f.write("scores_from:file=<permutation_output_dir>/final_result_(post_proc_approach).csv,column_name=auc,row_number=1\n");
         f.write("scores_to:/nfs/guille/myproject/collected_results\n");
         f.write("scores_y_axis:year,month\n");
         f.write("scores_x_axis:t_val\n");
@@ -67,7 +67,7 @@ class NewSpec(object):
         f.write("command:<tools_dir>/post_processor -i <permutation_result_dir>/rawresult.csv -o -technique 1 <permutation_result_dir>/finalresult_technique1.csv\n");
         f.write("command:<tools_dir>/post_processor -i <permutation_result_dir>/rawresult.csv -o -technique 2 <permutation_result_dir>/finalresult_technique2.csv\n");
         f.write("\n")
-        f.write("one_up_basis:0");
+        f.write("first_job_number:0");
         f.write("\n")
         f.write("(permute):year=2011,2012,2013\n");
         f.write("(permute):month=08,09,10\n");
@@ -78,7 +78,7 @@ class NewSpec(object):
         '''
         f.write("#\n");
         f.write("scores_permute:post_proc_approach=technique1,techniqu2\n");
-        f.write("scores_from:file=<permutation_results_dir>/final_result_(post_proc_approach).csv,column_name=auc,row_number=1\n");
+        f.write("scores_from:file=<permutation_output_dir>/final_result_(post_proc_approach).csv,column_name=auc,row_number=1\n");
         f.write("scores_to:/nfs/guille/myproject/collected_results\n");
         f.write("scores_y_axis:year,month\n");
         f.write("scores_x_axis:t_val\n");

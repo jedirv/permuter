@@ -26,7 +26,7 @@ class PermutationDriverFile(object):
         self.type = "permutation_driver_file"
         self.resolved_results_dir =  permutations.get_resolved_results_dir_for_permutation(permutation_info, cspec)
         #print "SETTING resolved_results_dir : {0}".format(self.resolved_results_dir)
-        self.key_val_map['permutation_results_dir'] = self.resolved_results_dir
+        self.key_val_map['permutation_output_dir'] = self.resolved_results_dir
         self.user_job_number = user_job_number
         self.script_dir = cspec.script_dir
         self.qsub_invoke_log = "{0}.qil".format(self.get_job_file_name())
