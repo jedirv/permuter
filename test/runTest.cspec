@@ -14,8 +14,9 @@ trials:1
 #  results_dir is where the generated results will be
 #
 root_dir:<root>/runtest_out
+output_filename:run_test.csv
+
+command:python <root>/run_test.py (x) (y) 5 <permutation_output_dir>/<output_filename>
 
 qsub_command:-q eecs,share
 qsub_command:-cwd
-
-command:python <root>/run_test.py (x) (y) 5 <permutation_results_dir>/run_test.csv
