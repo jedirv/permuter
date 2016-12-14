@@ -173,6 +173,7 @@ class Cluster(object):
                 return True
         return False
 
+    '''
     # not used until we add support multiple output_filenames in cspec
     def get_output_files_mod_time(self, pcode):
         permutation_info = self.cluster_runs.get_permutation_info_for_perm_code(pcode)
@@ -191,6 +192,7 @@ class Cluster(object):
             return 'NA'
         else:
             return time
+    '''
         
     def get_output_file_mod_time(self, pcode):
         output_path = "{0}/{1}".format(self.cluster_runs.cspec.generate_results_dir_for_permutation(pcode), self.cluster_runs.cspec.output_filename)
