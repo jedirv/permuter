@@ -194,7 +194,6 @@ class Cluster(object):
         
     def get_output_file_mod_time(self, pcode):
         output_path = "{0}/{1}".format(self.cluster_runs.cspec.generate_results_dir_for_permutation(pcode), self.cluster_runs.cspec.output_filename)
-        print "output_path in get_output_file_mod_time is {0}".format(output_path)
         time = 0
         # find the oldest output_file mod time
         if os.path.exists(output_path):
