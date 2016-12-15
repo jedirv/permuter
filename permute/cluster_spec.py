@@ -37,6 +37,8 @@ class ClusterSpec(object):
             cspec_filename = os.path.basename(self.path)
             self.cspec_name, file_ext  = cspec_filename.split('.')
             self.trials = self.load_special_value(self.lines, 'trials:')
+            if self.trials == '':
+                self.trials = '1'
             self.permuters = load_permuters(self.lines, 'permute:', '(permute):')
             self.concise_print_map = self.load_concise_print_map(self.lines)
             
