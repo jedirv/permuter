@@ -42,6 +42,9 @@ class ClusterSpec(object):
             
             self.key_val_map = self.load_replaces(self.lines)
             self.root_dir = self.load_dir(self.lines, "root_dir:")
+            print("original root dir {0}".format(self.root_dir))
+            self.root_dir = os.path.abspath(self.root_dir)
+            print("resolved root dir {0}".format(self.root_dir))
             self.job_results_dir = "{0}/{1}/{2}".format(self.root_dir, self.cspec_name, 'results')
             # put the results_dir into the kvm so that permutation calculation wil find it
             self.key_val_map['root_dir'] = self.root_dir
@@ -72,6 +75,7 @@ class ClusterSpec(object):
             self.stdout.println("An error occurred trying to open cspec file {0}".format(path))
             exit()
 
+    
     def get_permuters_trials_included(self):
         permuters_with_trials = {}
         for key, val in self.permuters.items():
