@@ -9,8 +9,8 @@ trials:1
 #
 
 #
-#<replace>:root=../test
-<replace>:root=/nfs/stak/faculty/i/irvineje/permuterGH/test
+<replace>:root=../test
+#<replace>:root=/nfs/stak/faculty/i/irvineje/permuterGH/test
 #
 #  results_dir is where the generated results will be
 #
