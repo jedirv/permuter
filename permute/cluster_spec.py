@@ -322,10 +322,6 @@ def validate(lines, stdout):
     result_root_dir = validate_statement_present(lines,"root_dir:","some_dir", stdout)
     if not(result_root_dir):
         stdout.println("problem found in root_dir statement")
-        
-    result_trials = validate_statement_present(lines,"trials:","some_integer", stdout)
-    if not(result_trials):
-        stdout.println("problem found in trials statement")
     
     result_scores_info = validate_scores_gathering_info(lines, stdout)
     if not(result_scores_info):
@@ -334,7 +330,7 @@ def validate(lines, stdout):
     output_filename = validate_statement_present(lines, "output_filename:", "some_filename", stdout)
     if not(output_filename):
         stdout.println("problem found in output_filename: statement")
-    return result_permute and result_replace and result_root_dir and result_trials and result_scores_info and output_filename
+    return result_permute and result_replace and result_root_dir and result_scores_info and output_filename
 
 
 def validate_statement_present(lines, statement, val, stdout):
