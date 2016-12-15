@@ -3,7 +3,7 @@ Created on Dec 12, 2013
 
 @author: admin-jed
 '''
-import permutations
+import permutations, os
 
 class PermutationDriverFile(object):
     '''
@@ -31,6 +31,7 @@ class PermutationDriverFile(object):
         self.script_dir = cspec.script_dir
         self.qsub_invoke_log = "{0}.qil".format(self.get_job_file_name())
         self.qsub_invoke_log_fullpath = "{0}/{1}".format(self.script_dir,self.qsub_invoke_log)
+        print "os.getcwd(): {0}".format(os.getcwd())
         print "self.qsub_invoke_log_fullpath : {0}".format(self.qsub_invoke_log_fullpath)
         self.configure()
         
