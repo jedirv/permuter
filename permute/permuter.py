@@ -100,8 +100,8 @@ def validate_cspec_is_cspec(cspec_path):
         f = open(cspec_path, 'r')
         # verify first line has cspec flag
         header = f.readline()
-        if (header != "#cspec\n"):
-            print "cspec file must have this header:  '#cspec', {0} does not. Exiting.".format(cspec_path)
+        if (header != "#pspec\n"):
+            print "pspec file must have this header:  '#pspec', {0} does not. Exiting.".format(cspec_path)
             f.close()
             exit()
         f.close()
