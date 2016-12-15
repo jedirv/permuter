@@ -17,7 +17,7 @@ trials:1
 root_dir:<root>/runtest_out
 output_filename:run_test.csv
 
-command:python <root>/run_test.py (x) (y) 5 <permutation_output_dir>/<output_filename>
+command:python <root>/run_test.py (x) (y) 5 <permutation_output_dir>
 
 qsub_command:-q eecs,share
 qsub_command:-cwd

@@ -13,7 +13,8 @@ def main():
     x = int(sys.argv[1])
     y = int(sys.argv[2])
     delay = int(sys.argv[3])
-    outpath = sys.argv[4]
+    outdir = sys.argv[4]
+    outpath = "{0}/run_test.csv".format(outdir)
     product = x * y
     for i in range(0,product):
         time.sleep(delay)
