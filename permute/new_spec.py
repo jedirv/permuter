@@ -19,7 +19,7 @@ class NewSpec(object):
     def persist(self):
         print "path : {0}".format( self.cspec_path)
         f = open(self.cspec_path, 'w')
-        f.write("#cspec\n")
+        f.write("#pspec\n")
         f.write("trials:1\n")
         f.write("\n")
         f.write("<replace>:project_root=/nfs/guille/myproject\n");

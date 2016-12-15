@@ -30,8 +30,8 @@ class ClusterSpec(object):
             header = lines[0]
             header = "".join(header.split()) # remove white spaces
             #print("header : {0} length {1} ".format(header, len(header)))
-            if (header != "#cspec"):
-                self.stdout.println("cspec file must have this header:  '#cspec', {0} does not. Exiting.".format(path))
+            if (header != "#pspec"):
+                self.stdout.println("pspec file must have this header:  '#pspec', {0} does not. Exiting.".format(path))
                 exit()
             
             cspec_filename = os.path.basename(self.path)

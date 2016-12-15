@@ -15,8 +15,8 @@ class SpecHelp(object):
         Constructor
         '''
     def express(self):   
-        print("#cspec")
-        print("# The very first line of the file must start with #cspec")
+        print("#pspec")
+        print("# The very first line of the file must start with #pspec")
         print("############################################################################")
         print("#  trials - specify the number of trials you want to run. Each permutation  ")
         print("#           will be run that many times.  Value must be integer.")
