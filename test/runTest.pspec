@@ -1,4 +1,4 @@
-#cspec
+#pspec
 (permute):x=range(1,5)
 (permute):y=1,2,3
 
