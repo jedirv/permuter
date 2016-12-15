@@ -76,7 +76,6 @@ class QsubInvokeLog(PermutationDriverFile):
         else:
             result = "NA"
         os.chdir(starting_dir)
-        print "load_job_number found job {0}".format(result)
         return result
         
     def delete(self):
