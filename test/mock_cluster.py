@@ -292,8 +292,6 @@ class MockCluster(object):
             return self.cluster_job_numbers[pcode]
         return 'NA'
     
-    def get_time_delay(self):
-        return 0.01
     ####################
     #  Stubs
     ####################

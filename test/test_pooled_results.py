@@ -14,7 +14,7 @@ class TestPooledResultsFile(unittest.TestCase):
 
     def test_gather_file_permuters(self):
         lines = []
-        lines.append("#cspec\n")
+        lines.append("#pspec\n")
         lines.append("permute:number=1-3\n")
         lines.append("permute:letter=AAA,BBB\n")
         lines.append("permute:singleton_val=300\n")
@@ -36,7 +36,7 @@ class TestPooledResultsFile(unittest.TestCase):
 
     def test_gen_result_perm_code_from_pieces(self):
         lines = []
-        lines.append("#cspec\n")
+        lines.append("#pspec\n")
 
         lines.append("trials:2\n")
         lines.append("permute:number=1-3\n")
@@ -63,7 +63,7 @@ class TestPooledResultsFile(unittest.TestCase):
         
     def test_gen_cluster_job_perm_code_from_pieces(self):
         lines = []
-        lines.append("#cspec\n")
+        lines.append("#pspec\n")
         lines.append("trials:2\n")
         lines.append("permute:number=1-3\n")
         lines.append("permute:letter=AAA,BBB\n")
@@ -93,7 +93,7 @@ class TestPooledResultsFile(unittest.TestCase):
          
     def test_generate_target_dirname(self):
         lines = []
-        lines.append("#cspec\n")
+        lines.append("#pspec\n")
         lines.append("permute:number=1-3\n")
         lines.append("permute:letter=AAA,BBB\n")
         lines.append("permute:singleton_val=300\n")
@@ -171,7 +171,7 @@ class TestPooledResultsFile(unittest.TestCase):
         
     def test_build_code_using_dictionary(self):
         lines = []
-        lines.append("#cspec\n")
+        lines.append("#pspec\n")
 
         lines.append("concise_print:letter,l\n")
         lines.append("concise_print:singleton_val,s\n")

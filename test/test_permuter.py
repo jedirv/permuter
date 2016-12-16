@@ -16,7 +16,7 @@ class TestPermuter(unittest.TestCase):
     COMMENTED OUT UNTIL WE RE_ENGAGE RESULTS COLLECTION
     def test_create_source_file_map(self):
         lines = []
-        lines.append("#cspec\n")
+        lines.append("#pspec\n")
         lines.append("trials:2\n")
         lines.append("permute:number=range(1,4)\n")
         lines.append("permute:letter=AAA,BBB\n")
@@ -171,7 +171,7 @@ class TestPermuter(unittest.TestCase):
         mc_system = mock_cluster_system.MockClusterSystem()
         mc_system.set_unittest_answers(answerkey)
         lines = []
-        lines.append("#cspec\n")
+        lines.append("#pspec\n")
         lines.append("trials:2\n")
         lines.append("permute:number=range(1,4)\n")
         lines.append("permute:letter=AAA,BBB\n")

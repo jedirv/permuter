@@ -182,7 +182,7 @@ class PermutationDriver(object):
                 f = open(full_path, 'r')
                 header = f.readline()
                 f.close()
-                if (header.startswith("#cspec")):
+                if (header.startswith("#pspec")):
                     cspec_paths.append(full_path)
         for path in cspec_paths:
             command = "python permuter.py {0} {1}".format(permuter_command, path)

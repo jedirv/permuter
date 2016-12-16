@@ -13,7 +13,7 @@ from permute import cluster_spec
 class TestCluster(unittest.TestCase):
     def setUp(self):
         lines = []
-        lines.append("#cspec\n")
+        lines.append("#pspec\n")
         lines.append("trials:1\n")
         lines.append("tag=_myTag\n")
         lines.append("permute:number=range(1,3)\n")

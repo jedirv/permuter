@@ -38,7 +38,7 @@ class ClusterSpec(object):
             self.cspec_name, file_ext  = cspec_filename.split('.')
             self.trials = self.load_special_value(self.lines, 'trials:')
             if self.trials == '':
-                self.trials = '1'
+                self.trials = 1
             self.permuters = load_permuters(self.lines, 'permute:', '(permute):')
             self.concise_print_map = self.load_concise_print_map(self.lines)
             
@@ -60,9 +60,10 @@ class ClusterSpec(object):
             if self.first_job_number == '':
                 self.first_job_number = '0'
 
-            self.launch_interval = self.load_special_value(self.lines, 'launch_interval:')
-            if self.launch_interval == '':
-                self.launch_interval = '0.5'
+            self.launch_interval = 0.1
+            launch_interval = self.load_special_value(self.lines, 'launch_interval:')
+            if not(launch_interval == ''):
+                self.launch_interval = launch_interval
                 
             self.output_filename = self.load_special_value(self.lines, 'output_filename:')
             

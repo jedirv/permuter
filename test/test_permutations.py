@@ -8,7 +8,7 @@ class TestPermuter(unittest.TestCase):
     def test_expand_permutations(self):
         stdout = mock_stdout.MockStdout()
         lines = []
-        lines.append("#cspec\n")
+        lines.append("#pspec\n")
         lines.append("permute:number=range(1,4)\n")
         lines.append("permute:letter=AAA,BBB\n")
         lines.append("permute:singleton_val=300\n")

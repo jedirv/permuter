@@ -31,7 +31,7 @@ class TestClusterSpec(unittest.TestCase):
         
     def test_load_cspec(self):
         lines = []
-        lines.append("#cspec\n")
+        lines.append("#pspec\n")
         lines.append("trials:2\n")
         lines.append("tag=_myTag\n")
         lines.append("(permute):number=range(1,4)\n") # new form
@@ -64,7 +64,7 @@ class TestClusterSpec(unittest.TestCase):
         lines.append("<replace>:tools_dir=<algs_dir>/tools\n")
         lines.append("<replace>:outfile_root=<pretty[(number)]>__TEST\n")
 
-        lines.append("root_dir:./myRuns\n")
+        lines.append("root_dir:/myRuns\n")
 
         lines.append("qsub_command:-q eecs,eecs1,eecs,share\n")
         lines.append("qsub_command:-M someone@gmail.com\n")
@@ -95,7 +95,7 @@ class TestClusterSpec(unittest.TestCase):
         #self.assertTrue(cspec.scores_y_axis==['letter'])
 
         #script_dir
-        self.assertTrue(cspec.script_dir=='./myRuns/baz/scripts')
+        self.assertTrue(cspec.script_dir=='/myRuns/baz/scripts')
         
         #trials:
         self.assertTrue(cspec.trials=='2')
@@ -107,7 +107,7 @@ class TestClusterSpec(unittest.TestCase):
         self.assertTrue(cspec.first_job_number == '100')
         
         #root_dir:
-        self.assertTrue(cspec.root_dir == './myRuns')
+        self.assertTrue(cspec.root_dir == '/myRuns')
 
 
         # permuters:
@@ -118,7 +118,7 @@ class TestClusterSpec(unittest.TestCase):
         self.assertTrue(cspec.permuters['letter'][1] == 'BBB')
         
         # generate_results_dir_for_permutation:
-        self.assertTrue(cspec.generate_results_dir_for_permutation('xyz_trial3') == './myRuns/baz/results/xyz_trial3')
+        self.assertTrue(cspec.generate_results_dir_for_permutation('xyz_trial3') == '/myRuns/baz/results/xyz_trial3')
         
         #concise_print_map:
         self.assertTrue(cspec.concise_print_map['letter'] == 'l')
@@ -171,7 +171,7 @@ class TestClusterSpec(unittest.TestCase):
        
     def test_load_cspec_with_white_spaces(self):
         lines = []
-        lines.append("#cspec \n")
+        lines.append("#pspec \n")
         lines.append("trials:\t2\n")
         lines.append("tag=_myTag \n")
         lines.append("(permute):number=range(1   , 4)\n") # new form
@@ -204,7 +204,7 @@ class TestClusterSpec(unittest.TestCase):
         lines.append("<replace>:tools_dir=<algs_di r>/tools\n")
         lines.append("<replace>:    outfile_root =     <pretty[(number)]>__TEST\n")
 
-        lines.append("root_dir:./myRuns\n")
+        lines.append("root_dir:/myRuns\n")
 
         lines.append("qsub_command:-q eecs,eecs1,eecs,share\n")
         lines.append("qsub_command:-M someone@gmail.com\n")
@@ -241,19 +241,19 @@ class TestClusterSpec(unittest.TestCase):
         #self.assertTrue(cspec.scores_y_axis==['letter'])
 
         #script_dir
-        self.assertTrue(cspec.script_dir=='./myRuns/baz/scripts')
+        self.assertTrue(cspec.script_dir=='/myRuns/baz/scripts')
         
         #trials:
         self.assertTrue(cspec.trials=='2')
     
-        #cspec_name:
+        #pspec_name:
         self.assertTrue(cspec.cspec_name=='baz')
             
         #first_job_number:
         self.assertTrue(cspec.first_job_number == '100')
         
         #root_dir:
-        self.assertTrue(cspec.root_dir == './myRuns')
+        self.assertTrue(cspec.root_dir == '/myRuns')
 
 
         # permuters:
@@ -264,7 +264,7 @@ class TestClusterSpec(unittest.TestCase):
         self.assertTrue(cspec.permuters['letter'][1] == 'BBB')
         
         # generate_results_dir_for_permutation:
-        self.assertTrue(cspec.generate_results_dir_for_permutation('xyz_trial_3') == './myRuns/baz/results/xyz_trial_3')
+        self.assertTrue(cspec.generate_results_dir_for_permutation('xyz_trial_3') == '/myRuns/baz/results/xyz_trial_3')
         
         #concise_print_map:
         self.assertTrue(cspec.concise_print_map['letter'] == 'l')
@@ -609,7 +609,7 @@ class TestClusterSpec(unittest.TestCase):
         f = open("./xyz.cspec", 'r')
         lines = f.readlines()
         f.close()
-        self.assertTrue(lines[0] == "#cspec\n")
+        self.assertTrue(lines[0] == "#pspec\n")
     
 if __name__ == '__main__':
     unittest.main()

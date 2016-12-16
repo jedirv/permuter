@@ -355,9 +355,6 @@ class Cluster(object):
             print "There was a problem executing command {0}".format(command)
             print "Return code was {0}".format(subprocess.CalledProcessError.returncode)
 
-    def get_time_delay(self):
-        return 1.5
-       
     def get_cluster_job_number(self, pcode):
         qil = self.get_invoke_log(pcode)
         return qil.cluster_job_number

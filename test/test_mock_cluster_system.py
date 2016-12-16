@@ -16,7 +16,7 @@ class TestMockClusterSystem(unittest.TestCase):
         mc_system.set_unittest_answers({})
         # set bogus cspec to satisfy method signature
         bogus_cspec_lines = []
-        bogus_cspec_lines.append("#cspec\n")
+        bogus_cspec_lines.append("#pspec\n")
         cspec = cluster_spec.ClusterSpec("/foo.cspec",bogus_cspec_lines,mc_system)
         mc_system.set_cluster_spec(cspec)
         self.assertTrue(mc_system.is_cluster_job_still_running("1", "na", "na") == False)
@@ -39,7 +39,7 @@ class TestMockClusterSystem(unittest.TestCase):
         mc_system.set_unittest_answers({})
         # set bogus cspec to satisfy method signature
         bogus_cspec_lines = []
-        bogus_cspec_lines.append("#cspec\n")
+        bogus_cspec_lines.append("#pspec\n")
         cspec = cluster_spec.ClusterSpec("/foo.cspec",bogus_cspec_lines,mc_system)
         mc_system.set_cluster_spec(cspec)
         mc_system.execute_command("foo")
