@@ -59,6 +59,11 @@ class ClusterSpec(object):
             self.first_job_number = self.load_special_value(self.lines, 'first_job_number:')
             if self.first_job_number == '':
                 self.first_job_number = '0'
+
+            self.launch_interval = self.load_special_value(self.lines, 'launch_interval:')
+            if self.launch_interval == '':
+                self.launch_interval = '0.5'
+                
             self.output_filename = self.load_special_value(self.lines, 'output_filename:')
             
             # disengage the scores_to and scores_from until we re-engage collection of results.
