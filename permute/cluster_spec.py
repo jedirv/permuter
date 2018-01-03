@@ -315,28 +315,120 @@ def is_string_a_float(val):
     except ValueError:
         return False
                
+def verify_optional_entry_present(lines, key, warnings, explanation):
+    result = True
+    key_count = 0;
+    for line in lines:
+        line = line.rstrip()
+        if (line.startswith(key)):
+            key_count = key_count + 1
+    if (key_count == 0):
+        warnings.append("WARNING: pspec missing entry for {0}. {1}".format(key, explanation))
+        result = False;
+    return result
+
+
+def verify_single_entry_present(lines, key, errors, explanation):
+    result = False
+    key_count = 0;
+    for line in lines:
+        line = line.rstrip()
+        if (line.startswith(key)):
+            key_count = key_count + 1
+    if (key_count == 0):
+        errors.append("ERROR: pspec missing line for {0}. {1}".format(key, explanation))
+    elif (key_count > 1):
+        errors.append("ERROR: pspec has multiple lines have the key {0}.  Should be only one".format(key))
+    else:
+        result = True
+    return result
+
+def verify_at_least_one_entry_present(lines, key, errors, explanation):
+    result = False
+    key_count = 0;
+    for line in lines:
+        line = line.rstrip()
+        if (line.startswith(key)):
+            key_count = key_count + 1
+    if (key_count == 0):
+        errors.append("ERROR: pspec missing line for {0}. {1}".format(key, explanation))
+    else:
+        result = True
+    return result
+        
+def verify_key_has_value(lines, key, errors):
+    result = True
+    value = "unknown"
+    for line in lines:
+        line = line.rstrip()
+        if (line.startswith(key)):
+	    statement_command, value = line.split(":")
+            if (value == "unknown" or value == "" or value == None):
+                result = False
+                errors.append("ERROR: pspec missing value for statement {0}".format(statement))
+    return result
                
 def validate(lines, stdout):
-    result_permute = validate_permute_entries(lines)
-    if not(result_permute):
-        stdout.println("problem found in permute statements")
-        
-    result_replace = validate_replace_entries(lines)
-    if not(result_replace):
-        stdout.println("problem found in replace statements")
+    errors = []
+    warnings = []
     
-    result_root_dir = validate_statement_present(lines,"root_dir:","some_dir", stdout)
-    if not(result_root_dir):
-        stdout.println("problem found in root_dir statement")
+    # root_dir
+    if (verify_single_entry_present(lines, "root_dir:", errors, "root_dir must be specified so files can be located/positioned")):
+        verify_key_has_value(lines, "root_dir:", errors)
+    # output_filename
+    if (verify_single_entry_present(lines, "output_filename:", errors, "output_filename must be specified so run status can be determined")):
+        verify_key_has_value(lines, "output_filename:", errors)
+    # (permute)
+    if (permute_declaration_present(lines)):
+    	result_permute = validate_permute_entries(lines, errors)
+    	if not(result_permute):
+            errors.append("ERROR - problem found in permute statements")
+    else:
+    	warnings.append("WARNING - no (permute) declaration present - only one script will be generated - no point using permuter!");
+    # <replace>
+    if (replace_declaration_present(lines)):    
+        result_replace = validate_replace_entries(lines, errors)
+        if not(result_replace):
+            errors.append("ERROR - problem found in replace statements")
+    else:
+        warnings.append("WARNING - no replace statements present.  Replace statements can make your pspec file more concise if pathname portions repeated")
     
-    result_scores_info = validate_scores_gathering_info(lines, stdout)
-    if not(result_scores_info):
-        stdout.println("problem found in scores gathering info entries")
-        
-    output_filename = validate_statement_present(lines, "output_filename:", "some_filename", stdout)
-    if not(output_filename):
-        stdout.println("problem found in output_filename: statement")
-    return result_permute and result_replace and result_root_dir and result_scores_info and output_filename
+    # not handline result
+    #result_scores_info = validate_scores_gathering_info(lines, stdout)
+    #if not(result_scores_info):
+    #    stdout.println("problem found in scores gathering info entries")
+    
+    #command
+    if (verify_at_least_one_entry_present(lines, "command:", errors, "Command statements express the program you want to launch.")):
+        verify_key_has_value(lines, "command:", errors)
+
+    #qsub_command:-q 
+    verify_single_entry_present(lines, "qsub_command:-q", errors, "cluster queues must be specified")
+    
+    #qsub_command:-cwd 
+    verify_single_entry_present(lines, "qsub_command:-cwd", errors, "causes job to be executed from current working directory")
+    
+    #concise_print
+    if (verify_optional_entry_present(lines, "concise_print:", warnings, "Specifying concise_print:argumentX=x will replace argumentX with x in filenames and run names.")):
+        verify_key_has_value(lines, "concise_print:", errors)	
+	
+    #trials
+    if (verify_optional_entry_present(lines, "trials:", warnings, "Specifying trials:n will give you n runs of each permutation.")):
+        verify_key_has_value(lines, "trials:", errors)
+	
+    #first_job_number
+    if (verify_optional_entry_present(lines, "first_job_number:", warnings, "Specifying first_job_number:n will start the job numbers at n")):
+        verify_key_has_value(lines, "first_job_number:", errors)
+	
+    #launch_interval
+    if (verify_optional_entry_present(lines, "launch_interval:", warnings, "Specifing launch_interval:1.5 would cause the qsub commands to be fired off every 1.5 seconds")):
+        verify_key_has_value(lines, "launch_interval:", errors)
+	
+    for error in errors:
+        stdout.println(error)
+    for warning in warnings:
+        stdout.println(warning)
+    return len(errors) == 0
 
 
 def validate_statement_present(lines, statement, val, stdout):
@@ -357,7 +449,7 @@ def validate_statement_present(lines, statement, val, stdout):
     return result
     
 
-def validate_replace_entries(lines):
+def validate_replace_entries(lines, errors):
     result = True
     for line in lines:
         line = line.rstrip()
@@ -366,30 +458,47 @@ def validate_replace_entries(lines):
             colon_count = line.count(':')
             if (colon_count != 1):
                 # should be one : 
-                print "<replace>:key=value - line malformed - {0}".format(line)
+                errors.append("<replace>:key=value - line malformed - {0}".format(line));
                 result = False
             else:
                 replace_command, keyVal = line.split(":")
                 equal_count = keyVal.count('=')
                 if (equal_count != 1):
                     # should be one =
-                    print "<replace>:key=value - line malformed - {0}".format(line)
+                    errors.append("<replace>:key=value - line malformed - {0}".format(line))
                     result = False
                 else:
                     key, val = keyVal.split('=')
                     # key has to be nonempty string
                     if (key == ""):
-                        print "<replace>:key=value - key must be non-empty string {0}".format(line)
+                        errors.append("<replace>:key=value - key must be non-empty string {0}".format(line))
                         result = False
                     elif (val == ""):
-                        print "<replace>:key=value - val must be non-empty string {0}".format(line)
+                        errors.append("<replace>:key=value - val must be non-empty string {0}".format(line))
                         result = False
                     else:
                         pass
     return result
     
+def permute_declaration_present(lines):
+    result = False;
+    for line in lines:
+        line = line.rstrip()
+        if (line.startswith("permute:") or line.startswith("(permute):")):
+	    result = True;
+    return result;
+    
+   
+def replace_declaration_present(lines):
+    result = False;
+    for line in lines:
+        line = line.rstrip()
+        if (line.startswith("<replace>:")):
+	    result = True;
+    return result;
+          
 
-def validate_permute_entries(lines):
+def validate_permute_entries(lines, errors):
     result = True
     for line in lines:
         line = line.rstrip()
@@ -398,11 +507,11 @@ def validate_permute_entries(lines):
             # should be 3 colons
             colon_count = line.count(':')
             if (colon_count != 1):
-                print "permute line malformed - {0} - should be permute:var=vals where vals can be:".format(line)
-                print "   range of integers with a space    range(1,5) (expanded to 1,2,3,4,5)"
-                print "   range of integers with a space    range(1,5,2) (expanded to 1,3,5)"
-                print "   single value                    x   (this exposes the value in the permutation code)"
-                print "   comma separated list of values  aa,bb,cc"
+                errors.append("permute line malformed - {0} - should be permute:var=vals where vals can be:".format(line))
+                errors.append("   range of integers with a space    range(1,5) (expanded to 1,2,3,4,5)")
+                errors.append("   range of integers with a space    range(1,5,2) (expanded to 1,3,5)")
+                errors.append("   single value                    x   (this exposes the value in the permutation code)")
+                errors.append("   comma separated list of values  aa,bb,cc")
                 result = False
             else:
                 permutecommand, permutation_info = line.split(':')
@@ -411,21 +520,21 @@ def validate_permute_entries(lines):
                     range_spec = permute_list_string[6:]
                     range_spec_length = len(range_spec)
                     if range_spec[range_spec_length - 1] != ')':
-                        print "range spec should be of form range(a,b) or range(a,b,c) : {0}".format(permute_list_string)
+                        errors.append("range spec should be of form range(a,b) or range(a,b,c) : {0}".format(permute_list_string))
                         result = False
                     else: 
                         nums = range_spec.strip(')')
                         numlist = nums.split(",")
                         for num in numlist:
                             if not num.isdigit():
-                                print "{0} is not an integer in range: {1}".format(num, line)
+                                errors.append("{0} is not an integer in range: {1}".format(num, line))
                                 result = False
                                 return
 
                         start = int(numlist[0])
                         end = int(numlist[1])
                         if (start > end):
-                            print "start or range is greater than end {0}".format(line)
+                            errors.append("start or range is greater than end {0}".format(line))
                             result = False
                             return
                         if (len(numlist) == 2):
@@ -433,12 +542,12 @@ def validate_permute_entries(lines):
                         elif (len(numlist) == 3):
                             stepInt = int(numlist[2])
                             if not end > stepInt:
-                                print "step interval must be less than range end {0}".format(line)
+                                errors.append("step interval must be less than range end {0}".format(line))
                                 result = False
                             else:
                                 result = True    
                         else:
-                            print "wrong number of digits in range expression - should be range(a,b) or range(a,b,c)"
+                            errors.append("wrong number of digits in range expression - should be range(a,b) or range(a,b,c)")
                             result = False
                 elif (permute_list_string.find(",") != -1):
                     # no way I can think of to mess this up

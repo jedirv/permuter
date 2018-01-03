@@ -211,14 +211,14 @@ class PermutationDriver(object):
                     cluster.create_script(pcode)
                 cluster.delete_all_but_script(pcode)
                 cluster.launch(pcode)
-                time.sleep(cluster_runs.cspec.launch_interval)
+                time.sleep(float(cluster_runs.cspec.launch_interval))
     
     def launch_scripts(self, cluster_runs, cluster, run_states):
         logging.info('LAUNCHING scripts')
         for pcode in cluster_runs.run_perm_codes_list:
             if run_states.is_ok_to_launch_run(pcode, cluster):
                 self.launch_script(pcode, cluster)
-                time.sleep(cluster_runs.cspec.launch_interval)
+                time.sleep(float(cluster_runs.cspec.launch_interval))
             
     def launch_script(self, pcode, cluster):
         cluster.delete_all_but_script(pcode)
