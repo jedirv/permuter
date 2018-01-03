@@ -24,7 +24,7 @@ class ClusterSpec(object):
         self.lines = lines
         try:
             if (len(lines) == 0):
-                print("cspec file empty:  {0}Exiting.".format(path))
+                print("pspec file empty:  {0}Exiting.".format(path))
             
             # verify first line has cspec flag
             header = lines[0]
@@ -76,9 +76,9 @@ class ClusterSpec(object):
             #self.scores_to = self.load_special_value(self.lines,'scores_to:')
             #self.scores_x_axis = self.load_list(self.lines, 'scores_x_axis:')
             #self.scores_y_axis = self.load_list(self.lines, 'scores_y_axis:')
-            #print "done loading cspec"
+            #print "done loading pspec"
         except IOError:
-            self.stdout.println("An error occurred trying to open cspec file {0}".format(path))
+            self.stdout.println("An error occurred trying to open pspec file {0}".format(path))
             exit()
 
     
