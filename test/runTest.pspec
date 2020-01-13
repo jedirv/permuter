@@ -1,7 +1,7 @@
 #pspec
 command:python <root>/run_test.py (x) (y) 5 <permutation_output_dir>
 
-<replace>:root=/nfs/stak/faculty/i/irvineje/permuterGH/test
+<replace>:root=/nfs/stak/users/irvineje/permuterGH/test
 
 (permute):x=range(1,5)
 (permute):y=1,2,3
