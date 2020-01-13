@@ -1,22 +1,14 @@
 #pspec
+command:python <root>/run_test.py (x) (y) 5 <permutation_output_dir>
+
+<replace>:root=/nfs/stak/faculty/i/irvineje/permuterGH/test
+
 (permute):x=range(1,5)
 (permute):y=1,2,3
 
-#
-# permutation-dependent mappings can be expressed like this.  These will be matched by 
-# using permutations like this:  <config[(month)]>
-#
-
-#
-<replace>:root=../test
-#<replace>:root=/nfs/stak/faculty/i/irvineje/permuterGH/test
-#
-#  results_dir is where the generated results will be
-#
 root_dir:<root>/runtest_out
-output_filename:run_test.csv
 
-command:python <root>/run_test.py (x) (y) 5 <permutation_output_dir>
+output_filename:run_test.csv
 
 qsub_command:-q eecs,share
 qsub_command:-cwd
