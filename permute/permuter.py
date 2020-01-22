@@ -75,6 +75,7 @@ def main():
     pdriver = permutation_driver.PermutationDriver(cspec_lines, cspec_path, true_stdout, hp_cluster)
     uu = user_usage.UserUsage()
     uu.log_command(permute_command, scope)
+
     pdriver.run_command(permute_command, scope)
 
 
@@ -99,9 +100,9 @@ def validate_cspec_is_cspec(cspec_path):
     try:
         f = open(cspec_path, 'r')
         # verify first line has cspec flag
-        header = f.readline()
-        if (header != "#pspec\n"):
-            print "pspec file must have this header:  '#pspec', {0} does not. Exiting.".format(cspec_path)
+        header = f.readline().strip()
+        if (header != "#pspec"):
+            print "pspec file must have this header:  '#pspec', {0} does not: {1} Exiting.".format(cspec_path, header)
             f.close()
             exit()
         f.close()
@@ -111,15 +112,15 @@ def validate_cspec_is_cspec(cspec_path):
   
 def usage():
     print "usage:  python permuter.py spec_help"
-    print"               # prints documentation for the cspec file contents."  
+    print"               # prints documentation for the pspec file contents."  
     print ""
     print "or"
     print ""
-    print "usage:  python permuter.py <path of cluster_spec> <command> [scope]  [-debug]"  # TODOadd [scope]
+    print "usage:  python permuter.py <path of permute_spec> <command> [scope]  [-debug]"  # TODOadd [scope]
     print ""
     print "   where some_command can be..."
-    print"        ...for generating a template cspec file" 
-    print"               new_spec               # generate a template cspec file the user can fill out"  
+    print"        ...for generating a template pspec file" 
+    print"               new_spec               # generate a template pspec file the user can fill out"  
     print""            
     print"        ...for actions to launch permutations"              
     print"               count                  # show the number of scripts that will be generated"                   
@@ -158,4 +159,4 @@ def usage():
     
 if __name__ == '__main__':
     main()
-    
+
