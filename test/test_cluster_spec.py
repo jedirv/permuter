@@ -374,26 +374,32 @@ class TestClusterSpec(unittest.TestCase):
         
     def test_validate_replaces(self):
         lines = []
+        errors = []
         lines.append("<replace>:=/nfs/foo/bar") # key missing
-        self.assertFalse(cluster_spec.validate_replace_entries(lines))
+        self.assertFalse(cluster_spec.validate_replace_entries(lines,errors))
         
         lines = []
+        errors = []
         lines.append("<replace>:foo=") # val missing
-        self.assertFalse(cluster_spec.validate_replace_entries(lines))
+        self.assertFalse(cluster_spec.validate_replace_entries(lines,errors))
         
         lines = []
+        errors = []
         lines.append("<replace>:root:/nfs/foo/bar") # colon count wrong
-        self.assertFalse(cluster_spec.validate_replace_entries(lines))
+        self.assertFalse(cluster_spec.validate_replace_entries(lines,errors))
         
         lines = []
+        errors = []
         lines.append("<replace>:root=/nfs/foo/bar") # correct
-        self.assertTrue(cluster_spec.validate_replace_entries(lines))
+        self.assertTrue(cluster_spec.validate_replace_entries(lines,errors))
         lines = []
+        errors = []
         lines.append("<replace>:root= /nfs/foo/bar") # correct with spaces
-        self.assertTrue(cluster_spec.validate_replace_entries(lines))
+        self.assertTrue(cluster_spec.validate_replace_entries(lines,errors))
         lines = []
+        errors = []
         lines.append("<replace>:root=/nfs/foo/bar ") # correct with spaces
-        self.assertTrue(cluster_spec.validate_replace_entries(lines))
+        self.assertTrue(cluster_spec.validate_replace_entries(lines,errors))
         
   
     def test_resolve_value(self):
