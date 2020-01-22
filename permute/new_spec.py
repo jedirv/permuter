@@ -72,5 +72,4 @@ class NewSpec(object):
         f.write("'qsub_command:' directives cause their values to be copied verbatim into the script,\n")
         f.write("# preceded by '#$'\n")
         f.write("qsub_command:-q eecs,eecs1,eecs,share\n")
-        f.write("qsub_command:-cwd\n")
         f.close() 

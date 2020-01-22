@@ -11,4 +11,3 @@ root_dir:<root>/runtest_out
 output_filename:run_test.csv
 
 qsub_command:-q eecs,share
-qsub_command:-cwd

@@ -26,6 +26,7 @@ class ClusterScript(PermutationDriverFile):
         f = open(self.pathname, 'w')
         f.write("#!/bin/csh\n")
         f.write("#\n")
+        f.write("#$ -cwd\n")
         for qsub_command in self.qsub_commands:
             f.write("#$ {0}\n".format(qsub_command))
         tag = ""
