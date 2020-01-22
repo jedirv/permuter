@@ -405,9 +405,6 @@ def validate(lines, stdout):
     #qsub_command:-q 
     verify_single_entry_present(lines, "qsub_command:-q", errors, "cluster queues must be specified")
     
-    #qsub_command:-cwd 
-    verify_single_entry_present(lines, "qsub_command:-cwd", errors, "causes job to be executed from current working directory")
-    
     #concise_print
     if (verify_optional_entry_present(lines, "concise_print:", warnings, "Specifying concise_print:argumentX=x will replace argumentX with x in filenames and run names.")):
         verify_key_has_value(lines, "concise_print:", errors)	
