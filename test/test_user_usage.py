@@ -7,7 +7,7 @@ import unittest
 import getpass
 import os
 
-from permute import user_usage
+import user_usage
 
 class TestUserUsage(unittest.TestCase):
 

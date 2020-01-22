@@ -4,7 +4,7 @@ Created on Jan 10, 2014
 @author: admin-jed
 '''
 import unittest
-from permute import ranked_results_file
+import ranked_results_file
  
 class TestRankedResultsFile(unittest.TestCase):
 

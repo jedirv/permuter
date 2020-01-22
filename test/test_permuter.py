@@ -4,10 +4,10 @@ Created on Dec 12, 2013
 @author: admin-jed
 '''
 import unittest, os
-from permute import cluster_spec
-from permute import permuter
-from permute import permutation_driver
-from permute import cluster_runs_info
+import cluster_spec
+import permuter
+import permutation_driver
+import cluster_runs_info
 import mock_stdout
 
 class TestPermuter(unittest.TestCase):
