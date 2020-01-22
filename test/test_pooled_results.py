@@ -15,10 +15,10 @@ class TestPooledResultsFile(unittest.TestCase):
     def test_gather_file_permuters(self):
         lines = []
         lines.append("#pspec\n")
-        lines.append("permute:number=1-3\n")
-        lines.append("permute:letter=AAA,BBB\n")
-        lines.append("permute:singleton_val=300\n")
-        lines.append("permute:animal=dog,cat\n")
+        lines.append("(permute):number=1-3\n")
+        lines.append("(permute):letter=AAA,BBB\n")
+        lines.append("(permute):singleton_val=300\n")
+        lines.append("(permute):animal=dog,cat\n")
 
         lines.append("scores_permute:resolution=userDay,userMonth\n")
         lines.append("scores_from:file=<permutation_output_dir>/(resolution).csv,column_name=auc,row_number=1\n")
@@ -39,10 +39,10 @@ class TestPooledResultsFile(unittest.TestCase):
         lines.append("#pspec\n")
 
         lines.append("trials:2\n")
-        lines.append("permute:number=1-3\n")
-        lines.append("permute:letter=AAA,BBB\n")
-        lines.append("permute:singleton_val=300\n")
-        lines.append("permute:animal=dog,cat\n")
+        lines.append("(permute):number=1-3\n")
+        lines.append("(permute):letter=AAA,BBB\n")
+        lines.append("(permute):singleton_val=300\n")
+        lines.append("(permute):animal=dog,cat\n")
         lines.append("concise_print:animal,an\n")
         lines.append("concise_print:letter,l\n")
         lines.append("concise_print:singleton_val,s\n")
@@ -65,10 +65,10 @@ class TestPooledResultsFile(unittest.TestCase):
         lines = []
         lines.append("#pspec\n")
         lines.append("trials:2\n")
-        lines.append("permute:number=1-3\n")
-        lines.append("permute:letter=AAA,BBB\n")
-        lines.append("permute:singleton_val=300\n")
-        lines.append("permute:animal=dog,cat\n")
+        lines.append("(permute):number=1-3\n")
+        lines.append("(permute):letter=AAA,BBB\n")
+        lines.append("(permute):singleton_val=300\n")
+        lines.append("(permute):animal=dog,cat\n")
         lines.append("concise_print:animal,an\n")
         lines.append("concise_print:letter,l\n")
         lines.append("concise_print:singleton_val,s\n")
@@ -94,10 +94,10 @@ class TestPooledResultsFile(unittest.TestCase):
     def test_generate_target_dirname(self):
         lines = []
         lines.append("#pspec\n")
-        lines.append("permute:number=1-3\n")
-        lines.append("permute:letter=AAA,BBB\n")
-        lines.append("permute:singleton_val=300\n")
-        lines.append("permute:animal=dog,cat\n")
+        lines.append("(permute):number=1-3\n")
+        lines.append("(permute):letter=AAA,BBB\n")
+        lines.append("(permute):singleton_val=300\n")
+        lines.append("(permute):animal=dog,cat\n")
         
         lines.append("concise_print:animal,an\n")
         lines.append("concise_print:letter,l\n")

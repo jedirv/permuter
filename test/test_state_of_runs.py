@@ -18,7 +18,7 @@ class TestStateOfRuns(unittest.TestCase):
         self.lines.append("trials:1\n")
         self.lines.append("tag=_myTag\n")
         self.lines.append("(permute):number=1,2\n") # new form
-        self.lines.append("permute:letter=A,B\n")
+        self.lines.append("(permute):letter=A,B\n")
         self.lines.append("concise_print:number,n\n")
         self.lines.append("concise_print:letter,l\n")
 

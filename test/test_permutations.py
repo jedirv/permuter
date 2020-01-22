@@ -9,10 +9,10 @@ class TestPermuter(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         lines = []
         lines.append("#pspec\n")
-        lines.append("permute:number=range(1,4)\n")
-        lines.append("permute:letter=AAA,BBB\n")
-        lines.append("permute:singleton_val=300\n")
-        lines.append("permute:animal=dog,cat\n")
+        lines.append("(permute):number=range(1,4)\n")
+        lines.append("(permute):letter=AAA,BBB\n")
+        lines.append("(permute):singleton_val=300\n")
+        lines.append("(permute):animal=dog,cat\n")
         cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout)
         
         permuters = cspec.permuters
