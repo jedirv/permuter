@@ -29,7 +29,7 @@ class SpecHelp(object):
         print("                AND hardcode the output filename")
         print("                     OR")
         print("             2. allow the output filepath to be passed in as an argument")
-        print("                in which case the output_filename is appended to the")
+        print("                in which case append the output_filename to the ")
         print("                <permutation_result_dir> string like this: ")
         print("                <permutation_result_dir>/outfile.txt")
         print("        This enables status commands to function")
