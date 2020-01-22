@@ -507,7 +507,7 @@ def validate_permute_entries(lines, errors):
             # should be 3 colons
             colon_count = line.count(':')
             if (colon_count != 1):
-                errors.append("permute line malformed - {0} - should be permute:var=vals where vals can be:".format(line))
+                errors.append("permute line malformed - {0} - should be (permute):var=vals where vals can be:".format(line))
                 errors.append("   range of integers with a space    range(1,5) (expanded to 1,2,3,4,5)")
                 errors.append("   range of integers with a space    range(1,5,2) (expanded to 1,3,5)")
                 errors.append("   single value                    x   (this exposes the value in the permutation code)")
