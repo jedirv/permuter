@@ -213,7 +213,7 @@ class TestSystem(unittest.TestCase):
         lines.append('trials:1\n')
         lines.append('permute:x=range(1,5)\n')
         lines.append('scores_from:file=<permutation_output_dir>/run_test.csv,column_name=auc,row_number=1\n')
-        lines.append('scores_to:/nfs/stak/students/i/irvine/python/cluster/test/runtest_out/collected_results\n')
+        lines.append('scores_to:/nfs/stak/users/irvineje/python/cluster/test/runtest_out/collected_results\n')
         lines.append('#\n')
         lines.append('# permutation-dependent mappings can be expressed like this.  These will be matched by \n')
         lines.append('# using permutations like this:  <config[(month)]>\n')

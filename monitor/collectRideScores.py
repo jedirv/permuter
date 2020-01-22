@@ -37,7 +37,7 @@ def createResultFile(months, perm_sets, fv, resolution):
     # write header
     header = "month,"
     for perm_set in perm_sets:
-        perm_set_dir = "/nfs/guille/bugid/adams/prodigalNet/cluster_perms/{0}".format(perm_set)
+        perm_set_dir = "/nfs/ride_dir/cluster_perms/{0}".format(perm_set)
         perm_set_subdir_list = os.listdir(perm_set_dir)
         sorted_perm_set_subdir_list = alphanum_sort(perm_set_subdir_list)
         for perm_set_subdir in sorted_perm_set_subdir_list:
@@ -50,12 +50,12 @@ def createResultFile(months, perm_sets, fv, resolution):
         aucs = []
         line = "{0},".format(month)
         for perm_set in perm_sets:
-            perm_set_dir = "/nfs/guille/bugid/adams/prodigalNet/cluster_perms/{0}".format(perm_set)
+            perm_set_dir = "/nfs/ride_dir/cluster_perms/{0}".format(perm_set)
             perm_set_subdir_list = os.listdir(perm_set_dir)
             sorted_perm_set_subdir_list = alphanum_sort(perm_set_subdir_list)
             for perm_set_subdir in sorted_perm_set_subdir_list:
                 print "...{0} {1} {2}".format(perm_set_subdir, perm_set, month)
-                result_path = "/nfs/guille/bugid/adams/prodigalNet/cluster_perms/{0}/{1}/{2}/{3}RIDE/score_out_{4}.csv".format(perm_set, perm_set_subdir, month, fv, resolution)
+                result_path = "/nfs/ride_dir/cluster_perms/{0}/{1}/{2}/{3}RIDE/score_out_{4}.csv".format(perm_set, perm_set_subdir, month, fv, resolution)
                 if (os.path.isfile(result_path)):
                     print "load result from {0}".format(result_path)
                     result_file = open(result_path, 'r')

@@ -18,7 +18,7 @@ import os
 #concise_print:BBB,bb
 #scores_permute:resolution=userDay,userMonth
 def main():
-    dir = '/nfs/stak/students/i/irvine/python/cluster/test/sample_results/unittest'
+    dir = '/some_dir/test/sample_results/unittest'
     if os.path.isdir(dir):
         shutil.rmtree(dir)
     trials = ['1','2']

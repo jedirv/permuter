@@ -29,18 +29,18 @@ concise_print:AlUdCoUq,CoUq
 <replace>:pretty[AlUdCoUq]=DTAllUdCoUvq
 #
 <replace>:permutation_set_name=ride_s_1_k_5_t_0.1_f_0.05
-<replace>:fv_root=/nfs/guille/bugid/adams/prodigalNet/fv
+<replace>:fv_root=/nfs/ride_dir/fv
 <replace>:fv_dir=<fv_root>/(month)/<config[(month)]>/(fv_type)
-<replace>:algs_dir=/nfs/guille/bugid/adams/prodigalNet/seward/git/framework/algorithms/osu/R-algos
+<replace>:algs_dir=/nfs/ride_dir/seward/git/framework/algorithms/osu/R-algos
 <replace>:tools_dir=<algs_dir>/tools
-<replace>:results_root=/nfs/guille/bugid/adams/prodigalNet/cluster_perms/<permutation_set_name>
-<replace>:answer_key_dir=/nfs/guille/bugid/adams/answerKeys
+<replace>:results_root=/nfs/ride_dir/cluster_perms/<permutation_set_name>
+<replace>:answer_key_dir=/nfs/ride_dir/answerKeys
 <replace>:results_dir=<results_root>/<permutation_set_name>/(month)/(fv_type)RIDE
 <replace>:outfile_root=<pretty[(fv_type)]>__RIDE
 #
 #  dir_script is where the generated scripts will be
 #
-script_dir:/nfs/stak/students/i/irvine/cluster/scripts_<permutation_set_name><tag>
+script_dir:/nfs/ride_dir/scripts_<permutation_set_name><tag>
 #
 qsub_command:-q eecs,eecs1,eecs,share
 qsub_command:-M jedirv@gmail.com
