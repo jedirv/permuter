@@ -4,9 +4,9 @@ Created on Oct 26, 2016
 @author: Jed Irvine
 '''
 import unittest
-from permute import cluster_spec
-from permute import state_of_runs
-from permute import cluster_runs_info
+import cluster_spec
+import state_of_runs
+import cluster_runs_info
 import mock_stdout
 import mock_cluster
 

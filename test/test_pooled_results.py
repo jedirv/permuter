@@ -4,10 +4,10 @@ Created on Nov 26, 2013
 @author: admin-jed
 '''
 import unittest
-from permute import pooled_results_file
-from permute import pooled_results_delta_file
-from permute import pooled_timings_file
-from permute import cluster_spec
+import pooled_results_file
+import pooled_results_delta_file
+import pooled_timings_file
+import cluster_spec
 import mock_stdout
 
 class TestPooledResultsFile(unittest.TestCase):

@@ -1,8 +1,8 @@
 import unittest, os
-from permute import cluster_spec
-from permute import cluster_script
-from permute import permutation_driver
-from permute import cluster_runs_info
+import cluster_spec
+import cluster_script
+import permutation_driver
+import cluster_runs_info
 import mock_stdout
 import mock_cluster
 from __builtin__ import True

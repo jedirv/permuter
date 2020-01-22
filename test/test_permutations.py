@@ -1,6 +1,6 @@
 import unittest
-from permute import cluster_spec
-from permute import permutations
+import cluster_spec
+import permutations
 import mock_stdout
 
 class TestPermuter(unittest.TestCase):

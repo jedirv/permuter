@@ -1,5 +1,5 @@
 import unittest
-from permute import cluster_spec
+import cluster_spec
 import mock_stdout
 
 class TestClusterSpec(unittest.TestCase):
