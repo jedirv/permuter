@@ -210,7 +210,7 @@ class TestClusterSpec(unittest.TestCase):
         lines.append("qsub_command:-M someone@gmail.com\n")
         lines.append("qsub_command:-m beas\n")
         lines.append("first_job_number:100 \n")
-
+        lines.append("output_filename:(letter)_(number)_<pretty[(number)]>.txt\n")
         lines.append("command:echo (letter) (number) (singleton_val) > <permutation_output_dir>/(letter)_(number)_<pretty[(number)]>.txt\n")
         stdout = mock_stdout.MockStdout()
         
