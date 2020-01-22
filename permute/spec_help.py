@@ -109,7 +109,7 @@ class SpecHelp(object):
         print("#       SPECIAL CASE - what if the algorithm you wrote expects a single argument that is a comma separated list?")
         print("#       For this, we've added an escaped-comma syntax that works like this:")
         print("#       permute declaration looks like this:      (permute):1_comma_foo,2,3")
-        print("#       resolved argument would look like :       1,foo
+        print("#       resolved argument would look like :       1,foo  ")
         print("#       this value would be represented in ppermutation code a.k.a pcode as: '1-foo'")
         print("############################################################################")
         print("permute:t_val=1,2,3")
