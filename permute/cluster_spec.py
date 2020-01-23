@@ -426,6 +426,8 @@ def validate(lines, stdout):
         stdout.println(error)
     for warning in warnings:
         stdout.println(warning)
+    for missing_optional in missing_optionals:
+        logging.info(missing_optional)
     return len(errors) == 0
 
 
