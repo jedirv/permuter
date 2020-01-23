@@ -315,7 +315,7 @@ def is_string_a_float(val):
     except ValueError:
         return False
                
-def verify_optional_entry_present(lines, key, warnings, explanation):
+def verify_optional_entry_present(lines, key, missing_optionals, explanation):
     result = True
     key_count = 0;
     for line in lines:
@@ -323,7 +323,7 @@ def verify_optional_entry_present(lines, key, warnings, explanation):
         if (line.startswith(key)):
             key_count = key_count + 1
     if (key_count == 0):
-        warnings.append("WARNING: pspec missing entry for {0}. {1}".format(key, explanation))
+        missing_optionals.append("WARNING: pspec missing entry for {0}. {1}".format(key, explanation))
         result = False;
     return result
 
@@ -371,6 +371,7 @@ def verify_key_has_value(lines, key, errors):
 def validate(lines, stdout):
     errors = []
     warnings = []
+    missing_optionals = []
     
     # root_dir
     if (verify_single_entry_present(lines, "root_dir:", errors, "root_dir must be specified so files can be located/positioned")):
@@ -406,19 +407,19 @@ def validate(lines, stdout):
     verify_single_entry_present(lines, "qsub_command:-q", errors, "cluster queues must be specified")
     
     #concise_print
-    if (verify_optional_entry_present(lines, "concise_print:", warnings, "Specifying concise_print:argumentX=x will replace argumentX with x in filenames and run names.")):
+    if (verify_optional_entry_present(lines, "concise_print:", missing_optionals, "Specifying concise_print:argumentX=x will replace argumentX with x in filenames and run names.")):
         verify_key_has_value(lines, "concise_print:", errors)	
 	
     #trials
-    if (verify_optional_entry_present(lines, "trials:", warnings, "Specifying trials:n will give you n runs of each permutation.")):
+    if (verify_optional_entry_present(lines, "trials:", missing_optionals, "Specifying trials:n will give you n runs of each permutation.")):
         verify_key_has_value(lines, "trials:", errors)
 	
     #first_job_number
-    if (verify_optional_entry_present(lines, "first_job_number:", warnings, "Specifying first_job_number:n will start the job numbers at n")):
+    if (verify_optional_entry_present(lines, "first_job_number:", missing_optionals, "Specifying first_job_number:n will start the job numbers at n")):
         verify_key_has_value(lines, "first_job_number:", errors)
 	
     #launch_interval
-    if (verify_optional_entry_present(lines, "launch_interval:", warnings, "Specifing launch_interval:1.5 would cause the qsub commands to be fired off every 1.5 seconds")):
+    if (verify_optional_entry_present(lines, "launch_interval:", missing_optionals, "Specifing launch_interval:1.5 would cause the qsub commands to be fired off every 1.5 seconds")):
         verify_key_has_value(lines, "launch_interval:", errors)
 	
     for error in errors:
