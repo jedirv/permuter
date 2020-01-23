@@ -323,7 +323,7 @@ def verify_optional_entry_present(lines, key, missing_optionals, explanation):
         if (line.startswith(key)):
             key_count = key_count + 1
     if (key_count == 0):
-        missing_optionals.append("WARNING: pspec missing entry for {0}. {1}".format(key, explanation))
+        missing_optionals.append("MISSING OPTIONAL DECLARATION: pspec missing entry for {0}. {1}".format(key, explanation))
         result = False;
     return result
 
