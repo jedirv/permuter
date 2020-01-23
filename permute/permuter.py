@@ -116,7 +116,7 @@ def usage():
     print ""
     print "or"
     print ""
-    print "usage:  python permuter.py <path of permute_spec> <command> [scope]  [-debug]"  # TODOadd [scope]
+    print "usage:  python permuter.py <path of permute_spec> <command> [-debug]" 
     print ""
     print "   where some_command can be..."
     print"        ...for generating a template pspec file" 
