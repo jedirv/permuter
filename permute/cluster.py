@@ -322,7 +322,7 @@ class Cluster(object):
         err_pathname = "{0}.err".format(cscript.script_path_root)
         if (os.path.exists(err_pathname)):
             os.unlink(err_pathname)
-        out_pathname = "{0}.err".format(cscript.script_path_root)
+        out_pathname = "{0}.out".format(cscript.script_path_root)
         if (os.path.exists(out_pathname)):
             os.unlink(out_pathname)
 
