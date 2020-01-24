@@ -217,7 +217,6 @@ class PermutationDriver(object):
         logging.info('LAUNCHING scripts')
         for pcode in cluster_runs.run_perm_codes_list:
             self.stop_run(pcode, cluster_runs, cluster)
-            cluster.delete_all_but_script(pcode)
             self.launch_script(pcode, cluster)
             time.sleep(float(cluster_runs.cspec.launch_interval))
             
