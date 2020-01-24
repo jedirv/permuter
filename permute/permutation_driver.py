@@ -84,11 +84,8 @@ class PermutationDriver(object):
         elif (permute_command == "stop"):
             self.stop_runs(cluster_runs, cluster)
             
-        elif (permute_command == "clean_scripts"):
-            self.clean_scripts(cluster_runs, cluster)
-            
-        elif (permute_command == "clean_results"):
-            self.clean_results(cluster_runs, cluster)
+        elif (permute_command == "clean_slate"):
+            self.clean_slate(cluster_runs, cluster)
             
         #elif (permute_command == "clean_pooled_results"):
         #    clean_pooled_results(cluster_runs, cluster)
@@ -246,10 +243,10 @@ class PermutationDriver(object):
         count = cluster_runs.get_permutation_count()
         stdout.println('{0} scripts in play'.format(count))
     
-    
-    def clean_results(self, cluster_runs, cluster):
-        for pcode in cluster_runs.run_perm_codes_list:
-            cluster.delete_results(pcode)
+    def clean_slate(self, cluster_runs, cluster):
+        self.stop_runs(cluster_runs, cluster)
+        cluster.clean_out_dir(self.cspec.job_results_dir)
+        cluster.clean_out_dir(self.cspec.script_dir)
         
     def clean_pooled_results(self, cluster_runs, cluster):
         cluster.delete_pooled_results()

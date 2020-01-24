@@ -90,7 +90,7 @@ def validate_args(command, scope):
         return
     if (command == 'launch_job' or command == 'stat_job' or command == 'stop_job' or command == 'clean_job'):
         return  #arg checking done downstream
-    if (command == 'clean_scripts' or command == 'clean_results'):
+    if (command == 'clean_slate'):
         return
     usage()
     exit()
@@ -139,6 +139,7 @@ def usage():
     print"        ...for actions to run after permutations have launched"               
     print"               stop                   # call qdel on any runs that are unfinished to abort them"   
     print"               clean_runs             # stop running jobs, clean everything but scripts" 
+    print"               clean_slate            # stop running jobs, clean everything" 
     #print"               collect                # created pooled results from results"  
     print""      
     print"        ...surgical commands that are normally handled in aggregate"
@@ -146,8 +147,6 @@ def usage():
     print"               stat_job j<#>          # show the status of desired permutation run"
     print"               stop_job j<#>          # call qdel on any runs that are unfinished to abort them"
     print"               clean_job j<#>         # clean downstream files for job"                    
-    print"               clean_scripts          # clean the launch scripts and associated .out, .err, and .qil files"          
-    print"               clean_results          # clean only the contents of <permutation_output_dir>" 
     #print"               clean_pooled_results   # clean only the pooled results"           
     print""
     print""
