@@ -318,6 +318,13 @@ class Cluster(object):
         # we always get the qstat_log fresh regardless, so no need to clean
         self.delete_done_marker(pcode)
         self.delete_results(pcode)
+        cscript = self.cluster_runs.get_script_for_perm_code(pcode)
+        err_pathname = "{0}.err".format(cscript.script_path_root)
+        if (os.path.exists(err_pathname)):
+            os.unlink(err_pathname)
+        out_pathname = "{0}.err".format(cscript.script_path_root)
+        if (os.path.exists(out_pathname)):
+            os.unlink(out_pathname)
 
     def clean_out_dir(self,dirpath):
         if not(os.path.exists(dirpath)):
