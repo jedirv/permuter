@@ -32,7 +32,7 @@ class PermutationDriver(object):
             self.launch_scripts(cluster_runs, cluster, run_states)
         #elif (permute_command == "auto"):
         #    run_states.assess_all_runs(cluster_runs, cluster)
-        #    if (run_states.is_ok_to_launch_all(cluster_runs, cluster)):
+        #    if (run_states.is_none_waiting_or_running(cluster_runs, cluster)):
         #       stdout.println("Permutation jobs still running.  Use 'stop' to stop them before 'auto' to avoid replicated jobs")
         #    else:
         #        generate_scripts(cluster_runs)
@@ -49,7 +49,7 @@ class PermutationDriver(object):
         elif (permute_command == "test_launch"):
             pcode = cluster_runs.run_perm_codes_list[0]
             run_states.assess_run(pcode, cluster_runs, cluster)
-            if run_states.is_ok_to_launch_run(pcode,cluster):
+            if run_states.is_not_waiting_or_running(pcode,cluster):
                 cluster.launch(pcode)
           
         #elif (permute_command == "collect"):
@@ -216,9 +216,10 @@ class PermutationDriver(object):
     def launch_scripts(self, cluster_runs, cluster, run_states):
         logging.info('LAUNCHING scripts')
         for pcode in cluster_runs.run_perm_codes_list:
-            if run_states.is_ok_to_launch_run(pcode, cluster):
-                self.launch_script(pcode, cluster)
-                time.sleep(float(cluster_runs.cspec.launch_interval))
+            self.stop_run(pcode, cluster_runs, cluster)
+            cluster.delete_all_but_script(pcode)
+            self.launch_script(pcode, cluster)
+            time.sleep(float(cluster_runs.cspec.launch_interval))
             
     def launch_script(self, pcode, cluster):
         cluster.delete_all_but_script(pcode)
