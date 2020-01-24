@@ -29,7 +29,7 @@ class PermutationDriverFile(object):
         self.key_val_map['permutation_output_dir'] = self.resolved_results_dir
         self.user_job_number = user_job_number
         self.script_dir = cspec.script_dir
-	if (not(os.path.isdir(self.script_dir))):
+        if (not(os.path.isdir(self.script_dir))):
             os.makedirs(self.script_dir)
 
         self.qsub_invoke_log = "{0}.qil".format(self.get_job_file_name())
