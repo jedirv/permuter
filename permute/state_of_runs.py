@@ -364,10 +364,10 @@ class StateOfRuns(object):
         #message = "{0}\n".format(message)
         stdout.println(message)
 
-    def is_ok_to_launch_all(self,cluster_runs, cluster):
+    def is_none_waiting_or_running(self,cluster_runs, cluster):
         result = True
         for pcode in cluster_runs.run_perm_codes_list:
-            if not(self.is_ok_to_launch_run(pcode, cluster)):
+            if not(self.is_not_waiting_or_running(pcode, cluster)):
                 result = False
         return result
 
@@ -386,7 +386,7 @@ class StateOfRuns(object):
             return True
         
         
-    def is_ok_to_launch_run(self, pcode, cluster):
+    def is_not_waiting_or_running(self, pcode, cluster):
         if cluster.is_waiting(pcode) or cluster.is_running(pcode):
             return False
         return True
