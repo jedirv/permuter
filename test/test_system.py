@@ -1074,35 +1074,35 @@ class TestSystem(unittest.TestCase):
         cluster.test_helper_set_run_finished_complete('x_2_trial_1')
         cluster.test_helper_set_run_finished_complete('x_3_trial_1')
         cluster.test_helper_set_run_finished_complete('x_4_trial_1')
-        pdriver.run_command('clean_results','')
-        # (after clean_results) summary 
-        stdout.lines = []
-        pdriver.run_command('summary','')
-        self.assertTrue(stdout.lines[0] == "....\n")
-        self.assertTrue(stdout.lines[1] == "baz\t-\t4 runs total\n")
-        self.assertTrue(stdout.lines[2] == "output files missing: 4\n")
-        self.assertTrue(len(stdout.lines) == 3)
-        # (after clean_results) stat 
-        stdout.lines = []
-        pdriver.run_command('stat','')
-        self.assertTrue(stdout.lines[0] == "1\tx_1_trial_1\tresults missing\t(done marker found, but no results)\t-> troubleshoot, then retry\n")
-        self.assertTrue(stdout.lines[1] == "2\tx_2_trial_1\tresults missing\t(done marker found, but no results)\t-> troubleshoot, then retry\n")
-        self.assertTrue(stdout.lines[2] == "3\tx_3_trial_1\tresults missing\t(done marker found, but no results)\t-> troubleshoot, then retry\n")
-        self.assertTrue(stdout.lines[3] == "4\tx_4_trial_1\tresults missing\t(done marker found, but no results)\t-> troubleshoot, then retry\n")
-        # (after clean_results) pending
-        stdout.lines = []
-        pdriver.run_command('pending','')
-        self.assertTrue(stdout.lines[0] == "1\tx_1_trial_1\tresults missing\t(done marker found, but no results)\t-> troubleshoot, then retry\n")
-        self.assertTrue(stdout.lines[1] == "2\tx_2_trial_1\tresults missing\t(done marker found, but no results)\t-> troubleshoot, then retry\n")
-        self.assertTrue(stdout.lines[2] == "3\tx_3_trial_1\tresults missing\t(done marker found, but no results)\t-> troubleshoot, then retry\n")
-        self.assertTrue(stdout.lines[3] == "4\tx_4_trial_1\tresults missing\t(done marker found, but no results)\t-> troubleshoot, then retry\n")
-        # (after clean_results) errors
-        stdout.lines = []
-        pdriver.run_command('errors','')
-        self.assertTrue(stdout.lines[0] == "1\tx_1_trial_1\tresults missing\t(done marker found, but no results)\t-> troubleshoot, then retry\n")
-        self.assertTrue(stdout.lines[1] == "2\tx_2_trial_1\tresults missing\t(done marker found, but no results)\t-> troubleshoot, then retry\n")
-        self.assertTrue(stdout.lines[2] == "3\tx_3_trial_1\tresults missing\t(done marker found, but no results)\t-> troubleshoot, then retry\n")
-        self.assertTrue(stdout.lines[3] == "4\tx_4_trial_1\tresults missing\t(done marker found, but no results)\t-> troubleshoot, then retry\n")         
+        # pdriver.run_command('clean_results','')
+        # # (after clean_results) summary 
+        # stdout.lines = []
+        # pdriver.run_command('summary','')
+        # self.assertTrue(stdout.lines[0] == "....\n")
+        # self.assertTrue(stdout.lines[1] == "baz\t-\t4 runs total\n")
+        # self.assertTrue(stdout.lines[2] == "output files missing: 4\n")
+        # self.assertTrue(len(stdout.lines) == 3)
+        # # (after clean_results) stat 
+        # stdout.lines = []
+        # pdriver.run_command('stat','')
+        # self.assertTrue(stdout.lines[0] == "1\tx_1_trial_1\tresults missing\t(done marker found, but no results)\t-> troubleshoot, then retry\n")
+        # self.assertTrue(stdout.lines[1] == "2\tx_2_trial_1\tresults missing\t(done marker found, but no results)\t-> troubleshoot, then retry\n")
+        # self.assertTrue(stdout.lines[2] == "3\tx_3_trial_1\tresults missing\t(done marker found, but no results)\t-> troubleshoot, then retry\n")
+        # self.assertTrue(stdout.lines[3] == "4\tx_4_trial_1\tresults missing\t(done marker found, but no results)\t-> troubleshoot, then retry\n")
+        # # (after clean_results) pending
+        # stdout.lines = []
+        # pdriver.run_command('pending','')
+        # self.assertTrue(stdout.lines[0] == "1\tx_1_trial_1\tresults missing\t(done marker found, but no results)\t-> troubleshoot, then retry\n")
+        # self.assertTrue(stdout.lines[1] == "2\tx_2_trial_1\tresults missing\t(done marker found, but no results)\t-> troubleshoot, then retry\n")
+        # self.assertTrue(stdout.lines[2] == "3\tx_3_trial_1\tresults missing\t(done marker found, but no results)\t-> troubleshoot, then retry\n")
+        # self.assertTrue(stdout.lines[3] == "4\tx_4_trial_1\tresults missing\t(done marker found, but no results)\t-> troubleshoot, then retry\n")
+        # # (after clean_results) errors
+        # stdout.lines = []
+        # pdriver.run_command('errors','')
+        # self.assertTrue(stdout.lines[0] == "1\tx_1_trial_1\tresults missing\t(done marker found, but no results)\t-> troubleshoot, then retry\n")
+        # self.assertTrue(stdout.lines[1] == "2\tx_2_trial_1\tresults missing\t(done marker found, but no results)\t-> troubleshoot, then retry\n")
+        # self.assertTrue(stdout.lines[2] == "3\tx_3_trial_1\tresults missing\t(done marker found, but no results)\t-> troubleshoot, then retry\n")
+        # self.assertTrue(stdout.lines[3] == "4\tx_4_trial_1\tresults missing\t(done marker found, but no results)\t-> troubleshoot, then retry\n")         
            
           
     def test_status_clean_scripts(self):
