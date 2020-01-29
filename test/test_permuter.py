@@ -37,7 +37,7 @@ class TestPermuter(unittest.TestCase):
         
         lines.append("root_dir:/foo/myRuns\n")
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout, [], False, False)
         source_file_map = cluster_runs_info.create_source_file_map(cspec)
         #print source_file_map
         #self.assertTrue(len(source_file_map.keys()) == 24)
@@ -193,7 +193,7 @@ class TestPermuter(unittest.TestCase):
         lines.append("first_job_number:0")
         lines.append("command:")
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec",lines,stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec",lines,stdout, [], False, False)
         mc_system.set_cluster_spec(cspec)
         #folder = './collected_results'
         # generate 

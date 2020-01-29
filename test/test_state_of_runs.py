@@ -40,7 +40,7 @@ class TestStateOfRuns(unittest.TestCase):
     def test_assess_run_______before_run(self):
         #pcode = 'l_A_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
@@ -63,7 +63,7 @@ class TestStateOfRuns(unittest.TestCase):
     def test_assess_run_______after_cleanup(self):
         #pcode = 'l_A_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
@@ -84,7 +84,7 @@ class TestStateOfRuns(unittest.TestCase):
     def test_assess_run__S____(self):
         #pcode = 'l_A_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
@@ -115,7 +115,7 @@ class TestStateOfRuns(unittest.TestCase):
     def test_assess_run___L___(self):
         #pcode = 'l_A_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
@@ -146,7 +146,7 @@ class TestStateOfRuns(unittest.TestCase):
     def test_assess_run__SL___(self):
         #pcode = 'l_A_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
@@ -177,7 +177,7 @@ class TestStateOfRuns(unittest.TestCase):
     def test_assess_run____B__(self):
         #pcode = 'l_A_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
@@ -211,7 +211,7 @@ class TestStateOfRuns(unittest.TestCase):
     def test_assess_run__S_B__(self):
         #pcode = 'l_A_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
@@ -244,7 +244,7 @@ class TestStateOfRuns(unittest.TestCase):
     def test_assess_run___LB__(self):
         #pcode = 'l_A_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
@@ -277,7 +277,7 @@ class TestStateOfRuns(unittest.TestCase):
     def test_assess_run__SLB__(self):
         #pcode = 'l_A_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
@@ -309,7 +309,7 @@ class TestStateOfRuns(unittest.TestCase):
     def test_assess_run_____D_(self):
         #pcode = 'l_A_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
@@ -348,7 +348,7 @@ class TestStateOfRuns(unittest.TestCase):
     def test_assess_run__S__D_(self):
         #pcode = 'l_A_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
@@ -379,7 +379,7 @@ class TestStateOfRuns(unittest.TestCase):
     def test_assess_run___L_D_(self):
         #pcode = 'l_A_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
@@ -410,7 +410,7 @@ class TestStateOfRuns(unittest.TestCase):
     def test_assess_run__SL_D_(self):
         #pcode = 'l_A_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
@@ -440,7 +440,7 @@ class TestStateOfRuns(unittest.TestCase):
     def test_assess_run____BD_(self):
         #pcode = 'l_A_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
@@ -473,7 +473,7 @@ class TestStateOfRuns(unittest.TestCase):
     def test_assess_run__S_BD_(self):
         #pcode = 'l_A_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
@@ -505,7 +505,7 @@ class TestStateOfRuns(unittest.TestCase):
     def test_assess_run___LBD_(self):
         #pcode = 'l_A_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
@@ -538,7 +538,7 @@ class TestStateOfRuns(unittest.TestCase):
     def test_assess_run__SLBD_(self):
         #pcode = 'l_A_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
@@ -570,7 +570,7 @@ class TestStateOfRuns(unittest.TestCase):
     def test_assess_run______O(self):
         #pcode = 'l_A_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
@@ -606,7 +606,7 @@ class TestStateOfRuns(unittest.TestCase):
     def test_assess_run__S___O(self):
         #pcode = 'l_A_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
@@ -637,7 +637,7 @@ class TestStateOfRuns(unittest.TestCase):
     def test_assess_run___L__O(self):
         #pcode = 'l_A_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
@@ -668,7 +668,7 @@ class TestStateOfRuns(unittest.TestCase):
     def test_assess_run__SL__O(self):
         #pcode = 'l_A_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
@@ -698,7 +698,7 @@ class TestStateOfRuns(unittest.TestCase):
     def test_assess_run____B_O(self):
         #pcode = 'l_A_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
@@ -731,7 +731,7 @@ class TestStateOfRuns(unittest.TestCase):
     def test_assess_run__S_B_O(self):
         #pcode = 'l_A_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
@@ -763,7 +763,7 @@ class TestStateOfRuns(unittest.TestCase):
     def test_assess_run___LB_O(self):
         #pcode = 'l_A_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
@@ -795,7 +795,7 @@ class TestStateOfRuns(unittest.TestCase):
     def test_assess_run__SLB_O(self):
         #pcode = 'l_A_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
@@ -826,7 +826,7 @@ class TestStateOfRuns(unittest.TestCase):
     def test_assess_run_____DO(self):
         #pcode = 'l_A_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
@@ -858,7 +858,7 @@ class TestStateOfRuns(unittest.TestCase):
     def test_assess_run__S__DO(self):
         #pcode = 'l_A_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
@@ -888,7 +888,7 @@ class TestStateOfRuns(unittest.TestCase):
     def test_assess_run___L_DO(self):
         #pcode = 'l_A_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
@@ -918,7 +918,7 @@ class TestStateOfRuns(unittest.TestCase):
     def test_assess_run____BDO(self):
         #pcode = 'l_A_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
@@ -950,7 +950,7 @@ class TestStateOfRuns(unittest.TestCase):
     def test_assess_run__S_BDO(self):
         #pcode = 'l_A_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
@@ -981,7 +981,7 @@ class TestStateOfRuns(unittest.TestCase):
     def test_assess_run___LBDO(self):
         #pcode = 'l_A_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
@@ -1012,7 +1012,7 @@ class TestStateOfRuns(unittest.TestCase):
     def test_assess_run__SLBDO(self):
         #pcode = 'l_A_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
@@ -1043,7 +1043,7 @@ class TestStateOfRuns(unittest.TestCase):
     def test_assess_run__SL_DO(self):
         #pcode = 'l_A_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
@@ -1072,7 +1072,7 @@ class TestStateOfRuns(unittest.TestCase):
     def test_assess_run__SC(self):
         #pcode = 'l_A_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list
@@ -1093,7 +1093,7 @@ class TestStateOfRuns(unittest.TestCase):
     def test_assess_run___C(self):
         #pcode = 'l_A_n_1_trial_1'
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pcodes = cluster_runs.run_perm_codes_list

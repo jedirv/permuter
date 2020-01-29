@@ -56,7 +56,7 @@ class TestSystem(unittest.TestCase):
         
     def test_preview(self):
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         perm_driver = permutation_driver.PermutationDriver(self.lines, "/foo/bar/baz.cspec", stdout, cluster)
@@ -87,7 +87,7 @@ class TestSystem(unittest.TestCase):
       
     def test_generate(self):
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", self.lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         perm_driver = permutation_driver.PermutationDriver(self.lines, "/foo/bar/baz.cspec",stdout, cluster)
@@ -167,7 +167,7 @@ class TestSystem(unittest.TestCase):
         lines.append("command:echo (letter) (number) (singleton_val) > <permutation_output_dir>/(letter)_(number)_<pretty[(number)]>.txt\n")
         
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         perm_driver = permutation_driver.PermutationDriver(self.lines, "/foo/bar/baz.cspec",stdout, cluster)
@@ -243,7 +243,7 @@ class TestSystem(unittest.TestCase):
         #self.state_codes['se 0 ile 0 rpb 0 dme 0 ofe 0'] = 'script missing'
         stdout = mock_stdout.MockStdout()
         lines = self.get_lines_for_simpleCaseCspec()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec", stdout, cluster)
@@ -255,7 +255,7 @@ class TestSystem(unittest.TestCase):
     def test_status_clean_slate(self):
         stdout = mock_stdout.MockStdout()
         lines = self.get_lines_for_simpleCaseCspec()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec", stdout, cluster)
@@ -291,7 +291,7 @@ class TestSystem(unittest.TestCase):
     def test_status_generate(self):
         stdout = mock_stdout.MockStdout()
         lines = self.get_lines_for_simpleCaseCspec()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec", stdout, cluster)
@@ -336,7 +336,7 @@ class TestSystem(unittest.TestCase):
     def test_status_test_launch(self):
         stdout = mock_stdout.MockStdout()
         lines = self.get_lines_for_simpleCaseCspec()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec", stdout, cluster)
@@ -379,7 +379,7 @@ class TestSystem(unittest.TestCase):
     def test_status_launch_after_test_launch(self):
         stdout = mock_stdout.MockStdout()
         lines = self.get_lines_for_simpleCaseCspec()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec", stdout, cluster)
@@ -432,7 +432,7 @@ class TestSystem(unittest.TestCase):
     def test_status_running(self):
         stdout = mock_stdout.MockStdout()
         lines = self.get_lines_for_simpleCaseCspec()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec", stdout, cluster)
@@ -474,7 +474,7 @@ class TestSystem(unittest.TestCase):
     def test_status_results_no_done_marker(self):
         stdout = mock_stdout.MockStdout()
         lines = self.get_lines_for_simpleCaseCspec()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec", stdout, cluster)
@@ -519,7 +519,7 @@ class TestSystem(unittest.TestCase):
     def test_status_problems1(self):
         stdout = mock_stdout.MockStdout()
         lines = self.get_lines_for_simpleCaseCspec()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec", stdout, cluster)
@@ -580,7 +580,7 @@ class TestSystem(unittest.TestCase):
     def test_status_retry(self):
         stdout = mock_stdout.MockStdout()
         lines = self.get_lines_for_simpleCaseCspec()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec", stdout, cluster)
@@ -647,7 +647,7 @@ class TestSystem(unittest.TestCase):
     def test_status_stop(self):
         stdout = mock_stdout.MockStdout()
         lines = self.get_lines_for_simpleCaseCspec()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec", stdout, cluster)
@@ -700,7 +700,7 @@ class TestSystem(unittest.TestCase):
     def test_status_clean(self):
         stdout = mock_stdout.MockStdout()
         lines = self.get_lines_for_simpleCaseCspec()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec", stdout, cluster)
@@ -755,7 +755,7 @@ class TestSystem(unittest.TestCase):
     def test_status_single_jobs(self):
         stdout = mock_stdout.MockStdout()
         lines = self.get_lines_for_simpleCaseCspec()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec", stdout, cluster)
@@ -889,7 +889,7 @@ class TestSystem(unittest.TestCase):
     def test_status_single_jobs_as_pcode(self):
         stdout = mock_stdout.MockStdout()
         lines = self.get_lines_for_simpleCaseCspec()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec", stdout, cluster)
@@ -1022,7 +1022,7 @@ class TestSystem(unittest.TestCase):
     def test_status_complete_runs(self):
         stdout = mock_stdout.MockStdout()
         lines = self.get_lines_for_simpleCaseCspec()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec", stdout, cluster)
@@ -1065,7 +1065,7 @@ class TestSystem(unittest.TestCase):
     def test_status_clean_results(self):
         stdout = mock_stdout.MockStdout()
         lines = self.get_lines_for_simpleCaseCspec()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec", stdout, cluster)
@@ -1115,7 +1115,7 @@ class TestSystem(unittest.TestCase):
     def test_status_clean_scripts(self):
         stdout = mock_stdout.MockStdout()
         lines = self.get_lines_for_simpleCaseCspec()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines, stdout, [], False, False)
         cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, stdout)
         cluster = mock_cluster.MockCluster(cluster_runs, stdout)
         pdriver = permutation_driver.PermutationDriver(lines, "/foo/bar/baz.cspec", stdout, cluster)

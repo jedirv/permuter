@@ -14,7 +14,7 @@ class PermutationDriver(object):
     
     def __init__(self,cspec_lines, cspec_path, stdout, cluster):
         self.cluster = cluster
-        self.cspec = cluster_spec.ClusterSpec(cspec_path, cspec_lines, stdout)
+        self.cspec = cluster_spec.ClusterSpec(cspec_path, cspec_lines, stdout, [], False, False)
         self.cluster_runs = cluster_runs_info.ClusterRunsInfo(self.cspec, stdout)
         self.cspec_path = cspec_path
         self.stdout = stdout

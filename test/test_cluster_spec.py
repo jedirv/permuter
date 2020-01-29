@@ -73,7 +73,7 @@ class TestClusterSpec(unittest.TestCase):
 
         lines.append("command:echo (letter) (number) (singleton_val) > <permutation_output_dir>/(letter)_(number)_<pretty[(number)]>.txt\n")
         stdout = mock_stdout.MockStdout()
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines,stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines,stdout, [], False, False)
         #print self.cspec.concise_print_map
         # concise_name
         self.assertTrue(cspec.get_concise_name('number') == 'number')
@@ -214,11 +214,13 @@ class TestClusterSpec(unittest.TestCase):
         stdout = mock_stdout.MockStdout()
         
         #complain until output_filename added
-        self.assertFalse(cluster_spec.validate(lines, stdout))
+        validated, foo = cluster_spec.validate(lines, stdout)
+        self.assertFalse(validated)
         lines.append("output_filename:(letter)_(number)_<pretty[(number)]>.txt\n")
-        self.assertTrue(cluster_spec.validate(lines, stdout))
+        validated, foo = cluster_spec.validate(lines, stdout)
+        self.assertTrue(validated)
         
-        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines,stdout)
+        cspec = cluster_spec.ClusterSpec("/foo/bar/baz.cspec", lines,stdout, [], False, False)
         #print self.cspec.concise_print_map
         # concise_name
         self.assertTrue(cspec.get_concise_name('number') == 'number')

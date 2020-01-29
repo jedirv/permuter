@@ -15,7 +15,7 @@ class ClusterSpec(object):
     Wraps the cluster specification file *.cspec
     '''
     
-    def __init__(self, path, lines, stdout):
+    def __init__(self, path, lines, stdout, missing_optionals, init_logging, is_debug):
         '''
         Constructor
         '''
@@ -36,15 +36,36 @@ class ClusterSpec(object):
             
             cspec_filename = os.path.basename(self.path)
             self.cspec_name, file_ext  = cspec_filename.split('.')
+
+            self.key_val_map , info_for_debug_logging = self.load_replaces(self.lines)
+            self.root_dir = self.load_dir(self.lines, "root_dir:")
+            self.root_dir = os.path.abspath(self.root_dir)
+
+            # set up logging 
+            if init_logging:
+                log_dir = os.path.join(self.root_dir, self.cspec_name)
+                logging_level = logging.INFO
+                if (is_debug):
+                    logging_level = logging.DEBUG
+                if (not(os.path.isdir(log_dir))):
+                    os.makedirs(log_dir)
+                logging.basicConfig(filename='{0}/permuter.log'.format(log_dir), filemode='w', level=logging_level)
+                logging.info("=========== pspec file contents... ===========")
+                logging.info(self.lines)
+                logging.info("=========== unused OPTIONAL pspec fields... ===========")
+                logging.info("")
+                for missing_optional in missing_optionals:
+                    logging.info(missing_optional)
+                logging.info("")
+                logging.info("=========== processing pspec fields... ===========")
+                logging.debug(info_for_debug_logging)    
             self.trials = self.load_special_value(self.lines, 'trials:')
             if self.trials == '':
                 self.trials = 1
             self.permuters = load_permuters(self.lines, 'permute:', '(permute):')
             self.concise_print_map = self.load_concise_print_map(self.lines)
             
-            self.key_val_map = self.load_replaces(self.lines)
-            self.root_dir = self.load_dir(self.lines, "root_dir:")
-            self.root_dir = os.path.abspath(self.root_dir)
+            
             self.job_results_dir = "{0}/{1}/{2}".format(self.root_dir, self.cspec_name, 'results')
             # put the results_dir into the kvm so that permutation calculation wil find it
             self.key_val_map['root_dir'] = self.root_dir
@@ -159,6 +180,7 @@ class ClusterSpec(object):
     
     
     def load_replaces(self, lines):
+        info_for_debug_logging = []
         key_val_map = {}
         # set default tag as empty string
         key_val_map['tag'] = ""
@@ -168,15 +190,15 @@ class ClusterSpec(object):
             if (line.startswith("#")):
                 pass
             elif (line.startswith("<replace>")):
-                logging.debug("  processing keyVal line - {0}".format(line))
+                info_for_debug_logging.append("  processing keyVal line - {0}".format(line))
                 replace_command, keyVal = line.split(":")
                 key, val = keyVal.split("=")
                 val = resolve_value(key_val_map, val)
                 key_val_map[key] = val
             else:
                 pass
-        logging.debug("  key_val_map {0}".format(key_val_map))
-        return key_val_map        
+        info_for_debug_logging.append("  key_val_map {0}".format(key_val_map))
+        return key_val_map , info_for_debug_logging       
     
 
     def load_qsub_commands(self, lines):
@@ -426,9 +448,7 @@ def validate(lines, stdout):
         stdout.println(error)
     for warning in warnings:
         stdout.println(warning)
-    for missing_optional in missing_optionals:
-        logging.info(missing_optional)
-    return len(errors) == 0
+    return len(errors) == 0, missing_optionals
 
 
 def validate_statement_present(lines, statement, val, stdout):

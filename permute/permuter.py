@@ -49,16 +49,6 @@ def main():
         uu = user_usage.UserUsage()
         uu.log_command(permute_command,'')
         exit()
-        
-   
-    # set up logging 
-    home_dir_permuter = os.path.expanduser('~/permuter')
-    logging_level = logging.INFO
-    if (debug):
-        logging_level = logging.DEBUG
-    if (not(os.path.isdir(home_dir_permuter))):
-        os.makedirs(home_dir_permuter)
-    logging.basicConfig(filename='{0}/permuter.log'.format(home_dir_permuter), filemode='w', level=logging_level)
     
     validate_args(permute_command, scope)
     validate_cspec_is_cspec(cspec_path)
@@ -67,9 +57,10 @@ def main():
     cspec_lines = f.readlines()
     f.close()
     true_stdout = stdout.Stdout()
-    if (not(cluster_spec.validate(cspec_lines, true_stdout))):
+    validated, missing_optionals = cluster_spec.validate(cspec_lines, true_stdout)
+    if not(validated):
         exit()
-    cspec = cluster_spec.ClusterSpec(cspec_path, cspec_lines, true_stdout)
+    cspec = cluster_spec.ClusterSpec(cspec_path, cspec_lines, true_stdout, missing_optionals, True, debug)
     cluster_runs = cluster_runs_info.ClusterRunsInfo(cspec, true_stdout)
     hp_cluster = cluster.Cluster(cluster_runs, true_stdout)
     pdriver = permutation_driver.PermutationDriver(cspec_lines, cspec_path, true_stdout, hp_cluster)
@@ -150,7 +141,7 @@ def usage():
     #print"               clean_pooled_results   # clean only the pooled results"           
     print""
     print""
-    print"  -debug will enable DEBUG level logging which is 'INFO' level by default.  Log sent to ~/permuter/permuter.log"                      
+    print"  -debug will enable DEBUG level logging which is 'INFO' level by default.  Log sent to <root_dir>/<spec_name>/permuter.log"                      
     #print"               stat_all               # show the summary status of all specs."                                     
     #print"               stat_full_all          # show the status of each permutation run for all specs."                                     
     #print"               stat_pending_all       # show the status of each permutation run that is not finished for all specs"   
