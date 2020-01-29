@@ -45,6 +45,7 @@ $ mkdir cluster
 $ cd cluster
 $ git clone https://github.com/jedirv/permuter.git
 $ cd permuter
+$ git checkout v1.0
 $ cd permute
 $ python permuter.py   // to show usage statement
 ```
