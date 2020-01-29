@@ -41,8 +41,8 @@ $ source pnv27/bin/activate
 ```
 To intsall permuter, make sure you clone it into a directory visible from the submit-host:
 ```
-$ mkdir cluster
-$ cd cluster
+$ mkdir <some_dir>
+$ cd <some_dir>
 $ git clone https://github.com/jedirv/permuter.git
 $ cd permuter
 $ git checkout v1.0
