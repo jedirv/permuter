@@ -245,6 +245,9 @@ class PermutationDriver(object):
     
     def clean_slate(self, cluster_runs, cluster):
         self.stop_runs(cluster_runs, cluster)
+        parent_dir = os.path.abspath(os.path.join(self.cspec.script_dir, os.pardir))
+        command = "rm -rf {0}/*.log".format(parent_dir)
+        os.system(command)
         cluster.clean_out_dir(self.cspec.job_results_dir)
         cluster.clean_out_dir(self.cspec.script_dir)
         
